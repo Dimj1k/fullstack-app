@@ -12,7 +12,6 @@ import { CreateUserService } from './create-user.service'
 export class CreateUserController {
     constructor(private readonly createUserService: CreateUserService) {}
 
-    @UsePipes(new ValidationPipe())
     @Post('/cache')
     create(@Body() createCreateUserDto: CreateUserDto) {
         delete createCreateUserDto.passwordConfirm
