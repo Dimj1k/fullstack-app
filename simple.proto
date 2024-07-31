@@ -9,5 +9,5 @@ message test2 {
 }
 
 service serv {
-    rpc Changenumber (test1) returns (test2) {}
+    rpc Changenum (test1) returns (test2) {}
 }
