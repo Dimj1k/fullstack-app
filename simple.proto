@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message test1 {
+    int64 testVar = 1;
+}
+
+message test2 {
+    int64 testVariable = 2;
+}
+
+service serv {
+    rpc Changenumber (test1) returns (test2) {}
+}

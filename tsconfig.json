@@ -16,14 +16,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
-    "paths": {
-      "~configs/*": ["src/configs/*"],
-      "~constants/*": ["src/constants/*"],
-      "~entities/*": ["src/entities/*"],
-      "~decorators/*": ["src/decorators/*"],
-      "~subscribers/*": ["src/subscribers/*"],
-      "~interceptors/*": ["src/interceptors/*"]
-    }
+    "noFallthroughCasesInSwitch": false
   }
 }

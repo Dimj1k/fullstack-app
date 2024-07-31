@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": false,
+    "outDir": "../../dist/apps/test-type-orm",
+    "paths": {
+      "~configs/*": [
+        "./configs/*"
+      ],
+      "~constants/*": [
+        "./constants/*"
+      ],
+      "~entities/*": [
+        "./entities/*"
+      ],
+      "~decorators/*": [
+        "./decorators/*"
+      ],
+      "~subscribers/*": [
+        "./subscribers/*"
+      ],
+      "~interceptors/*": [
+        "./interceptors/*"
+      ]
+    }
+  },
+  "include": ["root/**/*"],
+  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"],
+}
