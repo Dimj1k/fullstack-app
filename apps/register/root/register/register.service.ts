@@ -19,7 +19,6 @@ export class RegisterService {
         createUserDto: CreateUserDto,
     ): Promise<{ url: urlId }> {
         let url = this.generateIdUrl()
-        createUserDto.password = await hash(createUserDto.password, 10)
         let createdUser = this.userRepository.create({ ...createUserDto, url })
         this.userRepository.insert(createdUser)
         return { url: url }
