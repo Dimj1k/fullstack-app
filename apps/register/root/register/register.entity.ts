@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer'
 import {
     Column,
     CreateDateColumn,
@@ -5,6 +6,7 @@ import {
     ObjectId,
     ObjectIdColumn,
 } from 'typeorm'
+import { Token } from '../dtos/register-token.dto'
 enum GENDER {
     MALE,
     FEMALE,
@@ -27,6 +29,7 @@ export class CacheUserInfo {
 @Entity()
 export class CacheUser {
     @ObjectIdColumn()
+    @Exclude()
     _id: ObjectId
 
     @Column()
@@ -39,10 +42,16 @@ export class CacheUser {
     info: CacheUserInfo
 
     @Column()
-    url: string
+    @Exclude()
+    token: Token
 
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date
+    @CreateDateColumn()
+    @Exclude()
+    createdAt: Date = new Date()
+
+    constructor(partial?: Partial<CacheUser>) {
+        Object.assign(this, partial)
+    }
 }
 
 export const ENTITIES = [CacheUser]

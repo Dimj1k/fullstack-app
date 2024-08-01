@@ -10,7 +10,7 @@ async function bootstrap() {
     app.disable('x-powered-by')
     app.enableShutdownHooks()
     app.useGlobalPipes(new ValidationPipe())
-
     await app.listen(3000)
 }
 AppClusterService.clusterize(bootstrap, 2)
+// bootstrap()

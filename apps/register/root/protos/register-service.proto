@@ -14,8 +14,8 @@ message UserInfoDto {
     optional GENDER gender = 2;
 }
 
-message UrlId {
-    string url = 1;
+message Token {
+    string token = 1;
 }
 
 message CreateUserDto {
@@ -28,5 +28,6 @@ message CreateUserDto {
 }
 
 service RegisterController {
-    rpc createInCacheUser (CreateUserDto) returns (UrlId) {}
+    rpc createInCacheUser (CreateUserDto) returns (Token) {}
+    rpc returnByTokenUser (Token) returns (CreateUserDto) {}
 }

@@ -1,5 +1,5 @@
 import { Exclude, Transform } from 'class-transformer'
-import { GENDER, User } from '../../entities/user/user.entity'
+import { GENDER, User } from '../entities/user/user.entity'
 
 export class UserInfo {
     @Exclude()

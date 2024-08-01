@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { UserModule } from './user/user.module'
 import { POSTGRES_SUBSCRIBERS } from './subscribers'
-import { POSTGRES_ENTITIES } from './entities/user'
+import { POSTGRES_ENTITIES } from './entities'
 
 @Module({
     imports: [
@@ -34,5 +34,6 @@ import { POSTGRES_ENTITIES } from './entities/user'
     ],
     controllers: [AppController],
     providers: [AppService],
+    exports: [ConfigModule],
 })
 export class AppModule {}

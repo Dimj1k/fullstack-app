@@ -1,13 +1,12 @@
 import { Type } from 'class-transformer'
 import {
     IsString,
-    MaxLength,
     IsDateString,
     IsOptional,
     IsEnum,
     ValidateNested,
 } from 'class-validator'
-import { GENDER } from '../../entities/user/user.entity'
+import { GENDER } from '../entities/user/user.entity'
 
 export class UpdateUserInfoDto {
     @IsDateString()
@@ -21,7 +20,6 @@ export class UpdateUserInfoDto {
 
 export class UpdateUserDto {
     @IsString()
-    @MaxLength(60)
     @IsOptional()
     email?: string
 

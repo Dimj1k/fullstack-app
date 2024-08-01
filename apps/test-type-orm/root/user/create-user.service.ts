@@ -3,6 +3,8 @@ import { CreateUserDto } from '../dto/create-user.dto'
 import { Client, ClientGrpc, Transport } from '@nestjs/microservices'
 import { RegisterController } from '../interfaces/register-controller.interface'
 import { join } from 'path'
+import { Metadata } from '@grpc/grpc-js'
+import { RegisterToken } from '../dto/register-token.dto'
 
 @Injectable()
 export class CreateUserService implements OnModuleInit {
@@ -12,12 +14,7 @@ export class CreateUserService implements OnModuleInit {
         options: {
             url: 'localhost:3001',
             package: 'register',
-            protoPath: join(
-                __dirname,
-                'user',
-                'protos',
-                'register-service.proto',
-            ),
+            protoPath: join(__dirname, 'protos', 'register-service.proto'),
         },
     })
     client: ClientGrpc
@@ -27,7 +24,11 @@ export class CreateUserService implements OnModuleInit {
             this.client.getService<RegisterController>('RegisterController')
     }
 
-    async createInCacheUser(createCreateUserDto: CreateUserDto) {
-        return this.registerService.createInCacheUser(createCreateUserDto)
+    async createInCacheUser(createUserDto: CreateUserDto, metadata?: Metadata) {
+        return this.registerService.createInCacheUser(createUserDto)
+    }
+
+    async returnByTokenUser(token: RegisterToken) {
+        return this.registerService.returnByTokenUser(token)
     }
 }

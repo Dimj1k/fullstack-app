@@ -1,4 +1,4 @@
-import { Transform, Type } from 'class-transformer'
+import { Type } from 'class-transformer'
 import { IsDateString, IsEnum, IsString, ValidateNested } from 'class-validator'
 
 enum GENDER {
@@ -17,11 +17,9 @@ export class UserInfoDto {
 
 export class CreateUserDto {
     @IsString()
-    // @Transform((params) => params.value.trim())
     email: string
 
     @IsString()
-    // @Transform((params) => params.value.trim())
     password: string
 
     @Type(() => UserInfoDto)

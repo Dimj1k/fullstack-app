@@ -45,7 +45,7 @@ export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string
 
-    @Column({ type: 'varchar', length: 60 })
+    @Column({ type: 'varchar' })
     email: string
 
     @Column({ type: 'text', name: 'password_hash' })
@@ -68,9 +68,6 @@ export class User {
         type: 'timestamp without time zone',
     })
     updatedDate: Date
-
-    @VirtualColumn({ query: (alias) => `SELECT 2 + 2` })
-    calc: number
 
     @RelationId((user: User) => user.info, 'info_id')
     infoId: string

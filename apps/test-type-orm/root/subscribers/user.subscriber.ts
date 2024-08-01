@@ -1,4 +1,3 @@
-import { hash } from 'bcrypt'
 import { subDays } from 'date-fns'
 import {
     EntitySubscriberInterface,
@@ -16,10 +15,9 @@ export class UserSubscriber implements EntitySubscriberInterface<User> {
     async beforeInsert(event: InsertEvent<User>): Promise<void> {
         const { entity, manager } = event
         entity.updatedDate = entity.createdDate = subDays(new Date(), 4)
-        entity.password = await hash(entity.password, 5)
     }
 
     async beforeRemove(event: RemoveEvent<User>): Promise<void> {
-        console.log(`${event.entityId} удалён`)
+        console.log(`удалён`)
     }
 }

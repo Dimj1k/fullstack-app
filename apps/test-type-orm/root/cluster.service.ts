@@ -12,7 +12,6 @@ export class AppClusterService {
     static clusterize(callback: Function, cpuLimit: number = numCPUs): void {
         process.on('uncaughtException', (err) => {
             logger.error(err)
-            process.exit(1)
         })
         if (cluster.isPrimary) {
             if (cpuLimit > numCPUs || cpuLimit < 1) cpuLimit = numCPUs
