@@ -34,6 +34,5 @@ import { POSTGRES_ENTITIES } from './entities'
     ],
     controllers: [AppController],
     providers: [AppService],
-    exports: [ConfigModule],
 })
 export class AppModule {}

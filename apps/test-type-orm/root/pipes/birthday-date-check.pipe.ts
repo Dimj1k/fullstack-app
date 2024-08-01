@@ -5,7 +5,7 @@ import {
     HttpException,
     HttpStatus,
 } from '@nestjs/common'
-import { CreateUserDto } from '../dto/create-user.dto'
+import { CreateUserDto } from '../dto/user/create-user.dto'
 
 const assert = require('node:assert')
 

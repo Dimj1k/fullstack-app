@@ -5,8 +5,8 @@ import {
     IsString,
     ValidateNested,
 } from 'class-validator'
-import { Match } from '../decorators/match.decorator'
-import { GENDER } from '../entities/user/user.entity'
+import { Match } from '../../decorators/match.decorator'
+import { GENDER } from '../../entities/user/user.entity'
 import { Type } from 'class-transformer'
 
 export class UserInfo {

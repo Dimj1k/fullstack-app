@@ -1,10 +1,10 @@
 import { Injectable, OnModuleInit } from '@nestjs/common'
-import { CreateUserDto } from '../dto/create-user.dto'
+import { CreateUserDto } from '../dto/user/create-user.dto'
 import { Client, ClientGrpc, Transport } from '@nestjs/microservices'
 import { RegisterController } from '../interfaces/register-controller.interface'
 import { join } from 'path'
 import { Metadata } from '@grpc/grpc-js'
-import { RegisterToken } from '../dto/register-token.dto'
+import { RegisterToken } from '../dto/user/register-token.dto'
 
 @Injectable()
 export class CreateUserService implements OnModuleInit {

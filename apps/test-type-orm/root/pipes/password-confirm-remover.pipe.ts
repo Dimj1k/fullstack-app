@@ -1,5 +1,5 @@
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common'
-import { CreateUserDto } from '../dto/create-user.dto'
+import { CreateUserDto } from '../dto/user/create-user.dto'
 
 @Injectable()
 export class PasswordConfirmRemover implements PipeTransform {

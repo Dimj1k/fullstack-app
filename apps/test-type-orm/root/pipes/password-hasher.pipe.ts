@@ -1,11 +1,14 @@
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common'
-import { CreateUserDto } from '../dto/create-user.dto'
-import { hash } from 'bcrypt'
+import { CreateUserDto } from '../dto/user/create-user.dto'
+import { crypt } from '../utils/crypt.util'
 
 @Injectable()
 export class PasswordHasher implements PipeTransform {
-    async transform(user: CreateUserDto, metadata: ArgumentMetadata) {
+    async transform(
+        user: Omit<CreateUserDto, 'passwordConfirm'>,
+        metadata: ArgumentMetadata,
+    ) {
         if (metadata.type !== 'body') return user
-        return { ...user, password: await hash(user.password, 10) }
+        return { ...user, password: await crypt(user.password) }
     }
 }

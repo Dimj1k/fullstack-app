@@ -6,7 +6,7 @@ import {
     IsEnum,
     ValidateNested,
 } from 'class-validator'
-import { GENDER } from '../entities/user/user.entity'
+import { GENDER } from '../../entities/user/user.entity'
 
 export class UpdateUserInfoDto {
     @IsDateString()

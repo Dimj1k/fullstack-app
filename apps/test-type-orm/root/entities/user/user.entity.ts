@@ -45,7 +45,7 @@ export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', length: 60 })
     email: string
 
     @Column({ type: 'text', name: 'password_hash' })
@@ -75,13 +75,11 @@ export class User {
     @BeforeInsert()
     protected async createDate() {
         this.createdDate = this.updatedDate = subDays(new Date(), 4)
-        this.password = await hash(this.password, 5)
     }
 
     @BeforeUpdate()
     protected async updateDate() {
         this.updatedDate = new Date()
-        this.password = await hash(this.password, 5)
     }
 
     @BeforeRemove()
