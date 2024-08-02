@@ -12,6 +12,8 @@ import { UserFromMongo } from './user.controller'
 import { UUID } from 'crypto'
 import { compare } from 'bcrypt'
 import { crypt } from '../utils/crypt.util'
+import { PASSWORD_ONLY } from '../constants'
+import { comparePasswords } from '../utils/compare-passwords.util'
 
 @Injectable()
 export class UserService {
@@ -39,68 +41,43 @@ export class UserService {
     }
 
     async updateUser(id: UUID, updateUserDto: UpdateUserDto) {
-        if (Object.keys(updateUserDto).length === 1)
+        if (Object.keys(updateUserDto).length === PASSWORD_ONLY)
             throw new HttpException('bad request', HttpStatus.BAD_REQUEST)
-        let foundedUser = await this.findUser({ id })
-        let isPasswordCorrect = await compare(
-            updateUserDto.password,
-            foundedUser.password,
+        let foundedUser = await this.findUser(
+            { id },
+            { loadRelationIds: false, relations: { info: true } },
         )
-        if (!isPasswordCorrect)
-            throw new UnauthorizedException('incorrect password')
+        await comparePasswords(updateUserDto.password, foundedUser.password)
         if (updateUserDto.newPassword)
             updateUserDto.password = await crypt(updateUserDto.newPassword)
         else delete updateUserDto.password
         let {
-            info: updatedUserInfo,
+            info: updateUserInfo,
             newPassword: _,
-            ...updatedUser
+            ...updateUser
         } = updateUserDto
         await this.dataSource.transaction(
             'SERIALIZABLE',
             async (transactionalEntityManager: EntityManager) => {
-                if (updatedUserInfo)
+                if (updateUserInfo)
                     await transactionalEntityManager.update(
                         UserInfo,
-                        foundedUser.infoId,
-                        updatedUserInfo,
+                        foundedUser.info.id,
+                        this.userInfoRepository.create(updateUserInfo),
                     )
-                if (Object.keys(updatedUser).length)
-                    await transactionalEntityManager.update(
-                        User,
-                        id,
-                        updatedUser,
-                    )
+                await transactionalEntityManager.update(
+                    User,
+                    id,
+                    this.userRepository.create(updateUser),
+                )
             },
         )
+        return {
+            ...foundedUser,
+            ...updateUser,
+            info: { ...foundedUser.info, ...updateUserInfo },
+        }
     }
-
-    //     export class UpdateUserInfoDto {
-    //     @IsDateString()
-    //     @IsOptional()
-    //     birthdayDate?: Date
-
-    //     @IsEnum(GENDER)
-    //     @IsOptional()
-    //     gender?: GENDER
-    // }
-
-    // export class UpdateUserDto {
-    //     @IsString()
-    //     @IsOptional()
-    //     email?: string
-
-    //     @IsString()
-    //     password: string
-
-    //     @IsString()
-    //     @IsOptional()
-    //     newPassword?: string
-
-    //     @ValidateNested()
-    //     @Type(() => UpdateUserInfoDto)
-    //     info: UpdateUserInfoDto
-    // }
 
     async findUser(
         where: Partial<User>,

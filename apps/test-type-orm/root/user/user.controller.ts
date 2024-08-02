@@ -1,5 +1,6 @@
 import {
     Body,
+    ClassSerializerInterceptor,
     Controller,
     Delete,
     HttpException,
@@ -8,6 +9,7 @@ import {
     Patch,
     Post,
     UnauthorizedException,
+    UseInterceptors,
 } from '@nestjs/common'
 import { UserService } from './user.service'
 import { PasswordConfirmRemover } from '../pipes/password-confirm-remover.pipe'
@@ -38,7 +40,7 @@ export class UserController {
             email: createUserDto.email,
         })
         if (foundedUser)
-            throw new HttpException("users' exists", HttpStatus.BAD_REQUEST)
+            throw new HttpException("user's exists", HttpStatus.BAD_REQUEST)
         return this.createUserService.createInCacheUser(createUserDto)
     }
 
@@ -51,6 +53,7 @@ export class UserController {
         })
     }
 
+    @UseInterceptors(ClassSerializerInterceptor)
     @Patch('/update/:id')
     async updateUser(
         @Param('id') id: UUID,
@@ -62,8 +65,8 @@ export class UserController {
                     email: updateUserDto.email,
                 })
             )
-                throw new UnauthorizedException('email is busy')
-        return this.userService.updateUser(id, updateUserDto)
+                throw new UnauthorizedException('email is available')
+        return new User(await this.userService.updateUser(id, updateUserDto))
     }
 
     @Delete('/delete/:id')

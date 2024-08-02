@@ -1,5 +1,4 @@
-import { hash } from 'bcrypt'
-import { subDays } from 'date-fns'
+import { Exclude, Expose, Transform } from 'class-transformer'
 import {
     BeforeInsert,
     BeforeRemove,
@@ -21,8 +20,8 @@ export enum GENDER {
     UNKNOWN,
 }
 
-@Entity('users_info')
 @Check(`"birthday_date" < now()`)
+@Entity('users_info')
 export class UserInfo {
     @PrimaryGeneratedColumn('uuid')
     id: string
@@ -39,18 +38,23 @@ export class UserInfo {
     gender?: GENDER
 }
 
-@Entity('users')
 @Index(['email'], { unique: true })
+@Entity('users')
 export class User {
     @PrimaryGeneratedColumn('uuid')
+    @Exclude()
     id: string
 
     @Column({ type: 'varchar', length: 60 })
     email: string
 
     @Column({ type: 'text', name: 'password_hash' })
+    @Exclude()
     password: string
 
+    @Transform(({ value }: { value: UserInfo }) => {
+        return { birthdayDate: value.birthdayDate, gender: value.gender }
+    })
     @OneToOne(() => UserInfo, { eager: false, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'info_id' })
     info: UserInfo
@@ -69,12 +73,13 @@ export class User {
     })
     updatedDate: Date
 
+    @Exclude()
     @RelationId((user: User) => user.info, 'info_id')
     infoId: string
 
     @BeforeInsert()
     protected async createDate() {
-        this.createdDate = this.updatedDate = subDays(new Date(), 4)
+        this.createdDate = this.updatedDate = new Date()
     }
 
     @BeforeUpdate()
@@ -85,5 +90,9 @@ export class User {
     @BeforeRemove()
     protected async removeUser() {
         console.log(`${this.id} - удалён`)
+    }
+
+    constructor(partial: Partial<User>) {
+        Object.assign(this, partial)
     }
 }

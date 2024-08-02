@@ -1,1 +1,2 @@
 export const REGISTER_PACKAGE = 'REGISTER_PACKAGE'
+export const PASSWORD_ONLY = 1
