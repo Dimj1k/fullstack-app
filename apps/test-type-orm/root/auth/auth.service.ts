@@ -67,7 +67,9 @@ export class AuthService implements OnModuleInit {
         metadata.set('client-user-agent', userAgent)
         let userId = await lastValueFrom(
             this.jwtService.checkToken({ token: refreshToken }).pipe(take(1)),
-        )
+        ).catch((err) => {
+            throw new UnauthorizedException()
+        })
         let user = await this.userRepository.findOne({
             where: { id: userId.userId },
         })
@@ -76,10 +78,14 @@ export class AuthService implements OnModuleInit {
             roles: user.role,
             userId: user.id,
         }
-        return this.jwtService.refreshTokens(
-            { token: refreshToken, ...jwtPayload },
-            metadata,
-        )
+        try {
+            return this.jwtService.refreshTokens(
+                { token: refreshToken, ...jwtPayload },
+                metadata,
+            )
+        } catch {
+            throw new UnauthorizedException()
+        }
     }
 
     async deleteTokens(refreshToken: Tokens['refreshToken']['token']) {

@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common'
+import { ConflictException, Injectable, OnModuleInit } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { Client, ClientGrpc, Transport } from '@nestjs/microservices'
 import { RegisterController } from '../interfaces/register-controller.interface'
@@ -26,7 +26,11 @@ export class CreateUserService implements OnModuleInit {
     }
 
     async createInCacheUser(createUserDto: CreateUserDto, metadata?: Metadata) {
-        return this.registerService.createInCacheUser(createUserDto)
+        try {
+            return this.registerService.createInCacheUser(createUserDto)
+        } catch (err) {
+            throw new ConflictException(err)
+        }
     }
 
     async returnByTokenUser(token: RegisterCode) {

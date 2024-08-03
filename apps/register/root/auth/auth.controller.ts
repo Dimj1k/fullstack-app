@@ -49,15 +49,15 @@ export class AuthController {
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ) {
-        console.log(jwtPayload)
         let tokens: Tokens = await this.getPairTokens(jwtPayload)
-        console.log(tokens)
         let token = this.tokenRepository.create({
             ...tokens.refreshToken,
             ...jwtPayload,
             userAgent: metadata.get('client-user-agent')[0].toString(),
         })
-        this.tokenRepository.insert(token)
+        this.tokenRepository.insert(token).catch((err) => {
+            throw new RpcException(err)
+        })
         return tokens
     }
 
@@ -67,8 +67,11 @@ export class AuthController {
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ) {
-        console.log(refreshToken)
-        let { userId } = await this.tokenRepository.findOneBy(refreshToken)
+        let { userId } = await this.tokenRepository
+            .findOneByOrFail(refreshToken)
+            .catch((err) => {
+                throw new RpcException(err)
+            })
         if (!userId) throw new RpcException(new UnauthorizedException())
         return { userId }
     }
@@ -87,18 +90,23 @@ export class AuthController {
             token: refreshToken,
             userId: jwtPayload.userId,
         }
-        let foundedToken = await this.tokenRepository.findOneBy(tokenFindBy)
+        let foundedToken =
+            await this.tokenRepository.findOneByOrFail(tokenFindBy)
         if (!foundedToken || foundedToken.userAgent !== userAgent)
             throw new RpcException(new UnauthorizedException())
         let tokens = await this.getPairTokens(jwtPayload)
-        this.tokenRepository.update(
-            { _id: foundedToken._id },
-            this.tokenRepository.create({
-                ...tokens.refreshToken,
-                ...jwtPayload,
-                userAgent: metadata.get('client-user-agent')[0].toString(),
-            }),
-        )
+        this.tokenRepository
+            .update(
+                { _id: foundedToken._id },
+                this.tokenRepository.create({
+                    ...tokens.refreshToken,
+                    ...jwtPayload,
+                    userAgent: metadata.get('client-user-agent')[0].toString(),
+                }),
+            )
+            .catch((err) => {
+                throw new RpcException(err)
+            })
         return tokens
     }
 
@@ -108,7 +116,9 @@ export class AuthController {
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ) {
-        this.tokenRepository.delete(refreshToken)
+        this.tokenRepository.delete(refreshToken).catch((err) => {
+            throw new RpcException(err)
+        })
         return { message: 'token deleted' }
     }
 

@@ -1,5 +1,6 @@
 import {
     Body,
+    Catch,
     ClassSerializerInterceptor,
     ConflictException,
     Controller,
@@ -19,14 +20,18 @@ import { User, UserInfo } from '../entities/user/user.entity'
 import { BirthdayDateCheck } from '../pipes/birthday-date-check.pipe'
 import { UUID } from 'crypto'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { MyMailerService } from '../mailer/mailer.service'
+import { RpcException } from '@nestjs/microservices'
 
 export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 
+@Catch(RpcException)
 @Controller('user')
 export class UserController {
     constructor(
         private readonly createUserService: CreateUserService,
         private readonly userService: UserService,
+        private readonly mailService: MyMailerService,
     ) {}
 
     @Post('/registration')
@@ -38,14 +43,29 @@ export class UserController {
             email: createUserDto.email,
         })
         if (foundedUser) throw new ConflictException("user's exists")
-        return this.createUserService.createInCacheUser(createUserDto)
+        let registerCode =
+            await this.createUserService.createInCacheUser(createUserDto)
+        registerCode.subscribe((code) =>
+            this.mailService
+                .sendMail(
+                    createUserDto.email,
+                    'Код для регистрации',
+                    `Ваш код регистарции: ${JSON.stringify(code)}`,
+                )
+                .catch((err) => {
+                    throw new Error()
+                }),
+        )
+        return {
+            message: 'Если почта существует - Вы получите сообщение с кодом',
+        }
     }
 
     @Post('/registration/confirm')
     async registrationConfirm(@Body() token: RegisterCode) {
         let confirmedUser =
             await this.createUserService.returnByTokenUser(token)
-        confirmedUser.forEach(async (res: UserFromMongo) => {
+        confirmedUser.forEach((res: UserFromMongo) => {
             this.userService.createUser(res)
         })
         return { success: 'Вы успешно зарегистрировались' }

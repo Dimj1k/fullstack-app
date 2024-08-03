@@ -17,7 +17,6 @@ import { REFRESH_TOKEN, SECURE_COOKIES } from '../constants'
 import { Tokens } from '../interfaces/jwt-controller.interface'
 import { GetCookie } from '../decorators/get-cookie.decorator'
 import { lastValueFrom, take } from 'rxjs'
-import { JwtGuard } from '../guards/jwt.guard'
 
 @Controller('auth')
 export class AuthController {
@@ -33,12 +32,15 @@ export class AuthController {
         @Req() request: Request,
     ) {
         if (refreshToken) return { message: 'you logged in' }
-        let tokens = await this.authService.login(authDto, userAgent)
+        let tokens = await this.authService
+            .login(authDto, userAgent)
+            .catch((err) => {
+                throw new UnauthorizedException()
+            })
         let tokens$ = tokens.pipe(take(1))
         return this.setTokens(await lastValueFrom(tokens$), request, response)
     }
 
-    // @UseGuards(JwtGuard)
     @Post('refresh-tokens')
     async refreshTokens(
         @GetCookie(REFRESH_TOKEN) refreshToken: Tokens['refreshToken']['token'],
@@ -47,12 +49,16 @@ export class AuthController {
         @Headers('user-agent') userAgent: string,
     ) {
         if (!refreshToken) throw new UnauthorizedException()
-        let tokens = await this.authService.refreshTokens(
-            refreshToken,
-            userAgent,
-        )
-        let tokens$ = tokens.pipe(take(1))
-        return this.setTokens(await lastValueFrom(tokens$), request, response)
+        let tokens = await this.authService
+            .refreshTokens(refreshToken, userAgent)
+            .catch((err) => {
+                response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
+                throw new UnauthorizedException()
+            })
+        let tokens$ = await lastValueFrom(tokens.pipe(take(1))).catch((err) => {
+            throw new UnauthorizedException()
+        })
+        return this.setTokens(tokens$, request, response)
     }
 
     @HttpCode(HttpStatus.OK)

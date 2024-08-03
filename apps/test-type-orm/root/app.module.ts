@@ -7,7 +7,7 @@ import { AuthModule } from './auth/auth.module'
 import { POSTGRES_ENTITIES } from './entities'
 import { POSTGRES_SUBSCRIBERS } from './subscribers'
 import { UserModule } from './user/user.module'
-import { JwtStrategy } from './auth/strategy/jwt.strategy'
+import { MailerModule } from '@nestjs-modules/mailer'
 
 @Module({
     imports: [
@@ -34,6 +34,16 @@ import { JwtStrategy } from './auth/strategy/jwt.strategy'
             },
         }),
         UserModule,
+        MailerModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => ({
+                transport: `smtps://${config.get('USER_SMTP')}:${config.get('PASSWORD_SMTP')}@${config.get('SMTP_SERVER')}:465`,
+                defaults: {
+                    from: '"localhost" <localhost@host.com>',
+                },
+            }),
+        }),
     ],
     controllers: [AppController],
     providers: [AppService],
