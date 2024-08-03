@@ -1,26 +1,24 @@
 import {
     Body,
     ClassSerializerInterceptor,
+    ConflictException,
     Controller,
     Delete,
-    HttpException,
-    HttpStatus,
     Param,
     Patch,
     Post,
-    UnauthorizedException,
     UseInterceptors,
 } from '@nestjs/common'
 import { UserService } from './user.service'
 import { PasswordConfirmRemover } from '../pipes/password-confirm-remover.pipe'
 import { PasswordHasher } from '../pipes/password-hasher.pipe'
-import { CreateUserDto } from '../dto/user/create-user.dto'
+import { CreateUserDto } from './dto/create-user.dto'
 import { CreateUserService } from './create-user.service'
-import { RegisterToken } from '../dto/user/register-token.dto'
-import { User } from '../entities/user/user.entity'
+import { RegisterCode } from './dto/register-token.dto'
+import { User, UserInfo } from '../entities/user/user.entity'
 import { BirthdayDateCheck } from '../pipes/birthday-date-check.pipe'
 import { UUID } from 'crypto'
-import { UpdateUserDto } from '../dto/user/update-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
 
 export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 
@@ -39,18 +37,18 @@ export class UserController {
         let foundedUser = await this.userService.findUser({
             email: createUserDto.email,
         })
-        if (foundedUser)
-            throw new HttpException("user's exists", HttpStatus.BAD_REQUEST)
+        if (foundedUser) throw new ConflictException("user's exists")
         return this.createUserService.createInCacheUser(createUserDto)
     }
 
     @Post('/registration/confirm')
-    async registrationConfirm(@Body() token: RegisterToken) {
+    async registrationConfirm(@Body() token: RegisterCode) {
         let confirmedUser =
             await this.createUserService.returnByTokenUser(token)
-        confirmedUser.subscribe((user: UserFromMongo) => {
-            this.userService.createUser(user)
+        confirmedUser.forEach(async (res: UserFromMongo) => {
+            this.userService.createUser(res)
         })
+        return { success: 'Вы успешно зарегистрировались' }
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
@@ -59,14 +57,7 @@ export class UserController {
         @Param('id') id: UUID,
         @Body() updateUserDto: UpdateUserDto,
     ) {
-        if (updateUserDto.email)
-            if (
-                await this.userService.findUser({
-                    email: updateUserDto.email,
-                })
-            )
-                throw new UnauthorizedException('email is available')
-        return new User(await this.userService.updateUser(id, updateUserDto))
+        return this.userService.updateUser(id, updateUserDto)
     }
 
     @Delete('/delete/:id')

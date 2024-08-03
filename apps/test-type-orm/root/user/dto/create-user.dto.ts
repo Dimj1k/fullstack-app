@@ -9,7 +9,7 @@ import { Match } from '../../decorators/match.decorator'
 import { GENDER } from '../../entities/user/user.entity'
 import { Type } from 'class-transformer'
 
-export class UserInfo {
+export class UserInfoDto {
     @IsDateString()
     @IsOptional()
     birthdayDate?: Date
@@ -30,7 +30,7 @@ export class CreateUserDto {
     @IsString()
     passwordConfirm: string
 
-    @Type(() => UserInfo)
+    @Type(() => UserInfoDto)
     @ValidateNested()
-    info: UserInfo
+    info: UserInfoDto
 }

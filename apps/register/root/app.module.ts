@@ -1,11 +1,13 @@
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { ENTITIES } from './register/register.entity'
-import { TypeOrmModule } from '@nestjs/typeorm'
 import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { ENTITIES } from './register/register.entity'
 import { RegisterModule } from './register/register.module'
+import { AuthModule } from './auth/auth.module'
 
 @Module({
     imports: [
+        AuthModule,
         ConfigModule.forRoot({ isGlobal: true }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],

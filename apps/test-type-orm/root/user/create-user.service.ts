@@ -1,10 +1,11 @@
 import { Injectable, OnModuleInit } from '@nestjs/common'
-import { CreateUserDto } from '../dto/user/create-user.dto'
+import { CreateUserDto } from './dto/create-user.dto'
 import { Client, ClientGrpc, Transport } from '@nestjs/microservices'
 import { RegisterController } from '../interfaces/register-controller.interface'
 import { join } from 'path'
 import { Metadata } from '@grpc/grpc-js'
-import { RegisterToken } from '../dto/user/register-token.dto'
+import { RegisterCode } from './dto/register-token.dto'
+import { MONGO_DB_LOCATION } from '../constants'
 
 @Injectable()
 export class CreateUserService implements OnModuleInit {
@@ -12,9 +13,9 @@ export class CreateUserService implements OnModuleInit {
     @Client({
         transport: Transport.GRPC,
         options: {
-            url: 'localhost:3001',
-            package: 'register',
-            protoPath: join(__dirname, 'protos', 'register-service.proto'),
+            url: MONGO_DB_LOCATION,
+            package: 'mongo',
+            protoPath: join(__dirname, 'protos', 'mongo-service.proto'),
         },
     })
     client: ClientGrpc
@@ -28,7 +29,7 @@ export class CreateUserService implements OnModuleInit {
         return this.registerService.createInCacheUser(createUserDto)
     }
 
-    async returnByTokenUser(token: RegisterToken) {
+    async returnByTokenUser(token: RegisterCode) {
         return this.registerService.returnByTokenUser(token)
     }
 }

@@ -1,12 +1,12 @@
 {
     "$schema": "https://json.schemastore.org/nest-cli",
     "collection": "@nestjs/schematics",
-    "sourceRoot": "apps/test-type-orm/src",
+    "sourceRoot": "apps/test-type-orm/root",
     "compilerOptions": {
         "deleteOutDir": true,
         "webpack": true,
         "tsConfigPath": "apps/test-type-orm/tsconfig.app.json",
-        "assets": ["**/*.proto"],
+        "assets": ["**/*.proto", "**/*.pem"],
         "watchAssets": true
     },
     "monorepo": true,

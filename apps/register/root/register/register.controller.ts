@@ -10,10 +10,9 @@ import { GrpcMethod } from '@nestjs/microservices'
 import { CreateUserDto } from '../dtos/create-user.dto'
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js'
 import { CacheUser } from './register.entity'
-import { RegisterTokenDto } from '../dtos/register-token.dto'
+import { RegisterCodeDto } from '../dtos/register-code.dto'
 
 @UsePipes(new ValidationPipe())
-@Controller()
 export class RegisterController {
     constructor(private readonly registerService: RegisterService) {}
 
@@ -22,14 +21,14 @@ export class RegisterController {
         data: CreateUserDto,
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
-    ): Promise<RegisterTokenDto> {
+    ): Promise<RegisterCodeDto> {
         return this.registerService.createInCacheUser(data)
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
     @GrpcMethod('RegisterController', 'returnByTokenUser')
     async returnByTokenUser(
-        token: RegisterTokenDto,
+        token: RegisterCodeDto,
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ): Promise<Omit<CacheUser, 'token' | 'createdAt'>> {

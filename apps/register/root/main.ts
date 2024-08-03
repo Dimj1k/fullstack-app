@@ -10,8 +10,8 @@ async function bootstrap() {
         transport: Transport.GRPC,
         options: {
             url: URL_MICROSERVICE,
-            package: 'register',
-            protoPath: join(__dirname, 'protos', 'register-service.proto'),
+            package: 'mongo',
+            protoPath: join(__dirname, 'protos', 'mongo-service.proto'),
         },
     })
     await app.listen()

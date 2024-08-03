@@ -1,14 +1,17 @@
 import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { UserModule } from './user/user.module'
-import { POSTGRES_SUBSCRIBERS } from './subscribers'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { AuthModule } from './auth/auth.module'
 import { POSTGRES_ENTITIES } from './entities'
+import { POSTGRES_SUBSCRIBERS } from './subscribers'
+import { UserModule } from './user/user.module'
+import { JwtStrategy } from './auth/strategy/jwt.strategy'
 
 @Module({
     imports: [
+        AuthModule,
         ConfigModule.forRoot({ isGlobal: true }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],

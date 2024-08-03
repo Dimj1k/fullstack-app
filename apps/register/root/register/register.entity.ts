@@ -6,7 +6,7 @@ import {
     ObjectId,
     ObjectIdColumn,
 } from 'typeorm'
-import { Token } from '../dtos/register-token.dto'
+import { Code } from '../dtos/register-code.dto'
 enum GENDER {
     MALE,
     FEMALE,
@@ -43,7 +43,7 @@ export class CacheUser {
 
     @Column()
     @Exclude()
-    token: Token
+    code: Code
 
     @CreateDateColumn()
     @Exclude()

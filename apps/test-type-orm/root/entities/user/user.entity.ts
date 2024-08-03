@@ -20,6 +20,11 @@ export enum GENDER {
     UNKNOWN,
 }
 
+export enum ROLE {
+    USER = 'USER',
+    ADMIN = 'ADMIN',
+}
+
 @Check(`"birthday_date" < now()`)
 @Entity('users_info')
 export class UserInfo {
@@ -76,6 +81,14 @@ export class User {
     @Exclude()
     @RelationId((user: User) => user.info, 'info_id')
     infoId: string
+
+    @Column({
+        type: 'enum',
+        enum: ROLE,
+        array: true,
+        default: [ROLE.USER],
+    })
+    role: ROLE[]
 
     @BeforeInsert()
     protected async createDate() {

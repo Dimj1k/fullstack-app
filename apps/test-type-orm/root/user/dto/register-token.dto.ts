@@ -1,10 +1,10 @@
 import { IsDecimal, IsString, Length } from 'class-validator'
 
-type Token = `${number}${number}${number}${number}${number}${number}`
+type Code = `${number}${number}${number}${number}${number}${number}`
 
-export class RegisterToken {
+export class RegisterCode {
     @IsDecimal()
     @Length(6, 6)
     @IsString()
-    token: Token
+    code: Code
 }

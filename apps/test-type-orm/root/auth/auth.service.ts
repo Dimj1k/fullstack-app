@@ -1,0 +1,88 @@
+import { Injectable, OnModuleInit, UnauthorizedException } from '@nestjs/common'
+import { User } from '../entities/user/user.entity'
+import { Repository } from 'typeorm'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Client, ClientGrpc, Transport } from '@nestjs/microservices'
+import { join } from 'path'
+import { MONGO_DB_LOCATION } from '../constants'
+import { AuthDto } from './dto/auth.dto'
+import {
+    JwtController,
+    JwtPayload,
+    Tokens,
+} from '../interfaces/jwt-controller.interface'
+import { Metadata } from '@grpc/grpc-js'
+import { comparePasswords } from '../utils/compare-passwords.util'
+import { JwtService } from '@nestjs/jwt'
+import { lastValueFrom, take } from 'rxjs'
+
+@Injectable()
+export class AuthService implements OnModuleInit {
+    @Client({
+        transport: Transport.GRPC,
+        options: {
+            url: MONGO_DB_LOCATION,
+            package: 'mongo',
+            protoPath: join(__dirname, 'protos', 'mongo-service.proto'),
+        },
+    })
+    client: ClientGrpc
+
+    private jwtService: JwtController
+
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+    ) {}
+
+    onModuleInit() {
+        this.jwtService =
+            this.client.getService<JwtController>('AuthController')
+    }
+
+    async login(dto: AuthDto, userAgent: string) {
+        let user = await this.userRepository.findOne({
+            where: { email: dto.email },
+            relations: { info: true },
+        })
+        if (!user || !comparePasswords(dto.password, user.password))
+            throw new UnauthorizedException('incorrect login or password')
+        let metadata = new Metadata()
+        metadata.set('client-user-agent', userAgent)
+        return this.jwtService.createTokens(
+            {
+                email: user.email,
+                userId: user.id,
+                roles: user.role,
+            },
+            metadata,
+        )
+    }
+
+    async refreshTokens(
+        refreshToken: Tokens['refreshToken']['token'],
+        userAgent: string,
+    ) {
+        let metadata = new Metadata()
+        metadata.set('client-user-agent', userAgent)
+        let userId = await lastValueFrom(
+            this.jwtService.checkToken({ token: refreshToken }).pipe(take(1)),
+        )
+        let user = await this.userRepository.findOne({
+            where: { id: userId.userId },
+        })
+        let jwtPayload: JwtPayload = {
+            email: user.email,
+            roles: user.role,
+            userId: user.id,
+        }
+        return this.jwtService.refreshTokens(
+            { token: refreshToken, ...jwtPayload },
+            metadata,
+        )
+    }
+
+    async deleteTokens(refreshToken: Tokens['refreshToken']['token']) {
+        return this.jwtService.deleteTokens({ token: refreshToken })
+    }
+}
