@@ -65,7 +65,7 @@ export class User {
     info: UserInfo
 
     @Column({
-        nullable: true,
+        default: () => 'now()',
         name: 'created_date',
         type: 'timestamp without time zone',
     })

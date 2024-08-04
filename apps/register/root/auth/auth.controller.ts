@@ -4,9 +4,9 @@ import { JwtService } from '@nestjs/jwt'
 import { GrpcMethod, Payload, RpcException } from '@nestjs/microservices'
 import { InjectRepository } from '@nestjs/typeorm'
 import { randomUUID, UUID } from 'crypto'
-import { addDays } from 'date-fns'
+import { addMonths } from 'date-fns'
 import { Token } from './token.entity'
-import { MongoRepository, Repository } from 'typeorm'
+import { MongoRepository } from 'typeorm'
 
 export enum GENDER {
     MALE,
@@ -35,13 +35,26 @@ interface Tokens {
     }
 }
 
+const NAME_TTL_INDEX_TOKEN = 'expiresTokenDateTime'
+
 @Injectable()
 export class AuthController {
     constructor(
         private readonly jwtService: JwtService,
         @InjectRepository(Token)
         private readonly tokenRepository: MongoRepository<Token>,
-    ) {}
+    ) {
+        this.tokenRepository
+            .collectionIndexExists(NAME_TTL_INDEX_TOKEN)
+            .then((ttlIndexExists) => {
+                if (!ttlIndexExists)
+                    this.tokenRepository.createCollectionIndex('expires', {
+                        expireAfterSeconds: 0,
+                        background: true,
+                        name: NAME_TTL_INDEX_TOKEN,
+                    })
+            })
+    }
 
     @GrpcMethod('AuthController', 'createTokens')
     async createTokens(
@@ -127,7 +140,7 @@ export class AuthController {
         )) as JwtToken
         let refreshToken = {
             token: randomUUID(),
-            expires: addDays(new Date(), 30),
+            expires: addMonths(new Date(), 1),
         }
         return {
             accessToken,

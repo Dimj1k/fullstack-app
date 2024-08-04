@@ -4,13 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { ENTITIES } from './register/register.entity'
 import { RegisterModule } from './register/register.module'
 import { AuthModule } from './auth/auth.module'
-import { ScheduleModule } from '@nestjs/schedule'
 
 @Module({
     imports: [
         AuthModule,
         ConfigModule.forRoot({ isGlobal: true }),
-        ScheduleModule.forRoot(),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],

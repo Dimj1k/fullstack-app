@@ -6,7 +6,7 @@ import { CreateUserDto } from '../dtos/create-user.dto'
 import { RpcException } from '@nestjs/microservices'
 import { RegisterCodeDto, Code } from '../dtos/register-code.dto'
 
-const NAME_TTL_INDEX = 'expiresAt'
+const NAME_TTL_INDEX_CODE = 'expiresAt'
 
 export class RegisterService {
     private code: number = 0
@@ -15,13 +15,13 @@ export class RegisterService {
         private readonly userRepository: MongoRepository<CacheUser>,
     ) {
         this.userRepository
-            .collectionIndexExists(NAME_TTL_INDEX)
+            .collectionIndexExists(NAME_TTL_INDEX_CODE)
             .then((exists) => {
                 if (!exists)
                     this.userRepository.createCollectionIndex('createdAt', {
                         expireAfterSeconds: 300,
                         background: true,
-                        name: NAME_TTL_INDEX,
+                        name: NAME_TTL_INDEX_CODE,
                     })
             })
     }
