@@ -3,6 +3,7 @@ import {
     HttpStatus,
     Injectable,
     UnauthorizedException,
+    UseGuards,
 } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, EntityManager, FindOneOptions, Repository } from 'typeorm'
@@ -13,6 +14,7 @@ import { UUID } from 'crypto'
 import { crypt } from '../utils/crypt.util'
 import { PASSWORD_ONLY } from '../constants'
 import { comparePasswords } from '../utils/compare-passwords.util'
+import { JwtGuard } from '../guards/jwt.guard'
 
 @Injectable()
 export class UserService {
@@ -41,6 +43,7 @@ export class UserService {
         return newUser
     }
 
+    @UseGuards(JwtGuard)
     async updateUser(id: UUID, updateUserDto: UpdateUserDto): Promise<void> {
         let email = updateUserDto.email
         if (email)
@@ -94,12 +97,10 @@ export class UserService {
                         foundedUser.info.id,
                         this.userInfoRepository.create(updateUserInfo),
                     )
-                console.log(
-                    await transactionalEntityManager.update(
-                        User,
-                        id,
-                        this.userRepository.create(updateUser),
-                    ),
+                await transactionalEntityManager.update(
+                    User,
+                    id,
+                    this.userRepository.create(updateUser),
                 )
             },
         )

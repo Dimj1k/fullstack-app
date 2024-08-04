@@ -1,4 +1,10 @@
-import { ConflictException, Injectable, OnModuleInit } from '@nestjs/common'
+import {
+    ConflictException,
+    Injectable,
+    NotFoundException,
+    OnModuleInit,
+    UnauthorizedException,
+} from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { Client, ClientGrpc, Transport } from '@nestjs/microservices'
 import { RegisterController } from '../interfaces/register-controller.interface'
@@ -6,6 +12,7 @@ import { join } from 'path'
 import { Metadata } from '@grpc/grpc-js'
 import { RegisterCode } from './dto/register-token.dto'
 import { MONGO_DB_LOCATION } from '../constants'
+import { catchError, NotFoundError } from 'rxjs'
 
 @Injectable()
 export class CreateUserService implements OnModuleInit {
@@ -26,14 +33,18 @@ export class CreateUserService implements OnModuleInit {
     }
 
     async createInCacheUser(createUserDto: CreateUserDto, metadata?: Metadata) {
-        try {
-            return this.registerService.createInCacheUser(createUserDto)
-        } catch (err) {
-            throw new ConflictException(err)
-        }
+        return this.registerService.createInCacheUser(createUserDto).pipe(
+            catchError((err) => {
+                throw new ConflictException(err)
+            }),
+        )
     }
 
     async returnByTokenUser(token: RegisterCode) {
-        return this.registerService.returnByTokenUser(token)
+        return this.registerService.returnByTokenUser(token).pipe(
+            catchError((err) => {
+                throw new NotFoundException(err)
+            }),
+        )
     }
 }

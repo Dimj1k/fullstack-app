@@ -47,6 +47,7 @@ export class AuthController {
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response,
         @Headers('user-agent') userAgent: string,
+        @Headers('authorization') jwtTokens: string,
     ) {
         if (!refreshToken) throw new UnauthorizedException()
         let tokens = await this.authService
@@ -56,6 +57,7 @@ export class AuthController {
                 throw new UnauthorizedException()
             })
         let tokens$ = await lastValueFrom(tokens.pipe(take(1))).catch((err) => {
+            response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
             throw new UnauthorizedException()
         })
         return this.setTokens(tokens$, request, response)

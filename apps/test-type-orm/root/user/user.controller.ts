@@ -50,7 +50,7 @@ export class UserController {
                 .sendMail(
                     createUserDto.email,
                     'Код для регистрации',
-                    `Ваш код регистарции: ${JSON.stringify(code)}`,
+                    `Ваш код для регистарции:\n${JSON.stringify(code)}`,
                 )
                 .catch((err) => {
                     throw new Error()

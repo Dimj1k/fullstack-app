@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { randomUUID, UUID } from 'crypto'
 import { addDays } from 'date-fns'
 import { Token } from './token.entity'
-import { Repository } from 'typeorm'
+import { MongoRepository, Repository } from 'typeorm'
 
 export enum GENDER {
     MALE,
@@ -40,7 +40,7 @@ export class AuthController {
     constructor(
         private readonly jwtService: JwtService,
         @InjectRepository(Token)
-        private readonly tokenRepository: Repository<Token>,
+        private readonly tokenRepository: MongoRepository<Token>,
     ) {}
 
     @GrpcMethod('AuthController', 'createTokens')
@@ -55,7 +55,7 @@ export class AuthController {
             ...jwtPayload,
             userAgent: metadata.get('client-user-agent')[0].toString(),
         })
-        this.tokenRepository.insert(token).catch((err) => {
+        this.tokenRepository.insertOne(token).catch((err) => {
             throw new RpcException(err)
         })
         return tokens
@@ -90,23 +90,22 @@ export class AuthController {
             token: refreshToken,
             userId: jwtPayload.userId,
         }
-        let foundedToken =
-            await this.tokenRepository.findOneByOrFail(tokenFindBy)
-        if (!foundedToken || foundedToken.userAgent !== userAgent)
-            throw new RpcException(new UnauthorizedException())
         let tokens = await this.getPairTokens(jwtPayload)
-        this.tokenRepository
-            .update(
-                { _id: foundedToken._id },
-                this.tokenRepository.create({
-                    ...tokens.refreshToken,
-                    ...jwtPayload,
-                    userAgent: metadata.get('client-user-agent')[0].toString(),
-                }),
-            )
-            .catch((err) => {
-                throw new RpcException(err)
-            })
+        let foundedToken = await this.tokenRepository.findOneAndUpdate(
+            {
+                token: tokenFindBy.token,
+                userId: tokenFindBy.userId,
+                userAgent: userAgent,
+            },
+            {
+                $set: {
+                    token: tokens.refreshToken.token,
+                    expires: tokens.refreshToken.expires,
+                    roles: jwtPayload.roles,
+                },
+            },
+        )
+        if (!foundedToken) throw new RpcException(new UnauthorizedException())
         return tokens
     }
 
@@ -116,7 +115,7 @@ export class AuthController {
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ) {
-        this.tokenRepository.delete(refreshToken).catch((err) => {
+        this.tokenRepository.deleteOne(refreshToken).catch((err) => {
             throw new RpcException(err)
         })
         return { message: 'token deleted' }

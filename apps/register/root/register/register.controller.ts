@@ -11,6 +11,9 @@ import { CreateUserDto } from '../dtos/create-user.dto'
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js'
 import { CacheUser } from './register.entity'
 import { RegisterCodeDto } from '../dtos/register-code.dto'
+import { Cluster } from 'node:cluster'
+
+const cluster = require('node:cluster') as Cluster
 
 @UsePipes(new ValidationPipe())
 export class RegisterController {
@@ -28,12 +31,10 @@ export class RegisterController {
     @UseInterceptors(ClassSerializerInterceptor)
     @GrpcMethod('RegisterController', 'returnByTokenUser')
     async returnByTokenUser(
-        token: RegisterCodeDto,
+        code: RegisterCodeDto,
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ): Promise<Omit<CacheUser, 'token' | 'createdAt'>> {
-        return new CacheUser(
-            await this.registerService.deleteByTokenUser(token),
-        )
+        return new CacheUser(await this.registerService.deleteByCodeUser(code))
     }
 }

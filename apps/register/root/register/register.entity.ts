@@ -7,6 +7,7 @@ import {
     ObjectIdColumn,
 } from 'typeorm'
 import { Code } from '../dtos/register-code.dto'
+import { addMinutes } from 'date-fns'
 enum GENDER {
     MALE,
     FEMALE,
@@ -45,7 +46,7 @@ export class CacheUser {
     @Exclude()
     code: Code
 
-    @CreateDateColumn()
+    @Column()
     @Exclude()
     createdAt: Date = new Date()
 
