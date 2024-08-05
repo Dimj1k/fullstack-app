@@ -5,6 +5,7 @@ import {
     ConflictException,
     Controller,
     Delete,
+    Get,
     Param,
     Patch,
     Post,
@@ -72,6 +73,14 @@ export class UserController {
             this.userService.createUser(res)
         })
         return { success: 'Вы успешно зарегистрировались' }
+    }
+
+    @Get('/:id')
+    async findUser(@Param(':id') id: string) {
+        return this.userService.findUser(
+            { id },
+            { relations: { books: true }, select: ['books'] },
+        )
     }
 
     @UseInterceptors(ClassSerializerInterceptor)

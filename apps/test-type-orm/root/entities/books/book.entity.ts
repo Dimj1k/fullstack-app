@@ -1,32 +1,32 @@
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinTable,
     ManyToMany,
     PrimaryGeneratedColumn,
     VirtualColumn,
 } from 'typeorm'
-import { UUID } from 'typeorm/driver/mongodb/bson.typings'
 import { User } from '../user/user.entity'
 
 @Entity('books')
 export class Book {
-    @PrimaryGeneratedColumn('uuid')
-    bookId: UUID
+    @PrimaryGeneratedColumn('uuid', { name: 'book_id' })
+    bookId: string
 
-    @Column({ type: 'varchar', length: 100, name: 'name_book' })
+    @Column({ type: 'varchar', length: 100, name: 'name_book', unique: true })
     nameBook: string
 
     @Column({ type: 'text' })
     description: string
 
-    @VirtualColumn({
-        query: (alias) =>
-            `SELECT COUNT(*) FROM users WHERE "bookId" = ${alias}.bookId`,
-    })
-    numberUsers: number
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date
 
-    @ManyToMany(() => User, { nullable: true })
-    @JoinTable()
+    @ManyToMany(() => User, {
+        nullable: true,
+        onUpdate: 'CASCADE',
+        // eager: true,
+    })
     users: User[]
 }

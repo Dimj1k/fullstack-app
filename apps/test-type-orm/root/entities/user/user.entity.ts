@@ -8,6 +8,7 @@ import {
     Entity,
     Index,
     JoinColumn,
+    JoinTable,
     ManyToMany,
     OneToOne,
     PrimaryGeneratedColumn,
@@ -92,7 +93,16 @@ export class User {
     })
     role: ROLE[]
 
-    @ManyToMany(() => Book, { nullable: true })
+    @ManyToMany(() => Book, (book) => book.bookId, {
+        nullable: true,
+        onUpdate: 'CASCADE',
+        // eager: true,
+    })
+    @JoinTable({
+        name: 'users_books',
+        joinColumn: { name: 'user_id' },
+        inverseJoinColumn: { name: 'book_id' },
+    })
     books: Book[]
 
     @BeforeInsert()
