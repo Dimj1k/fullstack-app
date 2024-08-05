@@ -6,6 +6,7 @@ import {
     Param,
     Patch,
     Post,
+    Query,
     Req,
     UseGuards,
     UsePipes,
@@ -20,8 +21,8 @@ import { RolesGuard } from '../guards/role.guard'
 import { JwtGuard } from '../guards/jwt.guard'
 import { Request } from 'express'
 import { JwtPayload } from '../interfaces/jwt-controller.interface'
-import { FindAllBooksDto } from './dto/find-all-books.dto'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { Beetween } from '../pipes/beetween.pipe'
 
 @ApiTags('books')
 @UsePipes(new ValidationPipe())
@@ -37,9 +38,12 @@ export class BooksController {
         return this.booksService.create(createBooksDto)
     }
 
-    @Post('/find')
-    findAll(@Body() { skip, limit }: FindAllBooksDto) {
-        return this.booksService.findAll(skip, limit)
+    @Get('/find')
+    findAll(
+        @Query('skip', Beetween(0)) skip: number,
+        @Query('limit', Beetween(0, 500)) limit: number,
+    ) {
+        return this.booksService.findAll(+skip, +limit)
     }
 
     @Get('/find/:nameBook')

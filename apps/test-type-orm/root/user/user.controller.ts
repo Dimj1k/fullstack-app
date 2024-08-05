@@ -80,10 +80,7 @@ export class UserController {
 
     @Get('/:id')
     async findUser(@Param(':id') id: string) {
-        return this.userService.findUser(
-            { id },
-            { relations: { books: true }, select: ['books'] },
-        )
+        return this.userService.findUser({ id }, { relations: { books: true } })
     }
 
     @ApiParam({ name: 'id' })
