@@ -43,7 +43,6 @@ export class AuthService implements OnModuleInit {
     async login(dto: AuthDto, userAgent: string) {
         let user = await this.userRepository.findOne({
             where: { email: dto.email },
-            relations: { info: true },
         })
         if (!user || !comparePasswords(dto.password, user.password))
             throw new UnauthorizedException('incorrect login or password')

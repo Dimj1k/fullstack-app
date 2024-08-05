@@ -1,17 +1,26 @@
+import { MailerModule } from '@nestjs-modules/mailer'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
-import { AuthModule } from './auth/auth.module'
+import { AuthModule, PUBLIC_KEY } from './auth/auth.module'
+import { BooksModule } from './books/books.module'
 import { POSTGRES_ENTITIES } from './entities'
 import { POSTGRES_SUBSCRIBERS } from './subscribers'
 import { UserModule } from './user/user.module'
-import { MailerModule } from '@nestjs-modules/mailer'
+import { JwtModule } from '@nestjs/jwt'
+import { PassportModule } from '@nestjs/passport'
+import { JwtStrategy } from './strategy/jwt.strategy'
 
 @Module({
     imports: [
+        BooksModule,
         AuthModule,
+        JwtModule.register({
+            global: true,
+            publicKey: PUBLIC_KEY,
+            verifyOptions: { ignoreExpiration: false, algorithms: ['RS256'] },
+        }),
+        PassportModule.register({ defaultStrategy: 'jwt' }),
         ConfigModule.forRoot({ isGlobal: true }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
@@ -30,6 +39,7 @@ import { MailerModule } from '@nestjs-modules/mailer'
                     logger: 'debug',
                     subscribers: POSTGRES_SUBSCRIBERS,
                     autoLoadEntities: true,
+                    migrationsTableName: 'migration_table',
                 }
             },
         }),
@@ -39,13 +49,10 @@ import { MailerModule } from '@nestjs-modules/mailer'
             inject: [ConfigService],
             useFactory: (config: ConfigService) => ({
                 transport: `smtps://${config.get('USER_SMTP')}:${config.get('PASSWORD_SMTP')}@${config.get('SMTP_SERVER')}:465`,
-                defaults: {
-                    from: '"localhost" <localhost@host.com>',
-                },
             }),
         }),
     ],
-    controllers: [AppController],
-    providers: [AppService],
+    controllers: [],
+    providers: [],
 })
 export class AppModule {}

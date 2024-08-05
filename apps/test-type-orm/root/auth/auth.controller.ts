@@ -27,7 +27,8 @@ export class AuthController {
     async login(
         @Body() authDto: AuthDto,
         @Headers('user-agent') userAgent: string,
-        @GetCookie(REFRESH_TOKEN) refreshToken: Tokens['refreshToken']['token'],
+        @GetCookie(REFRESH_TOKEN)
+        refreshToken: Tokens['refreshToken']['token'],
         @Res({ passthrough: true }) response: Response,
         @Req() request: Request,
     ) {
@@ -43,11 +44,11 @@ export class AuthController {
 
     @Post('refresh-tokens')
     async refreshTokens(
-        @GetCookie(REFRESH_TOKEN) refreshToken: Tokens['refreshToken']['token'],
+        @GetCookie(REFRESH_TOKEN)
+        refreshToken: Tokens['refreshToken']['token'],
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response,
         @Headers('user-agent') userAgent: string,
-        @Headers('authorization') jwtTokens: string,
     ) {
         if (!refreshToken) throw new UnauthorizedException()
         let tokens = await this.authService
@@ -66,7 +67,8 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Post('logout')
     async logout(
-        @GetCookie(REFRESH_TOKEN) refreshToken: Tokens['refreshToken']['token'],
+        @GetCookie(REFRESH_TOKEN)
+        refreshToken: Tokens['refreshToken']['token'],
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response,
     ) {

@@ -1,6 +1,5 @@
 import {
-    HttpException,
-    HttpStatus,
+    BadRequestException,
     Injectable,
     UnauthorizedException,
     UseGuards,
@@ -28,6 +27,7 @@ export class UserService {
 
     async createUser(user: UserFromMongo) {
         let newUser: User
+        this.userRepository
         await this.dataSource.transaction(
             'SERIALIZABLE',
             async (transactionalEntityManager: EntityManager) => {
@@ -43,14 +43,13 @@ export class UserService {
         return newUser
     }
 
-    @UseGuards(JwtGuard)
     async updateUser(id: UUID, updateUserDto: UpdateUserDto): Promise<void> {
         let email = updateUserDto.email
         if (email)
             if (await this.findUser({ email }))
                 throw new UnauthorizedException('email is available')
         if (Object.keys(updateUserDto).length === PASSWORD_ONLY)
-            throw new HttpException('bad request', HttpStatus.BAD_REQUEST)
+            throw new BadRequestException()
         let foundedUser = await this.findUser(
             { id },
             { loadRelationIds: false, relations: { info: true } },
@@ -88,26 +87,30 @@ export class UserService {
         // } finally {
         //     await queryRunner.release()
         // }
-        await this.dataSource.transaction(
-            'SERIALIZABLE',
-            async (transactionalEntityManager: EntityManager) => {
-                if (updateUserInfo)
+        await this.dataSource
+            .transaction(
+                'SERIALIZABLE',
+                async (transactionalEntityManager: EntityManager) => {
+                    if (updateUserInfo)
+                        await transactionalEntityManager.update(
+                            UserInfo,
+                            foundedUser.info.id,
+                            this.userInfoRepository.create(updateUserInfo),
+                        )
                     await transactionalEntityManager.update(
-                        UserInfo,
-                        foundedUser.info.id,
-                        this.userInfoRepository.create(updateUserInfo),
+                        User,
+                        id,
+                        this.userRepository.create(updateUser),
                     )
-                await transactionalEntityManager.update(
-                    User,
-                    id,
-                    this.userRepository.create(updateUser),
-                )
-            },
-        )
+                },
+            )
+            .catch((err) => {
+                throw err
+            })
     }
 
     async findUser(
-        where: Partial<Omit<User, 'role'>>,
+        where: Partial<Omit<User, 'books' | 'role'>>,
         options: Omit<FindOneOptions<User>, 'where'> = {},
     ) {
         return this.userRepository.findOne({ where: where, ...options })

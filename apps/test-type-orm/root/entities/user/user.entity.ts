@@ -8,11 +8,13 @@ import {
     Entity,
     Index,
     JoinColumn,
+    ManyToMany,
     OneToOne,
     PrimaryGeneratedColumn,
     RelationId,
     VirtualColumn,
 } from 'typeorm'
+import { Book } from '../books/book.entity'
 
 export enum GENDER {
     MALE,
@@ -90,9 +92,12 @@ export class User {
     })
     role: ROLE[]
 
+    @ManyToMany(() => Book, { nullable: true })
+    books: Book[]
+
     @BeforeInsert()
     protected async createDate() {
-        this.createdDate = this.updatedDate = new Date()
+        this.updatedDate = new Date()
     }
 
     @BeforeUpdate()

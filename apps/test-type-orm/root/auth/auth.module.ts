@@ -3,28 +3,17 @@ import { AuthService } from './auth.service'
 import { AuthController } from './auth.controller'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { User } from '../entities/user/user.entity'
-import { JwtModule } from '@nestjs/jwt'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { JwtStrategy } from './strategy/jwt.strategy'
-import { PassportModule } from '@nestjs/passport'
 
-export const PUBLIC_KEY = readFileSync(
-    join(__dirname, 'auth', 'key', 'public-key.pem'),
-)
+export const PUBLIC_KEY = __dirname.includes('auth')
+    ? readFileSync(join(__dirname, 'key', 'public-key.pem'))
+    : readFileSync(join(__dirname, 'auth', 'key', 'public-key.pem'))
 
 @Module({
-    imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-        TypeOrmModule.forFeature([User]),
-        JwtModule.register({
-            global: true,
-            publicKey: PUBLIC_KEY,
-            verifyOptions: { ignoreExpiration: false, algorithms: ['RS256'] },
-        }),
-    ],
+    imports: [TypeOrmModule.forFeature([User])],
     controllers: [AuthController],
-    providers: [AuthService, JwtStrategy],
+    providers: [AuthService],
     exports: [],
 })
 export class AuthModule {}

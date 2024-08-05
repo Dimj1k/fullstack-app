@@ -11,10 +11,15 @@ const SECRET_KEY = readFileSync(
     join(__dirname, 'auth', 'keys', 'secret-key.pem'),
 )
 
+const PUBLIC_KEY = readFileSync(
+    join(__dirname, 'auth', 'keys', 'public-key.pem'),
+)
+
 @Module({
     imports: [
         JwtModule.register({
             privateKey: SECRET_KEY,
+            publicKey: PUBLIC_KEY,
             signOptions: { expiresIn: '300s', algorithm: 'RS256' },
         }),
         PassportModule,

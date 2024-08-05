@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt'
 import { GrpcMethod, Payload, RpcException } from '@nestjs/microservices'
 import { InjectRepository } from '@nestjs/typeorm'
 import { randomUUID, UUID } from 'crypto'
-import { addMonths } from 'date-fns'
+import { addMonths, addSeconds } from 'date-fns'
 import { Token } from './token.entity'
 import { MongoRepository } from 'typeorm'
 
