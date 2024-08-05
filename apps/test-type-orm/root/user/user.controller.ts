@@ -43,8 +43,11 @@ export class UserController {
             email: createUserDto.email,
         })
         if (foundedUser) throw new ConflictException("user's exists")
-        let registerCode =
-            await this.createUserService.createInCacheUser(createUserDto)
+        let registerCode = await this.createUserService
+            .createInCacheUser(createUserDto)
+            .catch((err) => {
+                throw err
+            })
         registerCode.subscribe((code) =>
             this.mailService
                 .sendMail(

@@ -8,4 +8,5 @@ export const comparePasswords = async (
     let isPasswordCorrect = await compare(password, hashPassword)
     if (!isPasswordCorrect)
         throw new UnauthorizedException('incorrect password')
+    return true
 }

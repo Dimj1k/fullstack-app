@@ -7,10 +7,14 @@ import {
 import { Reflector } from '@nestjs/core'
 import { ROLE } from '../entities/user/user.entity'
 import { ROLES_KEY } from '../decorators/roles.decorator'
+import { JwtService } from '@nestjs/jwt'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-    constructor(private reflector: Reflector) {}
+    constructor(
+        private reflector: Reflector,
+        private readonly jwtService: JwtService,
+    ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const requiredRoles = this.reflector.getAllAndOverride<ROLE[]>(
@@ -18,7 +22,13 @@ export class RolesGuard implements CanActivate {
             [context.getHandler(), context.getClass()],
         )
         if (!requiredRoles) return true
-        const { user } = context.switchToHttp().getRequest()
+        const { headers } = context.switchToHttp().getRequest()
+        let [tokenType, token] = headers.authorization.split(' ') as string[]
+        if (!tokenType) throw new UnauthorizedException()
+        let user = await this.jwtService.verifyAsync(token).catch((err) => {
+            throw new UnauthorizedException('Получите новую пару токенов')
+        })
+        // console.log(context.switchToHttp().getRequest().asadjikfqwjk)
         // console.log(user)
         // return true
         return requiredRoles.some((role) => user.roles.includes(role))
