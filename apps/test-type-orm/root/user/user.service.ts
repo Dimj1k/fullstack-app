@@ -13,7 +13,7 @@ import { UUID } from 'crypto'
 import { crypt } from '../utils/crypt.util'
 import { PASSWORD_ONLY } from '../constants'
 import { comparePasswords } from '../utils/compare-passwords.util'
-import { JwtGuard } from '../guards/jwt.guard'
+// import { JwtGuard } from '../guards/jwt.guard'
 
 @Injectable()
 export class UserService {

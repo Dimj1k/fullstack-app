@@ -16,7 +16,7 @@ import { BooksService } from './books.service'
 import { Roles } from '../decorators/roles.decorator'
 import { ROLE } from '../entities/user/user.entity'
 import { RolesGuard } from '../guards/role.guard'
-import { JwtGuard } from '../guards/jwt.guard'
+// import { JwtGuard } from '../guards/jwt.guard'
 
 @UsePipes(new ValidationPipe())
 @Controller('books')

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common'
 import { BooksService } from './books.service'
 import { BooksController } from './books.controller'
-import { JwtStrategy } from '../strategy/jwt.strategy'
+// import { JwtStrategy } from '../strategy/jwt.strategy'
 
 @Module({
     imports: [],
     controllers: [BooksController],
-    providers: [BooksService, JwtStrategy],
+    providers: [BooksService],
     exports: [],
 })
 export class BooksModule {}

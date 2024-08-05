@@ -23,10 +23,12 @@ export class RolesGuard implements CanActivate {
         )
         if (!requiredRoles) return true
         const { headers } = context.switchToHttp().getRequest()
-        let [tokenType, token] = headers.authorization.split(' ') as string[]
+        let bearerToken = headers.authorization as string
+        if (!bearerToken) throw new UnauthorizedException()
+        let [tokenType, token] = bearerToken.split(' ') as string[]
         if (!tokenType) throw new UnauthorizedException()
         let user = await this.jwtService.verifyAsync(token).catch((err) => {
-            throw new UnauthorizedException('Получите новую пару токенов')
+            throw new UnauthorizedException('refresh-tokens')
         })
         // console.log(context.switchToHttp().getRequest().asadjikfqwjk)
         // console.log(user)
