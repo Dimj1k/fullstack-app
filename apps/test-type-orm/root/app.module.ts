@@ -1,5 +1,5 @@
 import { MailerModule } from '@nestjs-modules/mailer'
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { AuthModule, PUBLIC_KEY } from './auth/auth.module'
@@ -9,7 +9,8 @@ import { POSTGRES_SUBSCRIBERS } from './subscribers'
 import { UserModule } from './user/user.module'
 import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
-import { JwtStrategy } from './strategy/jwt.strategy'
+import { LoggerMiddleware } from './middlewares/logger.middleware'
+import { BooksController } from './books/books.controller'
 
 @Module({
     imports: [
@@ -55,4 +56,8 @@ import { JwtStrategy } from './strategy/jwt.strategy'
     controllers: [],
     providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(LoggerMiddleware).forRoutes(BooksController)
+    }
+}
