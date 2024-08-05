@@ -16,6 +16,7 @@ import {
     VirtualColumn,
 } from 'typeorm'
 import { Book } from '../books/book.entity'
+import { ApiProperty } from '@nestjs/swagger'
 
 export enum GENDER {
     MALE,
@@ -54,6 +55,7 @@ export class User {
     id: string
 
     @Column({ type: 'varchar', length: 60 })
+    @ApiProperty({ example: 'dsa@das.com', description: 'email' })
     email: string
 
     @Column({ type: 'text', name: 'password_hash' })

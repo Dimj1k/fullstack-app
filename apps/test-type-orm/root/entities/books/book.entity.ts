@@ -2,10 +2,8 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    JoinTable,
     ManyToMany,
     PrimaryGeneratedColumn,
-    VirtualColumn,
 } from 'typeorm'
 import { User } from '../user/user.entity'
 

@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common'
+import {
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common'
 import { CreateBookDto } from './dto/create-book.dto'
 import { UpdateBookDto } from './dto/update-book.dto'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
@@ -22,12 +26,7 @@ export class BooksService {
         })
         if (foundedBook) throw new ConflictException()
         let newBook = this.bookRepository.create(createBookDto)
-        newBook.users = [
-            await this.userRepository.findOneBy({
-                id: '7162236d-4e14-4c0c-9b4b-cfd07612b86a',
-            }),
-        ]
-        this.bookRepository.save(newBook)
+        this.bookRepository.insert(newBook)
         return newBook
     }
 
@@ -41,6 +40,7 @@ export class BooksService {
 
     async addBook(userId: string, nameBook: string) {
         let book = await this.bookRepository.findOneBy({ nameBook })
+        if (!book) throw new NotFoundException()
         await this.dataSource.transaction(
             async (transactionalEntityManager: EntityManager) => {
                 await transactionalEntityManager.insert('users_books', {
@@ -52,8 +52,17 @@ export class BooksService {
         return { success: `${nameBook} добавлена` }
     }
 
+    async getBooksUser(userId: string) {
+        return this.userRepository
+            .findOne({
+                where: { id: userId },
+                relations: ['books'],
+            })
+            .then((user) => user.books)
+    }
+
     findOne(id: string) {
-        return this.bookRepository.findOneBy({ bookId: id })
+        return this.bookRepository.findOneBy({ nameBook: id })
     }
 
     update(id: string, updateBooksDto: UpdateBookDto) {

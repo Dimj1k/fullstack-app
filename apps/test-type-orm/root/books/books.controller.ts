@@ -21,12 +21,15 @@ import { JwtGuard } from '../guards/jwt.guard'
 import { Request } from 'express'
 import { JwtPayload } from '../interfaces/jwt-controller.interface'
 import { FindAllBooksDto } from './dto/find-all-books.dto'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
+@ApiTags('books')
 @UsePipes(new ValidationPipe())
 @Controller('books')
 export class BooksController {
     constructor(private readonly booksService: BooksService) {}
 
+    @ApiBearerAuth()
     @UseGuards(RolesGuard)
     @Roles([ROLE.ADMIN])
     @Post('/create')
@@ -34,7 +37,7 @@ export class BooksController {
         return this.booksService.create(createBooksDto)
     }
 
-    @Get('/find')
+    @Post('/find')
     findAll(@Body() { skip, limit }: FindAllBooksDto) {
         return this.booksService.findAll(skip, limit)
     }
@@ -44,6 +47,15 @@ export class BooksController {
         return this.booksService.findOne(nameBook)
     }
 
+    @ApiBearerAuth()
+    @UseGuards(JwtGuard)
+    @Get('/getOwnedBooks')
+    getOwnedBooks(@Req() request: Request & { user: JwtPayload }) {
+        let user = request.user
+        return this.booksService.getBooksUser(user.userId)
+    }
+
+    @ApiBearerAuth()
     @UseGuards(JwtGuard)
     @Post('/addBook/:nameBook')
     addBook(
@@ -54,6 +66,7 @@ export class BooksController {
         return this.booksService.addBook(user.userId, nameBook)
     }
 
+    @ApiBearerAuth()
     @UseGuards(RolesGuard)
     @Roles([ROLE.ADMIN])
     @Patch('/update/:id')
@@ -61,6 +74,7 @@ export class BooksController {
         return this.booksService.update(id, updateBookDto)
     }
 
+    @ApiBearerAuth()
     @UseGuards(RolesGuard)
     @Roles([ROLE.ADMIN])
     @Delete('/delete/:id')

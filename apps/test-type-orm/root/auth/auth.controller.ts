@@ -17,7 +17,9 @@ import { REFRESH_TOKEN, SECURE_COOKIES } from '../constants'
 import { Tokens } from '../interfaces/jwt-controller.interface'
 import { GetCookie } from '../decorators/get-cookie.decorator'
 import { lastValueFrom, take } from 'rxjs'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}

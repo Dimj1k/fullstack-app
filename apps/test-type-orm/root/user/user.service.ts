@@ -1,13 +1,14 @@
 import {
     BadRequestException,
     Injectable,
+    NotFoundException,
     UnauthorizedException,
     UseGuards,
 } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, EntityManager, FindOneOptions, Repository } from 'typeorm'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { User, UserInfo } from '../entities/user/user.entity'
+import { ROLE, User, UserInfo } from '../entities/user/user.entity'
 import { UserFromMongo } from './user.controller'
 import { UUID } from 'crypto'
 import { crypt } from '../utils/crypt.util'
@@ -107,6 +108,13 @@ export class UserService {
             .catch((err) => {
                 throw err
             })
+    }
+
+    async upgradeToAdmin(id: string) {
+        let foundedUser = await this.findUser({ id })
+        if (!foundedUser) throw new NotFoundException()
+        foundedUser.role.push(ROLE.ADMIN)
+        return this.userRepository.update({ id }, { role: foundedUser.role })
     }
 
     async findUser(

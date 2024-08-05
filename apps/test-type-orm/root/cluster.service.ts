@@ -10,9 +10,6 @@ const logger = new Logger('AppClusterService')
 @Injectable()
 export class AppClusterService {
     static clusterize(callback: Function, cpuLimit: number = numCPUs): void {
-        process.on('uncaughtException', (err) => {
-            logger.error(err)
-        })
         if (cluster.isPrimary) {
             if (cpuLimit > numCPUs || cpuLimit < 1) cpuLimit = numCPUs
             logger.log(`Primary server started on ${process.pid}`)
