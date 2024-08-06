@@ -12,7 +12,6 @@ export const Beetween = (
     @Injectable()
     class Beetween implements PipeTransform {
         transform(value: number, metadata: ArgumentMetadata) {
-            if (typeof value !== 'number') return value
             if (value < leftSide || value > rightSide)
                 throw new ConflictException()
             return value
