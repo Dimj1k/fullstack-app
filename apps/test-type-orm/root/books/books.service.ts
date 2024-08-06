@@ -30,11 +30,11 @@ export class BooksService {
         return newBook
     }
 
-    async findAll(skip: number = 0, limit: number = 20) {
+    async findAll(skip: number = 0, take: number = 20) {
         return this.bookRepository.find({
             select: ['bookId', 'nameBook', 'createdAt'],
             skip,
-            take: limit,
+            take,
         })
     }
 

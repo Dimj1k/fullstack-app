@@ -1,10 +1,4 @@
-import {
-    ClassSerializerInterceptor,
-    Controller,
-    UseInterceptors,
-    UsePipes,
-    ValidationPipe,
-} from '@nestjs/common'
+import { ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common'
 import { RegisterService } from './register.service'
 import { GrpcMethod } from '@nestjs/microservices'
 import { CreateUserDto } from '../dtos/create-user.dto'
@@ -15,7 +9,6 @@ import { Cluster } from 'node:cluster'
 
 const cluster = require('node:cluster') as Cluster
 
-@UsePipes(new ValidationPipe())
 export class RegisterController {
     constructor(private readonly registerService: RegisterService) {}
 
@@ -34,7 +27,7 @@ export class RegisterController {
         code: RegisterCodeDto,
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
-    ): Promise<Omit<CacheUser, 'token' | 'createdAt'>> {
+    ): Promise<Omit<CacheUser, 'code' | 'createdAt'>> {
         return new CacheUser(await this.registerService.deleteByCodeUser(code))
     }
 }

@@ -28,7 +28,7 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Get('/:id')
-    async findUser(@Param(':id') id: string) {
+    async findUser(@Param('id') id: string) {
         return this.userService.findUser({ id }, { relations: { books: true } })
     }
 

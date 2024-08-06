@@ -9,8 +9,6 @@ import {
     Query,
     Req,
     UseGuards,
-    UsePipes,
-    ValidationPipe,
 } from '@nestjs/common'
 import { CreateBookDto } from './dto/create-book.dto'
 import { UpdateBookDto } from './dto/update-book.dto'
@@ -27,7 +25,6 @@ import { Beetween } from '../pipes/beetween.pipe'
 type RequestWithUser = Request & { user: JwtPayload }
 
 @ApiTags('books')
-@UsePipes(new ValidationPipe())
 @Controller('books')
 export class BooksController {
     constructor(private readonly booksService: BooksService) {}
@@ -45,7 +42,7 @@ export class BooksController {
         @Query('skip', Beetween(0)) skip: number,
         @Query('limit', Beetween(0, 500)) limit: number,
     ) {
-        return this.booksService.findAll(+skip, +limit)
+        return this.booksService.findAll(skip, limit)
     }
 
     @Get('/find/:nameBook')

@@ -11,7 +11,7 @@ async function bootstrap() {
     app.setGlobalPrefix('api')
     app.disable('x-powered-by')
     app.use(cookieParser())
-    app.useGlobalPipes(new ValidationPipe())
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     const config = new DocumentBuilder()
         .addBearerAuth({
             name: 'Authorization',
