@@ -3,7 +3,6 @@ import {
     Injectable,
     NotFoundException,
     OnModuleInit,
-    UnauthorizedException,
 } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { Client, ClientGrpc, Transport } from '@nestjs/microservices'
@@ -12,10 +11,10 @@ import { join } from 'path'
 import { Metadata } from '@grpc/grpc-js'
 import { RegisterCode } from './dto/register-token.dto'
 import { MONGO_DB_LOCATION } from '../constants'
-import { catchError, NotFoundError } from 'rxjs'
+import { catchError } from 'rxjs'
 
 @Injectable()
-export class CreateUserService implements OnModuleInit {
+export class RegistrService implements OnModuleInit {
     private registerService: RegisterController
     @Client({
         transport: Transport.GRPC,

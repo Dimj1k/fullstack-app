@@ -10,6 +10,7 @@ import {
     Transport,
 } from '@nestjs/microservices'
 import { join } from 'path'
+import { MyMailerService } from '../root/mailer/mailer.service'
 
 describe('UserRegistration (e2e)', () => {
     let app: INestApplication
@@ -26,7 +27,14 @@ describe('UserRegistration (e2e)', () => {
             transport: Transport.GRPC,
             options: {
                 package: 'mongo',
-                protoPath: [join(__dirname, 'mongo-service.proto')],
+                protoPath: [
+                    join(
+                        'apps',
+                        'test-type-orm',
+                        'test',
+                        'mongo-service.proto',
+                    ),
+                ],
             },
         })
 
@@ -46,6 +54,7 @@ describe('UserRegistration (e2e)', () => {
     })
 
     test(`GRPC Sending and Receiving`, async () => {
+        let mailer: MyMailerService
         await request(app.getHttpServer())
             .post('/user/registration')
             .send({
@@ -59,7 +68,7 @@ describe('UserRegistration (e2e)', () => {
             })
     })
 
-    // afterAll(async () => {
-    //     await app.close()
-    // })
+    afterAll(async () => {
+        await app.close()
+    })
 })

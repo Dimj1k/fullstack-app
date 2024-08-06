@@ -117,6 +117,13 @@ export class UserService {
         return this.userRepository.update({ id }, { role: foundedUser.role })
     }
 
+    async dropAdmin(id: string) {
+        let foundedUser = await this.findUser({ id })
+        if (!foundedUser) throw new NotFoundException()
+        let roles = foundedUser.role.filter((val) => val !== ROLE.ADMIN)
+        return this.userRepository.update({ id }, { role: roles })
+    }
+
     async findUser(
         where: Partial<Omit<User, 'books' | 'role'>>,
         options: Omit<FindOneOptions<User>, 'where'> = {},

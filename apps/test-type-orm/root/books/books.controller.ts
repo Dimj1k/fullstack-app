@@ -24,6 +24,8 @@ import { JwtPayload } from '../interfaces/jwt-controller.interface'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Beetween } from '../pipes/beetween.pipe'
 
+type RequestWithUser = Request & { user: JwtPayload }
+
 @ApiTags('books')
 @UsePipes(new ValidationPipe())
 @Controller('books')
@@ -54,7 +56,7 @@ export class BooksController {
     @ApiBearerAuth()
     @UseGuards(JwtGuard)
     @Get('/getOwnedBooks')
-    getOwnedBooks(@Req() request: Request & { user: JwtPayload }) {
+    getOwnedBooks(@Req() request: RequestWithUser) {
         let user = request.user
         return this.booksService.getBooksUser(user.userId)
     }
@@ -64,7 +66,7 @@ export class BooksController {
     @Post('/addBook/:nameBook')
     addBook(
         @Param('nameBook') nameBook: string,
-        @Req() request: Request & { user: JwtPayload },
+        @Req() request: RequestWithUser,
     ) {
         let user = request.user
         return this.booksService.addBook(user.userId, nameBook)

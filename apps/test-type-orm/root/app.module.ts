@@ -1,19 +1,21 @@
 import { MailerModule } from '@nestjs-modules/mailer'
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { AuthModule, PUBLIC_KEY } from './auth/auth.module'
-import { BooksModule } from './books/books.module'
-import { POSTGRES_ENTITIES } from './entities'
-import { POSTGRES_SUBSCRIBERS } from './subscribers'
-import { UserModule } from './user/user.module'
 import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
-import { LoggerMiddleware } from './middlewares/logger.middleware'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { AuthModule, PUBLIC_KEY } from './auth/auth.module'
 import { BooksController } from './books/books.controller'
+import { BooksModule } from './books/books.module'
+import { POSTGRES_ENTITIES } from './entities'
+import { LoggerMiddleware } from './middlewares/logger.middleware'
+import { RegistrModule } from './registration/registr.module'
+import { POSTGRES_SUBSCRIBERS } from './subscribers'
+import { UserModule } from './user/user.module'
 
 @Module({
     imports: [
+        RegistrModule,
         BooksModule,
         AuthModule,
         JwtModule.register({

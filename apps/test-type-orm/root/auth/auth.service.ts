@@ -13,7 +13,6 @@ import {
 } from '../interfaces/jwt-controller.interface'
 import { Metadata } from '@grpc/grpc-js'
 import { comparePasswords } from '../utils/compare-passwords.util'
-import { JwtService } from '@nestjs/jwt'
 import { lastValueFrom, take } from 'rxjs'
 
 @Injectable()

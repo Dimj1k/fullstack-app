@@ -1,6 +1,6 @@
 import { Metadata } from '@grpc/grpc-js'
-import { CreateUserDto } from '../user/dto/create-user.dto'
-import { RegisterCode } from '../user/dto/register-token.dto'
+import { CreateUserDto } from '../registration/dto/create-user.dto'
+import { RegisterCode } from '../registration/dto/register-token.dto'
 import { Observable } from 'rxjs'
 import { User } from '../entities/user/user.entity'
 

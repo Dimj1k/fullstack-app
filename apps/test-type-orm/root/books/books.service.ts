@@ -39,8 +39,7 @@ export class BooksService {
     }
 
     async addBook(userId: string, nameBook: string) {
-        let book = await this.bookRepository.findOneBy({ nameBook })
-        if (!book) throw new NotFoundException()
+        let book = await this.bookRepository.findOneByOrFail({ nameBook })
         await this.dataSource.transaction(
             async (transactionalEntityManager: EntityManager) => {
                 await transactionalEntityManager.insert('users_books', {
