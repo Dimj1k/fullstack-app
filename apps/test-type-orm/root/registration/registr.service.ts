@@ -11,7 +11,7 @@ import { join } from 'path'
 import { Metadata } from '@grpc/grpc-js'
 import { RegisterCode } from './dto/register-token.dto'
 import { MONGO_DB_LOCATION } from '../constants'
-import { catchError } from 'rxjs'
+import { catchError, timeout } from 'rxjs'
 
 @Injectable()
 export class RegistrService implements OnModuleInit {
@@ -34,16 +34,18 @@ export class RegistrService implements OnModuleInit {
     async createInCacheUser(createUserDto: CreateUserDto, metadata?: Metadata) {
         return this.registerService.createInCacheUser(createUserDto).pipe(
             catchError((err) => {
-                throw new ConflictException(err)
+                throw err
             }),
+            timeout(5000),
         )
     }
 
     async returnByTokenUser(token: RegisterCode) {
         return this.registerService.returnByTokenUser(token).pipe(
             catchError((err) => {
-                throw new NotFoundException(err)
+                throw err
             }),
+            timeout(5000),
         )
     }
 }

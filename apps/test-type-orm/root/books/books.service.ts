@@ -6,7 +6,7 @@ import {
 import { CreateBookDto } from './dto/create-book.dto'
 import { UpdateBookDto } from './dto/update-book.dto'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { DataSource, EntityManager, Repository } from 'typeorm'
+import { DataSource, EntityManager, Like, Repository } from 'typeorm'
 import { Book } from '../entities/books/book.entity'
 import { User } from '../entities/user/user.entity'
 
@@ -39,7 +39,8 @@ export class BooksService {
     }
 
     async addBook(userId: string, nameBook: string) {
-        let book = await this.bookRepository.findOneByOrFail({ nameBook })
+        let book = await this.bookRepository.findOneBy({ nameBook })
+        if (!book) throw new NotFoundException()
         await this.dataSource.transaction(
             async (transactionalEntityManager: EntityManager) => {
                 await transactionalEntityManager.insert('users_books', {
@@ -60,8 +61,8 @@ export class BooksService {
             .then((user) => user.books)
     }
 
-    findOne(id: string) {
-        return this.bookRepository.findOneBy({ nameBook: id })
+    findOne(nameBook: string) {
+        return this.bookRepository.findOneBy({ nameBook: Like(`${nameBook}%`) })
     }
 
     update(id: string, updateBooksDto: UpdateBookDto) {

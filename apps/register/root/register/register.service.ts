@@ -19,7 +19,7 @@ export class RegisterService {
             .then((exists) => {
                 if (!exists)
                     this.userRepository.createCollectionIndex('createdAt', {
-                        expireAfterSeconds: 300,
+                        expireAfterSeconds: 900,
                         background: true,
                         name: NAME_TTL_INDEX_CODE,
                     })

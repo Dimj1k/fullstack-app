@@ -13,7 +13,7 @@ import {
 } from '../interfaces/jwt-controller.interface'
 import { Metadata } from '@grpc/grpc-js'
 import { comparePasswords } from '../utils/compare-passwords.util'
-import { lastValueFrom, take } from 'rxjs'
+import { lastValueFrom, take, timeout } from 'rxjs'
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -47,14 +47,16 @@ export class AuthService implements OnModuleInit {
             throw new UnauthorizedException('incorrect login or password')
         let metadata = new Metadata()
         metadata.set('client-user-agent', userAgent)
-        return this.jwtService.createTokens(
-            {
-                email: user.email,
-                userId: user.id,
-                roles: user.role,
-            },
-            metadata,
-        )
+        return this.jwtService
+            .createTokens(
+                {
+                    email: user.email,
+                    userId: user.id,
+                    roles: user.role,
+                },
+                metadata,
+            )
+            .pipe(timeout(5000))
     }
 
     async refreshTokens(
@@ -64,7 +66,9 @@ export class AuthService implements OnModuleInit {
         let metadata = new Metadata()
         metadata.set('client-user-agent', userAgent)
         let userId = await lastValueFrom(
-            this.jwtService.checkToken({ token: refreshToken }).pipe(take(1)),
+            this.jwtService
+                .checkToken({ token: refreshToken })
+                .pipe(take(1), timeout(5000)),
         ).catch((err) => {
             throw new UnauthorizedException()
         })
@@ -77,16 +81,17 @@ export class AuthService implements OnModuleInit {
             userId: user.id,
         }
         try {
-            return this.jwtService.refreshTokens(
-                { token: refreshToken, ...jwtPayload },
-                metadata,
-            )
+            return this.jwtService
+                .refreshTokens({ token: refreshToken, ...jwtPayload }, metadata)
+                .pipe(timeout(5000))
         } catch {
             throw new UnauthorizedException()
         }
     }
 
     async deleteTokens(refreshToken: Tokens['refreshToken']['token']) {
-        return this.jwtService.deleteTokens({ token: refreshToken })
+        return this.jwtService
+            .deleteTokens({ token: refreshToken })
+            .pipe(timeout(5000))
     }
 }

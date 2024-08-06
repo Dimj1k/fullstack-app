@@ -23,20 +23,20 @@ describe('UserRegistration (e2e)', () => {
 
         app = moduleFixture.createNestApplication()
 
-        app.connectMicroservice<MicroserviceOptions>({
-            transport: Transport.GRPC,
-            options: {
-                package: 'mongo',
-                protoPath: [
-                    join(
-                        'apps',
-                        'test-type-orm',
-                        'test',
-                        'mongo-service.proto',
-                    ),
-                ],
-            },
-        })
+        // app.connectMicroservice<MicroserviceOptions>({
+        //     transport: Transport.GRPC,
+        //     options: {
+        //         package: 'mongo',
+        //         protoPath: [
+        //             join(
+        //                 'apps',
+        //                 'test-type-orm',
+        //                 'test',
+        //                 'mongo-service.proto',
+        //             ),
+        //         ],
+        //     },
+        // })
 
         await app.startAllMicroservices()
         await app.init()

@@ -37,12 +37,12 @@ export class BooksController {
         return this.booksService.create(createBooksDto)
     }
 
-    @Get('/find')
+    @Get('/findAll')
     findAll(
         @Query('skip', Beetween(0)) skip: number,
-        @Query('limit', Beetween(0, 500)) limit: number,
+        @Query('take', Beetween(0, 500)) take: number,
     ) {
-        return this.booksService.findAll(skip, limit)
+        return this.booksService.findAll(skip, take)
     }
 
     @Get('/find/:nameBook')

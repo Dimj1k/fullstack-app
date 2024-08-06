@@ -13,7 +13,10 @@ export class AppClusterService {
         if (cluster.isPrimary) {
             if (cpuLimit > numCPUs || cpuLimit < 1) cpuLimit = numCPUs
             logger.log(`Primary server started on ${process.pid}`)
-            for (let i = 0; i < cpuLimit; i++) cluster.fork()
+            for (let i = 0; i < cpuLimit; i++) {
+                cluster.schedulingPolicy = cluster.SCHED_RR
+                cluster.fork()
+            }
             cluster.on('exit', (worker) => {
                 logger.error(`Worker ${worker.process.pid} died. Restarting`)
                 cluster.fork()
