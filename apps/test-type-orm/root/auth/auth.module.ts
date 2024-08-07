@@ -6,9 +6,15 @@ import { User } from '../entities/user/user.entity'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
-export const PUBLIC_KEY = __dirname.includes('auth')
-    ? readFileSync(join(__dirname, 'key', 'public-key.pem'))
-    : readFileSync(join(__dirname, 'auth', 'key', 'public-key.pem'))
+export const PUBLIC_KEY = readFileSync(
+    join(
+        __dirname,
+        __dirname.includes('auth') ? '..' : '.',
+        'auth',
+        'key',
+        'public-key.pem',
+    ),
+)
 
 @Module({
     imports: [TypeOrmModule.forFeature([User])],

@@ -40,8 +40,8 @@ export class RegisterService {
     }
 
     async deleteByCodeUser(code: RegisterCodeDto) {
-        let deletedUser = (await this.userRepository.findOneAndDelete(code))
-            .value
+        console.log(code)
+        let deletedUser = await this.userRepository.findOneAndDelete(code)
         if (!deletedUser)
             throw new RpcException(
                 new EntityNotFoundError(CacheUser, 'user not found'),

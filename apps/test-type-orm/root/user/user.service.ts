@@ -28,20 +28,37 @@ export class UserService {
 
     async createUser(user: UserFromMongo) {
         let newUser: User
-        this.userRepository
-        await this.dataSource.transaction(
-            'SERIALIZABLE',
-            async (transactionalEntityManager: EntityManager) => {
-                let newUserInfo = this.userInfoRepository.create(user?.info)
-                await transactionalEntityManager.insert(UserInfo, newUserInfo)
-                newUser = this.userRepository.create({
-                    ...user,
-                    info: newUserInfo,
-                })
-                await transactionalEntityManager.insert(User, newUser)
-            },
-        )
+        let queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction('READ COMMITTED')
+        try {
+            let newUserInfo = this.userInfoRepository.create(user?.info)
+            await queryRunner.manager.insert(UserInfo, newUserInfo)
+            newUser = this.userRepository.create({
+                ...user,
+                info: newUserInfo,
+            })
+            await queryRunner.manager.insert(User, newUser)
+            await queryRunner.commitTransaction()
+        } catch (err) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
         return newUser
+        // await this.dataSource.transaction(
+        //     'SERIALIZABLE',
+        //     async (transactionalEntityManager: EntityManager) => {
+        //         let newUserInfo = this.userInfoRepository.create(user?.info)
+        //         await transactionalEntityManager.insert(UserInfo, newUserInfo)
+        //         newUser = this.userRepository.create({
+        //             ...user,
+        //             info: newUserInfo,
+        //         })
+        //         await transactionalEntityManager.insert(User, newUser)
+        //     },
+        // )
+        // return newUser
     }
 
     async updateUser(id: UUID, updateUserDto: UpdateUserDto): Promise<void> {

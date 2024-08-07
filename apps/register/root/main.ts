@@ -11,7 +11,7 @@ async function bootstrap() {
         options: {
             url: URL_MICROSERVICE,
             package: 'mongo',
-            protoPath: join(__dirname, 'protos', 'mongo-service.proto'),
+            protoPath: join(__dirname, 'protos', 'mongo.proto'),
         },
     })
     await app.listen()

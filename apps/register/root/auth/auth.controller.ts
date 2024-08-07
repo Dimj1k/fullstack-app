@@ -81,7 +81,7 @@ export class AuthController {
         call: ServerUnaryCall<any, any>,
     ) {
         let { userId } = await this.tokenRepository
-            .findOneByOrFail(refreshToken)
+            .findOneBy(refreshToken)
             .catch((err) => {
                 throw new RpcException(err)
             })
@@ -118,7 +118,8 @@ export class AuthController {
                 },
             },
         )
-        if (!foundedToken) throw new RpcException(new UnauthorizedException())
+        if (!foundedToken.value)
+            throw new RpcException(new UnauthorizedException())
         return tokens
     }
 

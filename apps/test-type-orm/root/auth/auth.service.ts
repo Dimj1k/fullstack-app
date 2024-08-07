@@ -22,7 +22,7 @@ export class AuthService implements OnModuleInit {
         options: {
             url: MONGO_DB_LOCATION,
             package: 'mongo',
-            protoPath: join(__dirname, 'protos', 'mongo-service.proto'),
+            protoPath: join(__dirname, 'protos', 'mongo.proto'),
         },
     })
     client: ClientGrpc
