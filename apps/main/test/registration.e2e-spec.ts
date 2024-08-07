@@ -11,7 +11,6 @@ import { addDays } from 'date-fns'
 import { Db, MongoClient } from 'mongodb'
 import { User, UserInfo } from '../src/entities/user/user.entity'
 import { POSTGRES_ENTITIES } from '../src/entities'
-import { registrationUserForLogin } from './mocks/login-user.mock'
 
 function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
@@ -57,14 +56,6 @@ afterAll(async () => {
             .from('users')
             .where('users.email = :email', {
                 email: registrationUserSuccess.email,
-            })
-            .execute(),
-        pg
-            .createQueryBuilder()
-            .delete()
-            .from('users')
-            .where('usrs.email = :email', {
-                email: registrationUserForLogin.email,
             })
             .execute(),
         mongo.collection('cache_user').deleteMany({}),
@@ -141,18 +132,4 @@ describe('UserRegistration (e2e)', () => {
                 statusCode: 409,
             })
     })
-})
-
-describe('Auth Controller (e2e)', async () => {
-    let jwtToken: string
-    beforeAll(async () => {
-        await request(server)
-            .post('/api/registration')
-            .send(registrationUserForLogin)
-        let { code } = await mongo.collection('cache_user').findOne({
-            email: registrationUserForLogin.email,
-        })
-        await request(server).post('/api/registration/confirm').send({ code })
-    })
-    test('Login User - success', async () => {})
 })

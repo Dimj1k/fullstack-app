@@ -44,6 +44,7 @@ export class AuthController {
         return this.setTokens(await lastValueFrom(tokens$), request, response)
     }
 
+    @HttpCode(HttpStatus.OK)
     @Post('refresh-tokens')
     async refreshTokens(
         @GetCookie(REFRESH_TOKEN)
@@ -57,11 +58,11 @@ export class AuthController {
             .refreshTokens(refreshToken, userAgent)
             .catch((err) => {
                 response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
-                throw err ?? new UnauthorizedException()
+                throw err
             })
         let tokens$ = await lastValueFrom(tokens.pipe(take(1))).catch((err) => {
             response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
-            throw err ?? new UnauthorizedException()
+            throw new UnauthorizedException(err)
         })
         return this.setTokens(tokens$, request, response)
     }

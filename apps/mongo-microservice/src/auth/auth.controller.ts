@@ -118,8 +118,7 @@ export class AuthController {
                 },
             },
         )
-        if (!foundedToken.value)
-            throw new RpcException(new UnauthorizedException())
+        if (!foundedToken) throw new RpcException(new UnauthorizedException())
         return tokens
     }
 
