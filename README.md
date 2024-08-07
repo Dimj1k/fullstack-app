@@ -36,16 +36,16 @@ $ npm install
 
 ```bash
 # development
-$ npm run start test-type-orm
-$ npm run start register
+$ npm run start mongo
+$ npm run start main
 
 # watch mode
-$ npm run start:dev test-type-orm
-$ npm run start:dev register
+$ npm run start:dev mongo
+$ npm run start:dev main
 
 # production mode
-$ npm run start:prod test-type-orm
-$ npm run start:prod register
+$ npm run start:prod mongo
+$ npm run start:prod main
 ```
 
 ## Test
