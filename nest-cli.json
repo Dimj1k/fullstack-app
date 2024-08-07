@@ -1,33 +1,33 @@
 {
     "$schema": "https://json.schemastore.org/nest-cli",
     "collection": "@nestjs/schematics",
-    "sourceRoot": "apps/test-type-orm/root",
+    "sourceRoot": "apps/main/src",
     "compilerOptions": {
         "deleteOutDir": true,
         "webpack": true,
-        "tsConfigPath": "apps/test-type-orm/tsconfig.app.json",
+        "tsConfigPath": "apps/main/tsconfig.app.json",
         "assets": ["**/*.proto", "**/*.pem"],
         "watchAssets": true
     },
     "monorepo": true,
-    "root": "apps/test-type-orm",
+    "root": "apps/main",
     "projects": {
-        "test-type-orm": {
+        "main": {
             "type": "application",
-            "root": "apps/test-type-orm",
+            "root": "apps/main",
             "entryFile": "main",
-            "sourceRoot": "apps/test-type-orm/root",
+            "sourceRoot": "apps/main/src",
             "compilerOptions": {
-                "tsConfigPath": "apps/test-type-orm/tsconfig.app.json"
+                "tsConfigPath": "apps/main/tsconfig.app.json"
             }
         },
-        "register": {
+        "mongo": {
             "type": "application",
-            "root": "apps/register",
+            "root": "apps/mongo-microservice",
             "entryFile": "main",
-            "sourceRoot": "apps/register/root",
+            "sourceRoot": "apps/mongo-microservice/src",
             "compilerOptions": {
-                "tsConfigPath": "apps/register/tsconfig.app.json"
+                "tsConfigPath": "apps/mongo-microservice/tsconfig.app.json"
             }
         }
     }
