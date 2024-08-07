@@ -103,7 +103,7 @@ afterAll(async () => {
                 email: registrationUserForLogin.email,
             })
             .execute(),
-        mongo.collection('token').deleteOne({ userAgent: 'undefined' }),
+        mongo.collection('token').deleteMany({ userAgent: 'undefined' }),
     ])
     await Promise.all([pg.destroy(), connection.close()])
     await app.close()
