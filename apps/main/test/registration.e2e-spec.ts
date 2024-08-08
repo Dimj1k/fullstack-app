@@ -5,16 +5,14 @@ import { AppModule } from '../src/app.module'
 import {
     registrationUserFail,
     registrationUserSuccess,
+    secondUser,
 } from './mocks/registration-user.mock'
 import { DataSource } from 'typeorm'
 import { addDays } from 'date-fns'
 import { Db, MongoClient } from 'mongodb'
 import { User, UserInfo } from '../src/entities/user/user.entity'
 import { POSTGRES_ENTITIES } from '../src/entities'
-
-function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-}
+import { sleep } from './utils'
 
 let app: INestApplication
 let connection: MongoClient
@@ -48,20 +46,22 @@ beforeEach(async () => {
 
     server = app.getHttpServer()
 })
+afterEach(async () => {
+    await app.close()
+})
 afterAll(async () => {
     await Promise.all([
         pg
             .createQueryBuilder()
             .delete()
             .from('users')
-            .where('users.email = :email', {
-                email: registrationUserSuccess.email,
+            .where('users.email = any (:emails)', {
+                emails: [registrationUserSuccess.email, secondUser.email],
             })
             .execute(),
         mongo.collection('cache_user').deleteMany({}),
     ])
     await Promise.all([pg.destroy(), connection.close()])
-    await app.close()
 })
 
 describe('UserRegistration (e2e)', () => {
@@ -125,7 +125,18 @@ describe('UserRegistration (e2e)', () => {
             })
         await request(server)
             .post('/api/registration')
-            .send(registrationUserSuccess)
+            .send(secondUser)
+            .expect(201)
+        let { code } = await mongo
+            .collection('cache_user')
+            .findOne({ email: secondUser.email })
+        await request(server)
+            .post('/api/registration/confirm')
+            .send({ code })
+            .expect(201)
+        await request(server)
+            .post('/api/registration')
+            .send(secondUser)
             .expect(409, {
                 message: "user's exists",
                 error: 'Conflict',

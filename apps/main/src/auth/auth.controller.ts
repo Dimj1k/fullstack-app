@@ -38,7 +38,7 @@ export class AuthController {
         let tokens = await this.authService
             .login(authDto, userAgent)
             .catch((err) => {
-                throw err ?? new UnauthorizedException()
+                throw err ?? new UnauthorizedException({ message: 123 })
             })
         let tokens$ = tokens.pipe(take(1))
         return this.setTokens(await lastValueFrom(tokens$), request, response)

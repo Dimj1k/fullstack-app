@@ -46,19 +46,6 @@ export class UserService {
             await queryRunner.release()
         }
         return newUser
-        // await this.dataSource.transaction(
-        //     'SERIALIZABLE',
-        //     async (transactionalEntityManager: EntityManager) => {
-        //         let newUserInfo = this.userInfoRepository.create(user?.info)
-        //         await transactionalEntityManager.insert(UserInfo, newUserInfo)
-        //         newUser = this.userRepository.create({
-        //             ...user,
-        //             info: newUserInfo,
-        //         })
-        //         await transactionalEntityManager.insert(User, newUser)
-        //     },
-        // )
-        // return newUser
     }
 
     async updateUser(id: UUID, updateUserDto: UpdateUserDto): Promise<void> {
@@ -81,33 +68,9 @@ export class UserService {
             newPassword: _,
             ...updateUser
         } = updateUserDto
-        // let updUser: User
-        // let queryRunner = this.dataSource.createQueryRunner()
-        // await queryRunner.connect()
-        // await queryRunner.startTransaction()
-        // try {
-        //     if (updateUserInfo)
-        //         await queryRunner.manager.update(
-        //             UserInfo,
-        //             { id: foundedUser.info.id },
-        //             this.userInfoRepository.create(updateUserInfo),
-        //         )
-        //     updUser = (
-        //         await queryRunner.manager.update(
-        //             User,
-        //             { id: id },
-        //             this.userRepository.create(updateUser),
-        //         )
-        //     ).raw[0]
-        //     await queryRunner.commitTransaction()
-        // } catch {
-        //     await queryRunner.rollbackTransaction()
-        // } finally {
-        //     await queryRunner.release()
-        // }
         await this.dataSource
             .transaction(
-                'SERIALIZABLE',
+                'READ COMMITTED',
                 async (transactionalEntityManager: EntityManager) => {
                     if (updateUserInfo)
                         await transactionalEntityManager.update(

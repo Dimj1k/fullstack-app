@@ -60,13 +60,13 @@ export class BooksController {
 
     @ApiBearerAuth()
     @UseGuards(JwtGuard)
-    @Post('/addBook/:nameBook')
-    addBook(
+    @Post('/addToYourself/:nameBook')
+    addToYourself(
         @Param('nameBook') nameBook: string,
         @Req() request: RequestWithUser,
     ) {
         let user = request.user
-        return this.booksService.addBook(user.userId, nameBook)
+        return this.booksService.addToYourself(user.userId, nameBook)
     }
 
     @ApiBearerAuth()

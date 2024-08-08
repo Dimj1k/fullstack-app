@@ -9,3 +9,9 @@ export const registrationUserFail = {
     password: 'test',
     passwordConfirm: 'qwerty',
 }
+
+export const secondUser = {
+    email: 'test1@test.test',
+    password: 'test',
+    passwordConfirm: 'test',
+}

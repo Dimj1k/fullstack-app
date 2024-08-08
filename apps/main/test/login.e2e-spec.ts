@@ -6,58 +6,15 @@ import { DataSource } from 'typeorm'
 import { Db, MongoClient } from 'mongodb'
 import { POSTGRES_ENTITIES } from '../src/entities'
 import {
-    loginUserSuccess,
-    registrationUserForLogin,
+    loginFifthUser,
+    loginFirstUser,
+    loginFourthUser,
+    loginSecondUser,
+    loginThirdUser,
 } from './mocks/login-user.mock'
 import { REFRESH_TOKEN } from '../src/constants'
 import * as cookieParser from 'cookie-parser'
-
-function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-interface ICookie {
-    name: string
-    value: string
-    path: string
-    expires: Date
-    httpOnly: boolean
-    secure: boolean
-    SameSite: 'lax' | 'strict' | 'none'
-}
-
-function split(str: string, splitter: string, limit: number = Infinity) {
-    let splitting = []
-    let beforeSpliter = ''
-    for (let char of str) {
-        if (char !== splitter) beforeSpliter += char
-        else {
-            if (splitting.length !== limit) {
-                splitting.push(beforeSpliter)
-                beforeSpliter = ''
-            } else beforeSpliter += splitter
-        }
-    }
-    splitting.push(beforeSpliter)
-    return splitting
-}
-
-function parseCookie(cookie: string): ICookie {
-    let [name, values] = split(cookie, '=', 1)
-    let [value, path, expires, ...options] = values.split('; ')
-    return {
-        name,
-        value,
-        path: path.split('=')[1],
-        expires: new Date(expires.split('=')[1]),
-        httpOnly: options.includes('HttpOnly'),
-        secure: options.includes('Secure'),
-        SameSite: options.at(-1).split('=')[1].toLowerCase() as
-            | 'lax'
-            | 'strict'
-            | 'none',
-    }
-}
+import { ICookie, parseCookie, sleep } from './utils'
 
 let app: INestApplication
 let connection: MongoClient
@@ -93,61 +50,67 @@ beforeEach(async () => {
 
     server = app.getHttpServer()
 })
+afterEach(async () => {
+    await app.close()
+})
 afterAll(async () => {
     await Promise.all([
         pg
             .createQueryBuilder()
             .delete()
             .from('users')
-            .where('users.email = :email', {
-                email: registrationUserForLogin.email,
+            .where('users.email = any (:emails)', {
+                emails: [
+                    loginFirstUser.email,
+                    loginSecondUser.email,
+                    loginThirdUser.email,
+                    loginFourthUser.email,
+                ],
             })
             .execute(),
         mongo.collection('token').deleteMany({ userAgent: 'undefined' }),
     ])
     await Promise.all([pg.destroy(), connection.close()])
-    await app.close()
 })
 
 const checkJwtToken = (jwtToken: string) => {
     expect(jwtToken).toBeDefined()
-    let token = JSON.parse(jwtToken) as { accessToken: string }
-    expect(token).toHaveProperty('accessToken')
-    let jwt = token.accessToken
-    expect(jwt).toMatch(
+    expect(jwtToken).toMatch(
         /^Bearer\s([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]*)/,
     )
-    return jwt
+    return jwtToken
+}
+
+type User = { email: string; password: string }
+
+const registrationUser = async (user: User) => {
+    const createUser = { ...user, passwordConfirm: user.password }
+    await request(server).post('/api/registration').send(createUser)
+    let { code } = await mongo.collection('cache_user').findOne({
+        email: createUser.email,
+    })
+    await request(server)
+        .post('/api/registration/confirm')
+        .send({ code })
+        .expect(201)
 }
 
 describe('Auth Controller (e2e)', () => {
-    test('Create User - success', async () => {
-        await request(server)
-            .post('/api/registration')
-            .send(registrationUserForLogin)
-        let { code } = await mongo.collection('cache_user').findOne({
-            email: registrationUserForLogin.email,
-        })
-        await request(server)
-            .post('/api/registration/confirm')
-            .send({ code })
-            .timeout(50)
-            .expect(201)
-    })
     describe('Login', () => {
         test('Login User - success', async () => {
+            await registrationUser(loginFirstUser)
             await request(server)
                 .post('/api/auth/login')
-                .send(loginUserSuccess)
+                .send(loginFirstUser)
                 .expect(200)
                 .then((res) => {
-                    checkJwtToken(res.text)
+                    checkJwtToken(res.body.accessToken)
                 })
         })
         test('Login User - error', async () => {
             await request(server)
                 .post('/api/auth/login')
-                .send({ ...loginUserSuccess, password: '6fh' })
+                .send({ ...loginFirstUser, password: 'error' })
                 .expect(401, {
                     message: 'incorrect login or password',
                     error: 'Unauthorized',
@@ -155,7 +118,7 @@ describe('Auth Controller (e2e)', () => {
                 })
             await request(server)
                 .post('/api/auth/login')
-                .send({ ...loginUserSuccess, email: 'error' })
+                .send({ ...loginFirstUser, email: 'error' })
                 .expect(401, {
                     message: 'incorrect login or password',
                     error: 'Unauthorized',
@@ -163,14 +126,16 @@ describe('Auth Controller (e2e)', () => {
                 })
         })
     })
-    let jwtToken: string
-    let cookie: ICookie
-    let origCookie: string
     describe('Refresh Tokens', () => {
         test('Get refresh token', async () => {
+            let jwtToken: string
+            let cookie: ICookie
+            let origCookie: string
+            await registrationUser(loginSecondUser)
             await request(server)
                 .post('/api/auth/login')
-                .send(loginUserSuccess)
+                .send(loginSecondUser)
+                .expect(200)
                 .then((res) => {
                     cookie = parseCookie(res.header['set-cookie'][0])
                     expect(cookie.name).toEqual(REFRESH_TOKEN)
@@ -178,44 +143,83 @@ describe('Auth Controller (e2e)', () => {
                         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
                     )
                     origCookie = res.header['set-cookie'][0]
+                    jwtToken = checkJwtToken(res.body.accessToken)
                 })
         })
-        let newJwtToken: string
-        let newOrigCookie: string
-        let newCookie: ICookie
         test('Refresh refresh token - success', async () => {
+            let oldJwtToken: string
+            let oldCookie: ICookie
+            let oldOrigCookie: string
+            await registrationUser(loginThirdUser)
+            await request(server)
+                .post('/api/auth/login')
+                .send(loginThirdUser)
+                .expect(200)
+                .then((res) => {
+                    oldJwtToken = checkJwtToken(res.body.accessToken)
+                    oldCookie = parseCookie(res.header['set-cookie'][0])
+                    oldOrigCookie = res.header['set-cookie'][0]
+                    expect(oldCookie.name).toEqual(REFRESH_TOKEN)
+                    expect(oldCookie.value).toMatch(
+                        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+                    )
+                })
+            await sleep(1000)
+            let newJwtToken: string
+            let newCookie: ICookie
+            let newOrigCookie: string
             await request(server)
                 .post('/api/auth/refresh-tokens')
-                .set('Cookie', [origCookie])
+                .set('Cookie', [oldOrigCookie])
                 .send()
                 .expect(200)
                 .then((res) => {
-                    newJwtToken = checkJwtToken(res.text)
-                    expect(jwtToken).not.toEqual(newJwtToken)
+                    newJwtToken = checkJwtToken(res.body.accessToken)
                     newCookie = parseCookie(res.header['set-cookie'][0])
                     newOrigCookie = res.header['set-cookie'][0]
                     expect(newCookie.name).toEqual(REFRESH_TOKEN)
                     expect(newCookie.value).toMatch(
                         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
                     )
-                    expect(newCookie.value).not.toEqual(cookie.value)
+                    expect(oldJwtToken).toBeDefined()
+                    expect(oldOrigCookie).toBeDefined()
+                    expect(newJwtToken).not.toEqual(oldJwtToken)
+                    expect(newOrigCookie).not.toEqual(oldOrigCookie)
                 })
         })
         test('Refresh refresh token - error', async () => {
+            let cookie: ICookie
+            let origCookie: string
+            await registrationUser(loginFourthUser)
+            await request(server)
+                .post('/api/auth/login')
+                .set('user-agent', 'undefined')
+                .send(loginFourthUser)
+                .expect(200)
+                .then((res) => {
+                    origCookie = res.header['set-cookie'][0]
+                    cookie = parseCookie(origCookie)
+                })
             await request(server)
                 .post('/api/auth/refresh-tokens')
-                .set('Cookie', [newOrigCookie])
+                .set('Cookie', [origCookie])
                 .set('user-agent', secondUserAgent)
                 .send()
                 .expect(401)
+            expect(
+                await mongo
+                    .collection('token')
+                    .findOne({ token: cookie.value }),
+            ).not.toBeNull()
         })
     })
 
     describe('logout', () => {
         test('logout', async () => {
+            await registrationUser(loginFifthUser)
             await request(server)
                 .post('/api/auth/login')
-                .send(loginUserSuccess)
+                .send(loginFifthUser)
                 .expect(200)
                 .then(async (res) => {
                     let refreshToken = res.header['set-cookie'][0]
