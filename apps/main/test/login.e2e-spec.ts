@@ -65,6 +65,7 @@ afterAll(async () => {
                     loginSecondUser.email,
                     loginThirdUser.email,
                     loginFourthUser.email,
+                    loginFifthUser.email,
                 ],
             })
             .execute(),
@@ -81,11 +82,11 @@ const checkJwtToken = (jwtToken: string) => {
     return jwtToken
 }
 
-type User = { email: string; password: string }
+export type TypeUser = { email: string; password: string }
 
-const registrationUser = async (user: User) => {
+export const registrationUser = async (user: TypeUser) => {
     const createUser = { ...user, passwordConfirm: user.password }
-    await request(server).post('/api/registration').send(createUser)
+    await request(server).post('/api/registration').send(createUser).expect(201)
     let { code } = await mongo.collection('cache_user').findOne({
         email: createUser.email,
     })

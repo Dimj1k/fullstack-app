@@ -43,18 +43,7 @@ export class AuthController {
         private readonly jwtService: JwtService,
         @InjectRepository(Token)
         private readonly tokenRepository: MongoRepository<Token>,
-    ) {
-        this.tokenRepository
-            .collectionIndexExists(NAME_TTL_INDEX_TOKEN)
-            .then((ttlIndexExists) => {
-                if (!ttlIndexExists)
-                    this.tokenRepository.createCollectionIndex('expires', {
-                        expireAfterSeconds: 0,
-                        background: true,
-                        name: NAME_TTL_INDEX_TOKEN,
-                    })
-            })
-    }
+    ) {}
 
     @GrpcMethod('AuthController', 'createTokens')
     async createTokens(

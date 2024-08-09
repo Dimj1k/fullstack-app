@@ -33,8 +33,8 @@ export class BooksController {
     @UseGuards(RolesGuard)
     @Roles([ROLE.ADMIN])
     @Post('/create')
-    create(@Body() createBooksDto: CreateBookDto) {
-        return this.booksService.create(createBooksDto)
+    create(@Body() createBookDto: CreateBookDto) {
+        return this.booksService.create(createBookDto)
     }
 
     @Get('/findAll')
@@ -80,8 +80,8 @@ export class BooksController {
     @ApiBearerAuth()
     @UseGuards(RolesGuard)
     @Roles([ROLE.ADMIN])
-    @Delete('/delete/:id')
-    remove(@Param('id') id: string) {
-        return this.booksService.remove(id)
+    @Delete('/delete/:nameBook')
+    remove(@Param('nameBook') nameBook: string) {
+        return this.booksService.remove(nameBook)
     }
 }

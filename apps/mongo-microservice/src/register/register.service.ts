@@ -13,18 +13,7 @@ export class RegisterService {
     constructor(
         @InjectRepository(CacheUser)
         private readonly userRepository: MongoRepository<CacheUser>,
-    ) {
-        this.userRepository
-            .collectionIndexExists(NAME_TTL_INDEX_CODE)
-            .then((exists) => {
-                if (!exists)
-                    this.userRepository.createCollectionIndex('createdAt', {
-                        expireAfterSeconds: 900,
-                        background: true,
-                        name: NAME_TTL_INDEX_CODE,
-                    })
-            })
-    }
+    ) {}
 
     async createInCacheUser(data: CreateUserDto): Promise<{ code: Code }> {
         let userInCreating = await this.findUserByEmail(data.email)

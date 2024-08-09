@@ -10,9 +10,10 @@ import {
 import { DataSource } from 'typeorm'
 import { addDays } from 'date-fns'
 import { Db, MongoClient } from 'mongodb'
-import { User, UserInfo } from '../src/entities/user/user.entity'
+import { User } from '../src/entities/user/user.entity'
 import { POSTGRES_ENTITIES } from '../src/entities'
 import { sleep } from './utils'
+import * as cookieParser from 'cookie-parser'
 
 let app: INestApplication
 let connection: MongoClient
@@ -40,6 +41,7 @@ beforeEach(async () => {
     app = moduleFixture.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
     app.setGlobalPrefix('api')
+    app.use(cookieParser())
 
     await app.startAllMicroservices()
     await app.init()

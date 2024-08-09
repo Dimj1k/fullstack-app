@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer'
-import { Column, Entity, ObjectId, ObjectIdColumn } from 'typeorm'
+import { Column, Entity, Index, ObjectId, ObjectIdColumn } from 'typeorm'
 import { Code } from '../dtos/register-code.dto'
 enum GENDER {
     MALE,
@@ -39,6 +39,7 @@ export class CacheUser {
     @Exclude()
     code: Code
 
+    @Index({ expireAfterSeconds: 900 })
     @Column()
     @Exclude()
     createdAt: Date = new Date()

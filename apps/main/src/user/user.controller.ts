@@ -9,6 +9,7 @@ import {
     Param,
     Patch,
     Post,
+    Req,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
@@ -19,6 +20,8 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger'
 import { Roles } from '../decorators/roles.decorator'
 import { RolesGuard } from '../guards/role.guard'
+import { JwtGuard } from '../guards/jwt.guard'
+import { JwtPayload } from '../interfaces/jwt-controller.interface'
 
 export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 
@@ -27,19 +30,29 @@ export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Get('/:id')
+    @Get('find/:id')
     async findUser(@Param('id') id: string) {
         return this.userService.findUser({ id }, { relations: { books: true } })
     }
 
     @ApiParam({ name: 'id' })
-    @UseInterceptors(ClassSerializerInterceptor)
     @Patch('/update/:id')
     async updateUser(
         @Param('id') id: UUID,
         @Body() updateUserDto: UpdateUserDto,
     ) {
         return this.userService.updateUser(id, updateUserDto)
+    }
+
+    @UseGuards(JwtGuard)
+    @Get('/me')
+    async me(@Req() req: Request & { user: JwtPayload }) {
+        let user = req.user
+        return {
+            email: user.email,
+            userId: user.userId,
+            roles: user.roles,
+        }
     }
 
     @ApiBearerAuth()

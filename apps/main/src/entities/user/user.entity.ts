@@ -66,7 +66,7 @@ export class User {
     })
     @OneToOne(() => UserInfo, { eager: false, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'info_id' })
-    info: UserInfo
+    info?: UserInfo
 
     @Column({
         default: () => 'now()',
@@ -92,7 +92,7 @@ export class User {
         array: true,
         default: [ROLE.USER],
     })
-    role: ROLE[]
+    role?: ROLE[]
 
     @ManyToMany(() => Book, (book) => book.bookId, {
         nullable: true,
@@ -104,7 +104,7 @@ export class User {
         joinColumn: { name: 'user_id' },
         inverseJoinColumn: { name: 'book_id' },
     })
-    books: Book[]
+    books?: Book[]
 
     @BeforeInsert()
     protected async createDate() {

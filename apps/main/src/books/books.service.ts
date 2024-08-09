@@ -70,7 +70,7 @@ export class BooksService {
         return this.bookRepository.update({ bookId: id }, updateBooksDto)
     }
 
-    remove(id: string) {
-        return this.bookRepository.delete({ bookId: id })
+    remove(nameBook: string) {
+        return this.bookRepository.delete({ nameBook })
     }
 }

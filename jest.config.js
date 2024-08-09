@@ -30,7 +30,7 @@ module.exports = {
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    'moduleNameMapper': makeModuleNameMapper(SRC_PATH, TS_CONFIG_PATH),
+    // 'moduleNameMapper': makeModuleNameMapper(SRC_PATH, TS_CONFIG_PATH),
     "moduleFileExtensions": [
         "js",
         "json",
