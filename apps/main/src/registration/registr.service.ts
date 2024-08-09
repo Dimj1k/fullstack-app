@@ -1,9 +1,4 @@
-import {
-    ConflictException,
-    Injectable,
-    NotFoundException,
-    OnModuleInit,
-} from '@nestjs/common'
+import { Injectable, OnModuleInit } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import {
     Client,
@@ -16,7 +11,7 @@ import { join } from 'path'
 import { Metadata } from '@grpc/grpc-js'
 import { RegisterCode } from './dto/register-token.dto'
 import { MONGO_DB_LOCATION } from '../constants'
-import { catchError, throwError, timeout } from 'rxjs'
+import { catchError, lastValueFrom, take, throwError, timeout } from 'rxjs'
 
 @Injectable()
 export class RegistrService implements OnModuleInit {
@@ -42,20 +37,24 @@ export class RegistrService implements OnModuleInit {
     }
 
     async createInCacheUser(createUserDto: CreateUserDto, metadata?: Metadata) {
-        return this.registerService.createInCacheUser(createUserDto).pipe(
-            catchError((error) =>
-                throwError(() => new RpcException(error.response)),
+        return lastValueFrom(
+            this.registerService.createInCacheUser(createUserDto).pipe(
+                take(1),
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
             ),
-            timeout(5000),
         )
     }
 
     async returnByTokenUser(token: RegisterCode) {
-        return this.registerService.returnByTokenUser(token).pipe(
-            catchError((error) =>
-                throwError(() => new RpcException(error.response)),
+        return lastValueFrom(
+            this.registerService.returnByTokenUser(token).pipe(
+                take(1),
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
             ),
-            timeout(5000),
         )
     }
 }

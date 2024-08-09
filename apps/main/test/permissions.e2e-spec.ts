@@ -15,9 +15,8 @@ import { JwtPayload } from '../src/interfaces/jwt-controller.interface'
 import { ROLE } from '../src/entities/user/user.entity'
 import * as cookieParser from 'cookie-parser'
 import { TypeUser } from './login.e2e-spec'
+import { fakeJwt } from './mocks/fakeJwt.json'
 import { sleep } from './utils'
-import { readFile } from 'fs/promises'
-import { join } from 'path'
 
 let app: INestApplication
 let connection: MongoClient
@@ -25,7 +24,6 @@ let mongo: Db
 let pg: DataSource
 let jwtService: JwtService
 let server: any
-let fakeJwt: string
 let userService: UserService
 beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -38,9 +36,6 @@ beforeAll(async () => {
         userService.createUser({ ...noAdminUser, password }),
     ])
     await userService.upgradeToAdmin(id)
-    fakeJwt = (
-        await readFile(join(__dirname, 'mocks', 'fakeJwt.txt'))
-    ).toString()
     connection = await MongoClient.connect('mongodb://localhost:27017')
     mongo = connection.db('test')
     pg = await new DataSource({

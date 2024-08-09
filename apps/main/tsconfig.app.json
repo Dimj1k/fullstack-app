@@ -4,6 +4,9 @@
     "declaration": false,
     "outDir": "../../dist/apps/main",
     "paths": {
+      "~utils/*": [
+        "./utils/*"
+      ],
       "~configs/*": [
         "./configs/*"
       ],

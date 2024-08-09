@@ -11,10 +11,10 @@ const logger = new Logger('AppClusterService')
 export class AppClusterService {
     static clusterize(callback: Function, cpuLimit: number = numCPUs): void {
         if (cluster.isPrimary) {
+            cluster.schedulingPolicy = cluster.SCHED_RR
             if (cpuLimit > numCPUs || cpuLimit < 1) cpuLimit = numCPUs
             logger.log(`Primary server started on ${process.pid}`)
             for (let i = 0; i < cpuLimit; i++) {
-                cluster.schedulingPolicy = cluster.SCHED_RR
                 cluster.fork()
             }
             cluster.on('exit', (worker) => {

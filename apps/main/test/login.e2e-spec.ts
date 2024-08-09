@@ -165,7 +165,7 @@ describe('Auth Controller (e2e)', () => {
                         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
                     )
                 })
-            await sleep(1000)
+            await sleep(1100)
             let newJwtToken: string
             let newCookie: ICookie
             let newOrigCookie: string

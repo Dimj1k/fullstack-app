@@ -12,6 +12,8 @@ import { LoggerMiddleware } from './middlewares/logger.middleware'
 import { RegistrModule } from './registration/registr.module'
 import { POSTGRES_SUBSCRIBERS } from './subscribers'
 import { UserModule } from './user/user.module'
+import { MailerInterceptor } from './interceptors/mailer.interceptor'
+import { Mailer } from './mailer/mailer.service'
 
 @Module({
     imports: [

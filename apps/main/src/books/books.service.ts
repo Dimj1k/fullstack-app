@@ -60,6 +60,7 @@ export class BooksService {
                 relations: ['books'],
             })
             .then((user) => user.books)
+            .catch((err) => new NotFoundException(err))
     }
 
     findOne(nameBook: string) {

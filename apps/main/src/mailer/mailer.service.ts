@@ -1,32 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
 import { MailerService } from '@nestjs-modules/mailer'
+import { Injectable } from '@nestjs/common'
+import { makeMail } from './patterns'
+import { ContentMails } from '../interfaces/content-mails.interface'
+
+export interface IMailHeader {
+    to: string
+    from?: string
+}
+
+export type IMail = IMailHeader & ContentMails
 
 @Injectable()
-export class MyMailerService {
+export class Mailer {
     private from: string = 'dh7fm391j@yandex.ru'
-    constructor(private readonly mailService: MailerService) {}
+    constructor(private readonly mailerService: MailerService) {}
 
-    async sendMail(
-        to: string,
-        subject?: string,
-        text?: string,
-        html?: string,
-        send: boolean = false,
-    ) {
-        if (send)
-            return (
-                this.mailService
-                    .sendMail({
-                        from: this.from,
-                        to,
-                        subject,
-                        text,
-                        html,
-                    })
-                    // .then((res) => this.logger.log(res))
-                    .catch((err) => {
-                        throw new NotFoundException()
-                    })
-            )
+    async sendMail(header: IMailHeader, content: ContentMails) {
+        this.mailerService.sendMail({
+            to: header.to,
+            from: header?.from ?? this.from,
+            html: await makeMail(content.type, content.content),
+        })
     }
 }

@@ -7,33 +7,7 @@ import { randomUUID, UUID } from 'crypto'
 import { addMonths, addSeconds } from 'date-fns'
 import { Token } from './token.entity'
 import { MongoRepository } from 'typeorm'
-
-export enum GENDER {
-    MALE,
-    FEMALE,
-    UNKNOWN,
-}
-
-export enum ROLE {
-    USER = 'USER',
-    ADMIN = 'ADMIN',
-}
-
-interface JwtPayload {
-    userId: UUID
-    email: string
-    roles: ROLE[]
-}
-
-type JwtToken = `${string}.${string}.${string}`
-
-interface Tokens {
-    accessToken: JwtToken
-    refreshToken: {
-        token: UUID
-        expires: Date
-    }
-}
+import { JwtPayload, JwtToken, Tokens } from './interfaces/token.interface'
 
 @Injectable()
 export class AuthController {
@@ -85,12 +59,12 @@ export class AuthController {
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ) {
-        let userAgent = metadata.get('client-user-agent')[0].toString()
+        let tokens = await this.getPairTokens(jwtPayload)
         let tokenFindBy = {
             token: refreshToken,
             userId: jwtPayload.userId,
         }
-        let tokens = await this.getPairTokens(jwtPayload)
+        let userAgent = metadata.get('client-user-agent')[0].toString()
         let foundedToken = await this.tokenRepository.findOneAndUpdate(
             {
                 token: tokenFindBy.token,

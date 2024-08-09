@@ -1,10 +1,6 @@
-const { interval, lastValueFrom } = require('rxjs')
-const { take } = require('rxjs/operators')
+let map = new Map([
+    [1, 2],
+    [3, 4]
+])
 
-async function execute() {
-    const source$ = interval(2000).pipe(take(1));
-    const finalNumber = await lastValueFrom(source$);
-    console.log(`The final number is ${finalNumber}`);
-}
-
-execute();
+console.log(map.get(1))

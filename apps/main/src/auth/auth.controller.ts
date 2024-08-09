@@ -11,6 +11,7 @@ import {
     UnauthorizedException,
     UseFilters,
     UseGuards,
+    UseInterceptors,
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { AuthDto } from './dto/auth.dto'
@@ -21,12 +22,15 @@ import { GetCookie } from '../decorators/get-cookie.decorator'
 import { lastValueFrom, take } from 'rxjs'
 import { ApiTags } from '@nestjs/swagger'
 import { AuthExceptionFilter } from '../filters/auth-exception.filter'
+import { RpcException } from '@nestjs/microservices'
+import { TimeoutInterceptor } from '../interceptors/timeout.interceptor'
 
 @UseFilters(AuthExceptionFilter)
+@UseInterceptors(TimeoutInterceptor)
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-    constructor(@Inject() private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthService) {}
 
     @HttpCode(HttpStatus.OK)
     @Post('login')
@@ -43,9 +47,10 @@ export class AuthController {
             return
         }
         let tokens = await this.authService.login(authDto, userAgent)
-        tokens.subscribe((tokens) => {
-            this.setTokens(tokens, request, response)
-        })
+        // tokens.subscribe((tokens) => {
+        //     this.setTokens(tokens, request, response)
+        // })
+        this.setTokens(tokens, request, response)
     }
 
     @HttpCode(HttpStatus.OK)
@@ -62,6 +67,7 @@ export class AuthController {
             refreshToken,
             userAgent,
         )
+        // tokens.subscribe((tokens) => this.setTokens(tokens, request, response))
         this.setTokens(tokens, request, response)
     }
 
@@ -74,13 +80,13 @@ export class AuthController {
         @Res() response: Response,
     ) {
         if (!refreshToken) {
-            response.sendStatus(200)
-            return
+            return response.sendStatus(200)
         }
         response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
         request.headers.authorization = ''
-        let message$ = await this.authService.deleteTokens(refreshToken)
-        message$.subscribe((message) => response.json(message))
+        let message = await this.authService.deleteTokens(refreshToken)
+        response.json(message)
+        // message.subscribe((message) => response.json(message))
     }
 
     private setTokens(

@@ -22,6 +22,8 @@ import { Roles } from '../decorators/roles.decorator'
 import { RolesGuard } from '../guards/role.guard'
 import { JwtGuard } from '../guards/jwt.guard'
 import { JwtPayload } from '../interfaces/jwt-controller.interface'
+import { AdminResources } from '../decorators/admin-resource.decorator'
+import { UserResources } from '../decorators/user-resource.decorator'
 
 export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 
@@ -44,7 +46,7 @@ export class UserController {
         return this.userService.updateUser(id, updateUserDto)
     }
 
-    @UseGuards(JwtGuard)
+    @UserResources()
     @Get('/me')
     me(@Req() req: Request & { user: JwtPayload }) {
         let user = req.user
@@ -55,18 +57,14 @@ export class UserController {
         }
     }
 
-    @ApiBearerAuth()
-    @UseGuards(RolesGuard)
-    @Roles([ROLE.ADMIN])
+    @AdminResources()
     @ApiParam({ name: 'id' })
     @Patch('/upgradeToAdmin/:id')
     async upgradeToAdmin(@Param('id') id: string) {
         return this.userService.upgradeToAdmin(id)
     }
 
-    @ApiBearerAuth()
-    @UseGuards(RolesGuard)
-    @Roles([ROLE.ADMIN])
+    @AdminResources()
     @ApiParam({ name: 'id' })
     @Patch('/dropAdmin/:id')
     async dropAdmin(@Param('id') id: string) {

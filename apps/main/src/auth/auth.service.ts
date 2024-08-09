@@ -53,16 +53,23 @@ export class AuthService implements OnModuleInit {
         }
         let metadata = new Metadata()
         metadata.set('client-user-agent', userAgent)
-        return this.jwtService
-            .createTokens(
-                {
-                    email: user.email,
-                    userId: user.id,
-                    roles: user.role,
-                },
-                metadata,
-            )
-            .pipe(timeout(5000))
+        return await lastValueFrom(
+            this.jwtService
+                .createTokens(
+                    {
+                        email: user.email,
+                        userId: user.id,
+                        roles: user.role,
+                    },
+                    metadata,
+                )
+                .pipe(
+                    take(1),
+                    catchError((err) =>
+                        throwError(() => new RpcException(err)),
+                    ),
+                ),
+        )
     }
 
     async refreshTokens(
@@ -72,12 +79,9 @@ export class AuthService implements OnModuleInit {
         let userId = await lastValueFrom(
             this.jwtService.checkToken({ token: refreshToken }).pipe(
                 take(1),
-                timeout(5000),
                 catchError((err) => throwError(() => new RpcException(err))),
             ),
-        ).catch((err) => {
-            throw new UnauthorizedException()
-        })
+        )
         let user = await this.userRepository.findOne({
             where: { id: userId.userId },
         })
@@ -88,18 +92,24 @@ export class AuthService implements OnModuleInit {
         }
         let metadata = new Metadata()
         metadata.set('client-user-agent', userAgent)
-        return await lastValueFrom(
+        return lastValueFrom(
             this.jwtService
                 .refreshTokens({ token: refreshToken, ...jwtPayload }, metadata)
-                .pipe(timeout(5000), take(1)),
-        ).catch((err) => {
-            throw new UnauthorizedException()
-        })
+                .pipe(
+                    take(1),
+                    catchError((err) =>
+                        throwError(() => new RpcException(err)),
+                    ),
+                ),
+        )
     }
 
     async deleteTokens(refreshToken: Tokens['refreshToken']['token']) {
-        return this.jwtService
-            .deleteTokens({ token: refreshToken })
-            .pipe(timeout(5000))
+        return lastValueFrom(
+            this.jwtService.deleteTokens({ token: refreshToken }).pipe(
+                take(1),
+                catchError((err) => throwError(() => new RpcException(err))),
+            ),
+        )
     }
 }

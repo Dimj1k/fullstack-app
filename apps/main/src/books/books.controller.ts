@@ -13,14 +13,13 @@ import {
 import { CreateBookDto } from './dto/create-book.dto'
 import { UpdateBookDto } from './dto/update-book.dto'
 import { BooksService } from './books.service'
-import { Roles } from '../decorators/roles.decorator'
-import { ROLE } from '../entities/user/user.entity'
-import { RolesGuard } from '../guards/role.guard'
 import { JwtGuard } from '../guards/jwt.guard'
 import { Request } from 'express'
 import { JwtPayload } from '../interfaces/jwt-controller.interface'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Beetween } from '../pipes/beetween.pipe'
+import { AdminResources } from '../decorators/admin-resource.decorator'
+import { UserResources } from '../decorators/user-resource.decorator'
 
 type RequestWithUser = Request & { user: JwtPayload }
 
@@ -29,9 +28,7 @@ type RequestWithUser = Request & { user: JwtPayload }
 export class BooksController {
     constructor(private readonly booksService: BooksService) {}
 
-    @ApiBearerAuth()
-    @UseGuards(RolesGuard)
-    @Roles([ROLE.ADMIN])
+    @AdminResources()
     @Post('/create')
     create(@Body() createBookDto: CreateBookDto) {
         return this.booksService.create(createBookDto)
@@ -50,16 +47,14 @@ export class BooksController {
         return this.booksService.findOne(nameBook)
     }
 
-    @ApiBearerAuth()
-    @UseGuards(JwtGuard)
+    @UserResources()
     @Get('/getOwnedBooks')
     getOwnedBooks(@Req() request: RequestWithUser) {
         let user = request.user
         return this.booksService.getBooksUser(user.userId)
     }
 
-    @ApiBearerAuth()
-    @UseGuards(JwtGuard)
+    @UserResources()
     @Post('/addToYourself/:nameBook')
     addToYourself(
         @Param('nameBook') nameBook: string,
@@ -69,17 +64,13 @@ export class BooksController {
         return this.booksService.addToYourself(user.userId, nameBook)
     }
 
-    @ApiBearerAuth()
-    @UseGuards(RolesGuard)
-    @Roles([ROLE.ADMIN])
+    @AdminResources()
     @Patch('/update/:id')
     update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
         return this.booksService.update(id, updateBookDto)
     }
 
-    @ApiBearerAuth()
-    @UseGuards(RolesGuard)
-    @Roles([ROLE.ADMIN])
+    @AdminResources()
     @Delete('/delete/:nameBook')
     remove(@Param('nameBook') nameBook: string) {
         return this.booksService.remove(nameBook)

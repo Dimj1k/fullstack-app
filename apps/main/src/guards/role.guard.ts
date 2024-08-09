@@ -3,11 +3,13 @@ import {
     ExecutionContext,
     Injectable,
     UnauthorizedException,
+    UseFilters,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { ROLE } from '../entities/user/user.entity'
 import { ROLES_KEY } from '../decorators/roles.decorator'
-import { JwtService } from '@nestjs/jwt'
+import { JsonWebTokenError, JwtService } from '@nestjs/jwt'
+import { RoleExceptionFilter } from '../filters/role-exception.filter'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -16,6 +18,7 @@ export class RolesGuard implements CanActivate {
         private readonly jwtService: JwtService,
     ) {}
 
+    @UseFilters(RoleExceptionFilter)
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const requiredRoles = this.reflector.getAllAndOverride<ROLE[]>(
             ROLES_KEY,
@@ -28,12 +31,13 @@ export class RolesGuard implements CanActivate {
         let [tokenType, token] = bearerToken.split(' ') as string[]
         if (!tokenType) throw new UnauthorizedException()
         let user = await this.jwtService.verifyAsync(token).catch((err) => {
-            throw new UnauthorizedException('refresh-tokens')
+            throw new UnauthorizedException(err)
         })
         request.user = user
+        let roles = user.roles
         // console.log(context.switchToHttp().getRequest().asadjikfqwjk)
         // console.log(user)
         // return true
-        return requiredRoles.some((role) => user.roles.includes(role))
+        return requiredRoles.some((role) => roles.includes(role))
     }
 }
