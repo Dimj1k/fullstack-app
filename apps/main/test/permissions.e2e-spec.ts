@@ -89,7 +89,6 @@ afterAll(async () => {
             .from('books')
             .where('books.name_book = any (:nameBooks)', {
                 nameBooks: [
-                    mockBook.nameBook,
                     mockBook.nameBook + 'Admin',
                     mockBook.nameBook + 'User',
                 ],

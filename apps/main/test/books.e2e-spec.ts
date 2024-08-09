@@ -2,16 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
 import { AppModule } from '../src/app.module'
-import {
-    registrationUserSuccess,
-    secondUser,
-} from './mocks/registration-user.mock'
 import { DataSource } from 'typeorm'
 import { Db, MongoClient } from 'mongodb'
 import { POSTGRES_ENTITIES } from '../src/entities'
 import * as cookieParser from 'cookie-parser'
 import { UserService } from '../src/user/user.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { crypt } from '../src/utils/crypt.util'
+import { bookCreator, bookReceiver } from './mocks/books.mock'
 
 let app: INestApplication
 let connection: MongoClient
@@ -24,6 +22,13 @@ beforeAll(async () => {
         providers: [UserService],
     }).compile()
     let userService = moduleFixture.get<UserService>(UserService)
+    let password = await crypt(bookCreator.password)
+    let [{ id }] = await Promise.all([
+        userService.createUser({ ...bookCreator, password }),
+        userService.createUser({ ...bookReceiver, password }),
+    ])
+    console.log(id)
+    await userService.upgradeToAdmin(id)
     connection = await MongoClient.connect('mongodb://localhost:27017')
     mongo = connection.db('test')
     pg = await new DataSource({
@@ -56,17 +61,19 @@ afterEach(async () => {
 })
 afterAll(async () => {
     await Promise.all([
-        pg
-            .createQueryBuilder()
-            .delete()
-            .from('users')
-            .where('users.email = any (:emails)', {
-                emails: [registrationUserSuccess.email, secondUser.email],
-            })
-            .execute(),
-        mongo.collection('cache_user').deleteMany({}),
+        // pg
+        //     .createQueryBuilder()
+        //     .delete()
+        //     .from('users')
+        //     .where('users.email = any (:emails)', {
+        //         emails: [registrationUserSuccess.email, secondUser.email],
+        //     })
+        //     .execute(),
+        // mongo.collection('cache_user').deleteMany({}),
     ])
     await Promise.all([pg.destroy(), connection.close()])
 })
 
-describe('Book creating (e2e)', () => {})
+describe('Book creating (e2e)', () => {
+    test('test', () => {})
+})

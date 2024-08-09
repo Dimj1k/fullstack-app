@@ -4,10 +4,12 @@ import {
     Headers,
     HttpCode,
     HttpStatus,
+    Inject,
     Post,
     Req,
     Res,
     UnauthorizedException,
+    UseFilters,
     UseGuards,
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
@@ -18,11 +20,13 @@ import { Tokens } from '../interfaces/jwt-controller.interface'
 import { GetCookie } from '../decorators/get-cookie.decorator'
 import { lastValueFrom, take } from 'rxjs'
 import { ApiTags } from '@nestjs/swagger'
+import { AuthExceptionFilter } from '../filters/auth-exception.filter'
 
+@UseFilters(AuthExceptionFilter)
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(@Inject() private readonly authService: AuthService) {}
 
     @HttpCode(HttpStatus.OK)
     @Post('login')
@@ -31,17 +35,17 @@ export class AuthController {
         @Headers('user-agent') userAgent: string,
         @GetCookie(REFRESH_TOKEN)
         refreshToken: Tokens['refreshToken']['token'],
-        @Res({ passthrough: true }) response: Response,
+        @Res() response: Response,
         @Req() request: Request,
     ) {
-        if (refreshToken) return { message: 'you logged in' }
-        let tokens = await this.authService
-            .login(authDto, userAgent)
-            .catch((err) => {
-                throw err ?? new UnauthorizedException({ message: 123 })
-            })
-        let tokens$ = tokens.pipe(take(1))
-        return this.setTokens(await lastValueFrom(tokens$), request, response)
+        if (refreshToken) {
+            response.json({ message: 'you logged in' })
+            return
+        }
+        let tokens = await this.authService.login(authDto, userAgent)
+        tokens.subscribe((tokens) => {
+            this.setTokens(tokens, request, response)
+        })
     }
 
     @HttpCode(HttpStatus.OK)
@@ -50,21 +54,15 @@ export class AuthController {
         @GetCookie(REFRESH_TOKEN)
         refreshToken: Tokens['refreshToken']['token'],
         @Req() request: Request,
-        @Res({ passthrough: true }) response: Response,
+        @Res() response: Response,
         @Headers('user-agent') userAgent: string,
     ) {
         if (!refreshToken) throw new UnauthorizedException()
-        let tokens = await this.authService
-            .refreshTokens(refreshToken, userAgent)
-            .catch((err) => {
-                response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
-                throw err
-            })
-        let tokens$ = await lastValueFrom(tokens.pipe(take(1))).catch((err) => {
-            response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
-            throw new UnauthorizedException(err)
-        })
-        return this.setTokens(tokens$, request, response)
+        let tokens = await this.authService.refreshTokens(
+            refreshToken,
+            userAgent,
+        )
+        this.setTokens(tokens, request, response)
     }
 
     @HttpCode(HttpStatus.OK)
@@ -73,12 +71,16 @@ export class AuthController {
         @GetCookie(REFRESH_TOKEN)
         refreshToken: Tokens['refreshToken']['token'],
         @Req() request: Request,
-        @Res({ passthrough: true }) response: Response,
+        @Res() response: Response,
     ) {
-        if (!refreshToken) return
+        if (!refreshToken) {
+            response.sendStatus(200)
+            return
+        }
         response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
         request.headers.authorization = ''
-        return this.authService.deleteTokens(refreshToken)
+        let message$ = await this.authService.deleteTokens(refreshToken)
+        message$.subscribe((message) => response.json(message))
     }
 
     private setTokens(

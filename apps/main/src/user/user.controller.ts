@@ -46,7 +46,7 @@ export class UserController {
 
     @UseGuards(JwtGuard)
     @Get('/me')
-    async me(@Req() req: Request & { user: JwtPayload }) {
+    me(@Req() req: Request & { user: JwtPayload }) {
         let user = req.user
         return {
             email: user.email,

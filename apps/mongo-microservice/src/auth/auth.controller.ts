@@ -35,8 +35,6 @@ interface Tokens {
     }
 }
 
-const NAME_TTL_INDEX_TOKEN = 'expiresTokenDateTime'
-
 @Injectable()
 export class AuthController {
     constructor(
@@ -57,7 +55,7 @@ export class AuthController {
             ...jwtPayload,
             userAgent: metadata.get('client-user-agent')[0].toString(),
         })
-        this.tokenRepository.insertOne(token).catch((err) => {
+        await this.tokenRepository.insertOne(token).catch((err) => {
             throw new RpcException(err)
         })
         return tokens
@@ -69,13 +67,13 @@ export class AuthController {
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ) {
-        let { userId } = await this.tokenRepository
+        let token = await this.tokenRepository
             .findOneBy(refreshToken)
             .catch((err) => {
                 throw new RpcException(err)
             })
-        if (!userId) throw new RpcException(new UnauthorizedException())
-        return { userId }
+        if (!token) throw new RpcException(new UnauthorizedException())
+        return { userId: token.userId }
     }
 
     @GrpcMethod('AuthController', 'refreshTokens')

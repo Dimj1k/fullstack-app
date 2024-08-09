@@ -23,7 +23,7 @@ export class UserInfoDto {
 }
 
 export class CreateUserDto {
-    @Transform(({ value }) => value.trim())
+    @Transform(({ value }: { value: string }) => value.trim().toLowerCase())
     @IsString()
     @ApiProperty()
     email: string

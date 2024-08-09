@@ -3,4 +3,12 @@ export const mockBook = {
     description: 'book mock',
 }
 
-export const bookCreator = {}
+export const bookCreator = {
+    email: 'bookCreator@test.test',
+    password: 'test',
+}
+
+export const bookReceiver = {
+    email: 'bookReceiver@test.test',
+    password: 'test',
+}
