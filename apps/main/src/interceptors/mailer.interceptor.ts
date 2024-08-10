@@ -22,13 +22,13 @@ export class MailerInterceptor implements NestInterceptor {
                 let response = context.switchToHttp().getResponse<Response>()
                 let { statusCode, answer } = answers.get(type)
                 response.status(statusCode).json(answer)
-                //     this.mailer.sendMail(
-                //         {
-                //             to: header.to,
-                //             from: header?.from,
-                //         },
-                //         { content, type } as ContentMails,
-                //     )
+                this.mailer.sendMail(
+                    {
+                        to: header.to,
+                        from: header?.from,
+                    },
+                    { content, type } as ContentMails,
+                )
             }),
             catchError((err) => throwError(() => err)),
         )
