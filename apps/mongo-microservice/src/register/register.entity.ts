@@ -1,6 +1,6 @@
 import { Exclude } from 'class-transformer'
 import { Column, Entity, Index, ObjectId, ObjectIdColumn } from 'typeorm'
-import { Code } from '../dtos/register-code.dto'
+import { Code } from '../dtos'
 enum GENDER {
     MALE,
     FEMALE,

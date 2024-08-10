@@ -1,5 +1,3 @@
-export enum TypeMails {
+export const enum TypeMails {
     REGISTRATION_CODE,
-    TEST,
-    TESTTEST,
 }

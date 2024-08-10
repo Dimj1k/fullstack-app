@@ -1,34 +1,24 @@
 import {
     Body,
-    Catch,
-    ClassSerializerInterceptor,
-    ConflictException,
     Controller,
     Delete,
     Get,
     Param,
     Patch,
-    Post,
     Req,
-    UseGuards,
-    UseInterceptors,
 } from '@nestjs/common'
 import { UserService } from './user.service'
-import { ROLE, User } from '../entities/user/user.entity'
+import { User } from '../entities/user'
 import { UUID } from 'crypto'
-import { UpdateUserDto } from './dto/update-user.dto'
-import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger'
-import { Roles } from '../decorators/roles.decorator'
-import { RolesGuard } from '../guards/role.guard'
-import { JwtGuard } from '../guards/jwt.guard'
-import { JwtPayload } from '../interfaces/jwt-controller.interface'
-import { AdminResources } from '../decorators/admin-resource.decorator'
-import { UserResources } from '../decorators/user-resource.decorator'
+import { UpdateUserDto } from './dto'
+import { ApiParam, ApiTags } from '@nestjs/swagger'
+import { JwtPayload } from '../interfaces'
+import { UserResources } from '../decorators'
 
 export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 
-@ApiTags('user')
-@Controller('user')
+@ApiTags('users')
+@Controller('users')
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
@@ -55,20 +45,6 @@ export class UserController {
             userId: user.userId,
             roles: user.roles,
         }
-    }
-
-    @AdminResources()
-    @ApiParam({ name: 'id' })
-    @Patch('/upgradeToAdmin/:id')
-    async upgradeToAdmin(@Param('id') id: string) {
-        return this.userService.upgradeToAdmin(id)
-    }
-
-    @AdminResources()
-    @ApiParam({ name: 'id' })
-    @Patch('/dropAdmin/:id')
-    async dropAdmin(@Param('id') id: string) {
-        return this.userService.dropAdmin(id)
     }
 
     @ApiParam({ name: 'id' })

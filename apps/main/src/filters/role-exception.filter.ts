@@ -16,13 +16,12 @@ export class RoleExceptionFilter implements ExceptionFilter {
     ) {
         let ctx = host.switchToHttp()
         let response = ctx.getResponse<Response>()
-        let status = HttpStatus.UNAUTHORIZED
-        console.log(exception)
+        let statusCode = HttpStatus.UNAUTHORIZED
         if (exception instanceof JsonWebTokenError) {
             return response
-                .sendStatus(status)
-                .json({ ...exception, statusCode: status })
+                .sendStatus(statusCode)
+                .json({ ...exception, statusCode })
         }
-        response.sendStatus(status).json(exception)
+        response.sendStatus(statusCode).json(exception)
     }
 }

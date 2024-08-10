@@ -5,7 +5,7 @@ import {
     HttpException,
     HttpStatus,
 } from '@nestjs/common'
-import { CreateUserDto } from '../registration/dto/create-user.dto'
+import { CreateUserDto } from '../registration/dto'
 
 @Injectable()
 export class BirthdayDateCheck implements PipeTransform {

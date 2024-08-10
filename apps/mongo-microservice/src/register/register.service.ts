@@ -2,11 +2,9 @@ import { ConflictException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CacheUser } from './register.entity'
 import { EntityNotFoundError, MongoRepository } from 'typeorm'
-import { CreateUserDto } from '../dtos/create-user.dto'
+import { CreateUserDto } from '../dtos'
 import { RpcException } from '@nestjs/microservices'
-import { RegisterCodeDto, Code } from '../dtos/register-code.dto'
-
-const NAME_TTL_INDEX_CODE = 'expiresAt'
+import { RegisterCodeDto, Code } from '../dtos'
 
 export class RegisterService {
     private code: number = 0

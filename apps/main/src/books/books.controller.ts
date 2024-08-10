@@ -7,19 +7,15 @@ import {
     Patch,
     Post,
     Query,
-    Req,
-    UseGuards,
 } from '@nestjs/common'
-import { CreateBookDto } from './dto/create-book.dto'
-import { UpdateBookDto } from './dto/update-book.dto'
+import { CreateBookDto } from './dto'
+import { UpdateBookDto } from './dto'
 import { BooksService } from './books.service'
-import { JwtGuard } from '../guards/jwt.guard'
 import { Request } from 'express'
-import { JwtPayload } from '../interfaces/jwt-controller.interface'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
-import { Beetween } from '../pipes/beetween.pipe'
-import { AdminResources } from '../decorators/admin-resource.decorator'
-import { UserResources } from '../decorators/user-resource.decorator'
+import { JwtPayload } from '../interfaces'
+import { ApiTags } from '@nestjs/swagger'
+import { Beetween } from '../pipes'
+import { AdminResources } from '../decorators'
 
 type RequestWithUser = Request & { user: JwtPayload }
 
@@ -45,23 +41,6 @@ export class BooksController {
     @Get('/find/:nameBook')
     findOne(@Param('nameBook') nameBook: string) {
         return this.booksService.findOne(nameBook)
-    }
-
-    @UserResources()
-    @Get('/getOwnedBooks')
-    getOwnedBooks(@Req() request: RequestWithUser) {
-        let user = request.user
-        return this.booksService.getBooksUser(user.userId)
-    }
-
-    @UserResources()
-    @Post('/addToYourself/:nameBook')
-    addToYourself(
-        @Param('nameBook') nameBook: string,
-        @Req() request: RequestWithUser,
-    ) {
-        let user = request.user
-        return this.booksService.addToYourself(user.userId, nameBook)
     }
 
     @AdminResources()

@@ -1,34 +1,28 @@
 import {
-    BadRequestException,
-    Body,
-    Catch,
-    ConflictException,
-    Controller,
-    NotFoundException,
-    Post,
-    Res,
     UseInterceptors,
+    Controller,
+    Post,
+    Body,
+    ConflictException,
 } from '@nestjs/common'
-import { CreateUserDto } from './dto/create-user.dto'
-import { RegisterCode } from './dto/register-token.dto'
-import { RegistrService } from './registr.service'
-import { PasswordHasher } from '../pipes/password-hasher.pipe'
-import { BirthdayDateCheck } from '../pipes/birthday-date-check.pipe'
-import { PasswordConfirmRemover } from '../pipes/password-confirm-remover.pipe'
-import { UserService } from '../user/user.service'
 import { ApiTags } from '@nestjs/swagger'
-import { TimeoutInterceptor } from '../interceptors/timeout.interceptor'
-import { MailerInterceptor } from '../interceptors/mailer.interceptor'
-import { TypeMails } from '../mailer/type-mails.types'
-import { IMail } from '../mailer/mailer.service'
-import { Response } from 'express'
+import { TimeoutInterceptor, MailerInterceptor } from '../interceptors'
+import { IMail, TypeMails } from '../mailer'
+import {
+    PasswordHasher,
+    PasswordConfirmRemover,
+    BirthdayDateCheck,
+} from '../pipes'
+import { UserService } from '../user'
+import { CreateUserDto, RegisterCode } from './dto'
+import { RegistrService } from './registr.service'
 
 @UseInterceptors(TimeoutInterceptor)
 @ApiTags('registration')
 @Controller('registration')
 export class RegistrController {
     constructor(
-        private readonly createUserService: RegistrService,
+        private readonly registrationService: RegistrService,
         private readonly userService: UserService,
     ) {}
 
@@ -43,7 +37,7 @@ export class RegistrController {
         })
         if (foundedUser) throw new ConflictException("user's exists")
         let registerCode =
-            await this.createUserService.createInCacheUser(createUserDto)
+            await this.registrationService.createInCacheUser(createUserDto)
         // registerCode.subscribe((code) => {
         return {
             to: createUserDto.email,
@@ -56,9 +50,9 @@ export class RegistrController {
     @Post('/confirm')
     async registrationConfirm(@Body() token: RegisterCode) {
         let confirmedUser =
-            await this.createUserService.returnByTokenUser(token)
+            await this.registrationService.returnByTokenUser(token)
         // confirmedUser.subscribe((res: UserFromMongo) => {
-        this.userService.createUser(confirmedUser)
+        this.registrationService.createUserInSql(confirmedUser)
         return { success: 'Вы успешно зарегистрировались' }
         // })
     }

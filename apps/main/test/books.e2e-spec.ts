@@ -1,34 +1,35 @@
-import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication, ValidationPipe } from '@nestjs/common'
-import * as request from 'supertest'
-import { AppModule } from '../src/app.module'
-import { DataSource } from 'typeorm'
-import { Db, MongoClient } from 'mongodb'
-import { POSTGRES_ENTITIES } from '../src/entities'
-import * as cookieParser from 'cookie-parser'
-import { UserService } from '../src/user/user.service'
+import { TestingModule, Test } from '@nestjs/testing'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { crypt } from '../src/utils/crypt.util'
-import { bookCreator, bookReceiver } from './mocks/books.mock'
+import * as cookieParser from 'cookie-parser'
+import { DataSource } from 'typeorm'
+import { AdminService } from '../src/administration'
+import { AppModule } from '../src/app.module'
+import { POSTGRES_ENTITIES } from '../src/entities'
+import { RegistrService } from '../src/registration'
+import { UserService } from '../src/user'
+import { bookCreator, password, bookReceiver } from './mocks'
+import { Db, MongoClient } from 'mongodb'
 
 let app: INestApplication
 let connection: MongoClient
 let mongo: Db
 let pg: DataSource
 let server: any
+let userService: UserService
 beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule, TypeOrmModule.forFeature(POSTGRES_ENTITIES)],
-        providers: [UserService],
+        providers: [RegistrService, AdminService],
     }).compile()
-    let userService = moduleFixture.get<UserService>(UserService)
-    let password = await crypt(bookCreator.password)
-    let [{ id }] = await Promise.all([
-        userService.createUser({ ...bookCreator, password }),
-        userService.createUser({ ...bookReceiver, password }),
+    let registrationService = moduleFixture.get<RegistrService>(RegistrService)
+    userService = moduleFixture.get<UserService>(UserService)
+    let [{ email }] = await Promise.all([
+        registrationService.createUserInSql({ ...bookCreator, password }),
+        registrationService.createUserInSql({ ...bookReceiver, password }),
     ])
-    console.log(id)
-    await userService.upgradeToAdmin(id)
+    let adminService = moduleFixture.get<AdminService>(AdminService)
+    await adminService.upgradeToAdmin(email)
     connection = await MongoClient.connect('mongodb://localhost:27017')
     mongo = connection.db('test')
     pg = await new DataSource({

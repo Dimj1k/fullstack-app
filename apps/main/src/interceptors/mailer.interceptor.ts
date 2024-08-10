@@ -1,14 +1,16 @@
 import {
+    BadRequestException,
     CallHandler,
     ExecutionContext,
     Inject,
     Injectable,
     NestInterceptor,
 } from '@nestjs/common'
-import { map, Observable } from 'rxjs'
-import { Mailer, IMail } from '../mailer/mailer.service'
+import { catchError, map, Observable, throwError } from 'rxjs'
+import { Mailer, IMail } from '../mailer'
 import { Response } from 'express'
 import { answers } from '../mailer/patterns'
+import { ContentMails } from '../interfaces'
 
 @Injectable()
 export class MailerInterceptor implements NestInterceptor {
@@ -16,20 +18,19 @@ export class MailerInterceptor implements NestInterceptor {
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         return next.handle().pipe(
-            map((headerAndContent: IMail) => {
+            map(({ content, type, ...header }: IMail) => {
                 let response = context.switchToHttp().getResponse<Response>()
-                let answer = answers.get(headerAndContent.type)
-                response.status(answer.statusCode).json(answer.answer)
-                this.mailer.sendMail(
-                    {
-                        to: headerAndContent.to,
-                        from: headerAndContent?.from,
-                    },
-                    'from' in headerAndContent
-                        ? (({ from, ...content }) => content)(headerAndContent)
-                        : headerAndContent,
-                )
+                let { statusCode, answer } = answers.get(type)
+                response.status(statusCode).json(answer)
+                //     this.mailer.sendMail(
+                //         {
+                //             to: header.to,
+                //             from: header?.from,
+                //         },
+                //         { content, type } as ContentMails,
+                //     )
             }),
+            catchError((err) => throwError(() => err)),
         )
     }
 }

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { ENTITIES } from './register/register.entity'
-import { RegisterModule } from './register/register.module'
-import { AuthModule } from './auth/auth.module'
+import { ENTITIES } from './register'
+import { RegisterModule } from './register'
+import { AuthModule } from './auth'
 
 @Module({
     imports: [

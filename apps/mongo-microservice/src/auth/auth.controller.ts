@@ -7,7 +7,7 @@ import { randomUUID, UUID } from 'crypto'
 import { addMonths, addSeconds } from 'date-fns'
 import { Token } from './token.entity'
 import { MongoRepository } from 'typeorm'
-import { JwtPayload, JwtToken, Tokens } from './interfaces/token.interface'
+import { JwtPayload, JwtToken, Tokens } from './interfaces'
 
 @Injectable()
 export class AuthController {

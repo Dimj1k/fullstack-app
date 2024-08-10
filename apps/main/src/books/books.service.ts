@@ -1,14 +1,9 @@
-import {
-    ConflictException,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common'
-import { CreateBookDto } from './dto/create-book.dto'
-import { UpdateBookDto } from './dto/update-book.dto'
+import { ConflictException, Injectable } from '@nestjs/common'
+import { CreateBookDto, UpdateBookDto } from './dto'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { DataSource, EntityManager, Like, Repository } from 'typeorm'
-import { Book } from '../entities/books/book.entity'
-import { User } from '../entities/user/user.entity'
+import { DataSource, Like, Repository } from 'typeorm'
+import { Book } from '../entities/books'
+import { User } from '../entities/user'
 
 @Injectable()
 export class BooksService {
@@ -36,31 +31,6 @@ export class BooksService {
             skip,
             take,
         })
-    }
-
-    async addToYourself(userId: string, nameBook: string) {
-        let book = await this.bookRepository.findOneBy({ nameBook })
-        if (!book) throw new NotFoundException()
-        await this.dataSource.transaction(
-            'READ COMMITTED',
-            async (transactionalEntityManager: EntityManager) => {
-                await transactionalEntityManager.insert('users_books', {
-                    user_id: userId,
-                    book_id: book.bookId,
-                })
-            },
-        )
-        return { success: `${nameBook} добавлена` }
-    }
-
-    async getBooksUser(userId: string) {
-        return this.userRepository
-            .findOne({
-                where: { id: userId },
-                relations: ['books'],
-            })
-            .then((user) => user.books)
-            .catch((err) => new NotFoundException(err))
     }
 
     findOne(nameBook: string) {

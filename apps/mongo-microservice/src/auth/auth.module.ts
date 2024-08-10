@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
 import { AuthController } from './auth.controller'
-import { PassportModule } from '@nestjs/passport'
 import { Token } from './token.entity'
 import { readFileSync } from 'fs'
 import { join } from 'path'
@@ -17,7 +16,6 @@ const SECRET_KEY = readFileSync(
             privateKey: SECRET_KEY,
             signOptions: { expiresIn: '300s', algorithm: 'RS256' },
         }),
-        PassportModule,
         TypeOrmModule.forFeature([Token]),
     ],
     controllers: [AuthController],

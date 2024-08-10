@@ -7,7 +7,6 @@ import {
 import { RpcException } from '@nestjs/microservices'
 import { Response } from 'express'
 import { REFRESH_TOKEN, SECURE_COOKIES } from '../constants'
-import { throwError } from 'rxjs'
 
 @Catch(UnauthorizedException, RpcException)
 export class AuthExceptionFilter implements ExceptionFilter {

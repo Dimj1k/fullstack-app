@@ -1,6 +1,6 @@
 import { UUID } from 'crypto'
 import { Column, Entity, Index, ObjectId, ObjectIdColumn } from 'typeorm'
-import { ROLE } from './interfaces/token.interface'
+import { ROLE } from './interfaces'
 
 @Entity()
 export class Token {

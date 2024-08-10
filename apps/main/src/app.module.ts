@@ -1,30 +1,31 @@
 import { MailerModule } from '@nestjs-modules/mailer'
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
+import { NestModule, MiddlewareConsumer, Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { AuthModule, PUBLIC_KEY } from './auth/auth.module'
-import { BooksController } from './books/books.controller'
-import { BooksModule } from './books/books.module'
+import { AdminModule } from './administration'
+import { AuthModule, PUBLIC_KEY } from './auth'
+import { BooksModule, BooksController } from './books'
 import { POSTGRES_ENTITIES } from './entities'
-import { LoggerMiddleware } from './middlewares/logger.middleware'
-import { RegistrModule } from './registration/registr.module'
+import { LoggerMiddleware } from './middlewares'
+import { RegistrModule } from './registration'
 import { POSTGRES_SUBSCRIBERS } from './subscribers'
-import { UserModule } from './user/user.module'
-import { MailerInterceptor } from './interceptors/mailer.interceptor'
-import { Mailer } from './mailer/mailer.service'
+import { UserModule } from './user'
+import { UserBookModule } from './user-book'
 
 @Module({
     imports: [
-        RegistrModule,
-        BooksModule,
         AuthModule,
         JwtModule.register({
             global: true,
             publicKey: PUBLIC_KEY,
             verifyOptions: { ignoreExpiration: false, algorithms: ['RS256'] },
         }),
+        UserBookModule,
+        AdminModule,
+        RegistrModule,
+        BooksModule,
         PassportModule.register({ defaultStrategy: 'jwt' }),
         ConfigModule.forRoot({ isGlobal: true }),
         TypeOrmModule.forRootAsync({

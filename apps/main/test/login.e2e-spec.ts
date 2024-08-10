@@ -1,20 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication, ValidationPipe } from '@nestjs/common'
+import { TestingModule, Test } from '@nestjs/testing'
+import * as cookieParser from 'cookie-parser'
 import * as request from 'supertest'
-import { AppModule } from '../src/app.module'
 import { DataSource } from 'typeorm'
-import { Db, MongoClient } from 'mongodb'
+import { AppModule } from '../src/app.module'
+import { REFRESH_TOKEN } from '../src/constants/index'
 import { POSTGRES_ENTITIES } from '../src/entities'
 import {
-    loginFifthUser,
     loginFirstUser,
-    loginFourthUser,
     loginSecondUser,
     loginThirdUser,
-} from './mocks/login-user.mock'
-import { REFRESH_TOKEN } from '../src/constants'
-import * as cookieParser from 'cookie-parser'
-import { ICookie, parseCookie, sleep } from './utils'
+    loginFourthUser,
+    loginFifthUser,
+} from './mocks'
+import { ICookie, parseCookie, sleep } from './utils/index'
+import { Db, MongoClient } from 'mongodb'
 
 let app: INestApplication
 let connection: MongoClient
@@ -165,7 +165,7 @@ describe('Auth Controller (e2e)', () => {
                         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
                     )
                 })
-            await sleep(1100)
+            await sleep(1000)
             let newJwtToken: string
             let newCookie: ICookie
             let newOrigCookie: string
@@ -194,7 +194,6 @@ describe('Auth Controller (e2e)', () => {
             await registrationUser(loginFourthUser)
             await request(server)
                 .post('/api/auth/login')
-                .set('user-agent', 'undefined')
                 .send(loginFourthUser)
                 .expect(200)
                 .then((res) => {

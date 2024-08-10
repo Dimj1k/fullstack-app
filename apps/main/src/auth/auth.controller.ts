@@ -4,26 +4,22 @@ import {
     Headers,
     HttpCode,
     HttpStatus,
-    Inject,
     Post,
     Req,
     Res,
     UnauthorizedException,
     UseFilters,
-    UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { AuthDto } from './dto/auth.dto'
+import { AuthDto } from './dto'
 import { Request, Response } from 'express'
 import { REFRESH_TOKEN, SECURE_COOKIES } from '../constants'
-import { Tokens } from '../interfaces/jwt-controller.interface'
-import { GetCookie } from '../decorators/get-cookie.decorator'
-import { lastValueFrom, take } from 'rxjs'
+import { Tokens } from '../interfaces'
+import { GetCookie } from '../decorators'
 import { ApiTags } from '@nestjs/swagger'
-import { AuthExceptionFilter } from '../filters/auth-exception.filter'
-import { RpcException } from '@nestjs/microservices'
-import { TimeoutInterceptor } from '../interceptors/timeout.interceptor'
+import { AuthExceptionFilter } from '../filters'
+import { TimeoutInterceptor } from '../interceptors'
 
 @UseFilters(AuthExceptionFilter)
 @UseInterceptors(TimeoutInterceptor)
@@ -42,10 +38,7 @@ export class AuthController {
         @Res() response: Response,
         @Req() request: Request,
     ) {
-        if (refreshToken) {
-            response.json({ message: 'you logged in' })
-            return
-        }
+        if (refreshToken) return response.json({ message: 'you logged in' })
         let tokens = await this.authService.login(authDto, userAgent)
         // tokens.subscribe((tokens) => {
         //     this.setTokens(tokens, request, response)

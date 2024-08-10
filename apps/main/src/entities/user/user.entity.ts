@@ -1,4 +1,4 @@
-import { Exclude, Expose, Transform } from 'class-transformer'
+import { Exclude, Transform } from 'class-transformer'
 import {
     BeforeInsert,
     BeforeRemove,
@@ -14,7 +14,7 @@ import {
     PrimaryGeneratedColumn,
     RelationId,
 } from 'typeorm'
-import { Book } from '../books/book.entity'
+import { Book } from '../books'
 import { ApiProperty } from '@nestjs/swagger'
 
 export enum GENDER {

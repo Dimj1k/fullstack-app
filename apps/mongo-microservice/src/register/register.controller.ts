@@ -7,10 +7,10 @@ import {
 } from '@nestjs/common'
 import { RegisterService } from './register.service'
 import { GrpcMethod } from '@nestjs/microservices'
-import { CreateUserDto } from '../dtos/create-user.dto'
+import { CreateUserDto } from '../dtos'
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js'
 import { CacheUser } from './register.entity'
-import { RegisterCodeDto } from '../dtos/register-code.dto'
+import { RegisterCodeDto } from '../dtos'
 
 @UsePipes(
     new ValidationPipe({

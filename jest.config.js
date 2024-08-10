@@ -18,7 +18,8 @@ const SRC_PATH = '<rootDir>';
 
 module.exports = {
     'roots': [
-        SRC_PATH
+        SRC_PATH,
+        'apps/mailer'
     ],
     "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
@@ -30,7 +31,13 @@ module.exports = {
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    // 'moduleNameMapper': makeModuleNameMapper(SRC_PATH, TS_CONFIG_PATH),
+    "modulePaths": [
+        "<rootDir>",
+    ],
+    "moduleDirectories": [
+        "node_modules"
+    ],
+    // 'moduleNameMapper': {...makeModuleNameMapper(SRC_PATH, TS_CONFIG_PATH), "src/(.*)": "<rootDir>/$1" },
     "moduleFileExtensions": [
         "js",
         "json",

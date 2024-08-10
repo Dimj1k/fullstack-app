@@ -1,22 +1,23 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
-import { AppModule } from '../src/app.module'
-import { DataSource } from 'typeorm'
-import { Db, MongoClient } from 'mongodb'
-import { POSTGRES_ENTITIES } from '../src/entities'
-import { JwtService } from '@nestjs/jwt'
-import { UserService } from '../src/user/user.service'
-import { adminUser, noAdminUser, password } from './mocks/permissions.mock'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { NestExpressApplication } from '@nestjs/platform-express'
-import { mockBook } from './mocks/books.mock'
-import { JwtPayload } from '../src/interfaces/jwt-controller.interface'
-import { ROLE } from '../src/entities/user/user.entity'
 import * as cookieParser from 'cookie-parser'
+import { INestApplication, ValidationPipe } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import { NestExpressApplication } from '@nestjs/platform-express'
+import { TestingModule, Test } from '@nestjs/testing'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { DataSource } from 'typeorm'
+import { AdminService } from '../src/administration'
+import { AppModule } from '../src/app.module'
+import { POSTGRES_ENTITIES } from '../src/entities'
+import { ROLE } from '../src/entities/user'
+import { JwtPayload } from '../src/interfaces'
+import { RegistrService } from '../src/registration'
+import { UserService } from '../src/user'
 import { TypeUser } from './login.e2e-spec'
-import { fakeJwt } from './mocks/fakeJwt.json'
+import { adminUser, password, noAdminUser, mockBook } from './mocks'
 import { sleep } from './utils'
+import { fakeJwt } from './mocks/fakeJwt.json'
+import { Db, MongoClient } from 'mongodb'
 
 let app: INestApplication
 let connection: MongoClient
@@ -28,14 +29,16 @@ let userService: UserService
 beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule, TypeOrmModule.forFeature(POSTGRES_ENTITIES)],
-        providers: [UserService],
+        providers: [RegistrService],
     }).compile()
+    let registrationService = moduleFixture.get<RegistrService>(RegistrService)
     userService = moduleFixture.get<UserService>(UserService)
-    let [{ id }, _] = await Promise.all([
-        userService.createUser({ ...adminUser, password }),
-        userService.createUser({ ...noAdminUser, password }),
+    let [{ email }, _] = await Promise.all([
+        registrationService.createUserInSql({ ...adminUser, password }),
+        registrationService.createUserInSql({ ...noAdminUser, password }),
     ])
-    await userService.upgradeToAdmin(id)
+    let adminService = moduleFixture.get<AdminService>(AdminService)
+    await adminService.upgradeToAdmin(email)
     connection = await MongoClient.connect('mongodb://localhost:27017')
     mongo = connection.db('test')
     pg = await new DataSource({
@@ -141,7 +144,7 @@ describe('Permissions check (e2e)', () => {
         ])('%s default permission', async (role, user) => {
             let jwtToken = await getJwtToken(user)
             await request(server)
-                .get('/api/user/me')
+                .get('/api/users/me')
                 .set('authorization', jwtToken)
                 .expect(200)
                 .then(async (res) => {
@@ -161,13 +164,13 @@ describe('Permissions check (e2e)', () => {
     describe('users without jwt', () => {
         test.each([
             ['admin', '/api/books/create', 'post'],
-            ['default', '/api/user/me', 'get'],
+            ['default', '/api/users/me', 'get'],
         ])('user forbidden to %s resource', async (role, path, method) => {
             await request(server)[method](path).expect(401)
         })
         test.each([
             ['admin', '/api/books/create', 'post'],
-            ['default', '/api/user/me', 'get'],
+            ['default', '/api/users/me', 'get'],
         ])('user with fake jwt to %s resource', async (role, path, method) => {
             await request(server)
                 [method](path)

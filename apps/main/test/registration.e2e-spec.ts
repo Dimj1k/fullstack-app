@@ -1,19 +1,19 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
+import * as cookieParser from 'cookie-parser'
+import { INestApplication, ValidationPipe } from '@nestjs/common'
+import { TestingModule, Test } from '@nestjs/testing'
+import { addDays } from 'date-fns'
+import { DataSource } from 'typeorm'
 import { AppModule } from '../src/app.module'
+import { POSTGRES_ENTITIES } from '../src/entities'
+import { User } from '../src/entities/user'
 import {
-    registrationUserFail,
     registrationUserSuccess,
     secondUser,
-} from './mocks/registration-user.mock'
-import { DataSource } from 'typeorm'
-import { addDays } from 'date-fns'
-import { Db, MongoClient } from 'mongodb'
-import { User } from '../src/entities/user/user.entity'
-import { POSTGRES_ENTITIES } from '../src/entities'
+    registrationUserFail,
+} from './mocks'
 import { sleep } from './utils'
-import * as cookieParser from 'cookie-parser'
+import { Db, MongoClient } from 'mongodb'
 
 let app: INestApplication
 let connection: MongoClient

@@ -1,4 +1,4 @@
-import { ROLE } from '../entities/user/user.entity'
+import { ROLE } from '../entities/user'
 import { Reflector } from '@nestjs/core'
 
 export const ROLES_KEY = 'roles'

@@ -1,6 +1,6 @@
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common'
-import { CreateUserDto } from '../registration/dto/create-user.dto'
-import { crypt } from '../utils/crypt.util'
+import { CreateUserDto } from '../registration/dto'
+import { crypt } from '../utils'
 
 @Injectable()
 export class PasswordHasher implements PipeTransform {

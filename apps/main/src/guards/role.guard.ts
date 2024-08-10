@@ -6,10 +6,10 @@ import {
     UseFilters,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { ROLE } from '../entities/user/user.entity'
-import { ROLES_KEY } from '../decorators/roles.decorator'
+import { ROLE } from '../entities/user'
+import { ROLES_KEY } from '../decorators'
 import { JsonWebTokenError, JwtService } from '@nestjs/jwt'
-import { RoleExceptionFilter } from '../filters/role-exception.filter'
+import { RoleExceptionFilter } from '../filters'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
