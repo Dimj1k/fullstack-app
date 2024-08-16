@@ -2,10 +2,10 @@ import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { TestingModule, Test } from '@nestjs/testing'
 import * as cookieParser from 'cookie-parser'
 import * as request from 'supertest'
-import { DataSource } from 'typeorm'
+import { DataSource, Db, MongoClient } from 'typeorm'
 import { AppModule } from '../src/app.module'
-import { REFRESH_TOKEN } from '../src/constants/index'
-import { POSTGRES_ENTITIES } from '../src/entities'
+import { REFRESH_TOKEN } from '../src/shared/constants/index'
+import { POSTGRES_ENTITIES } from '../src/shared/entities'
 import {
     loginFirstUser,
     loginSecondUser,
@@ -14,7 +14,6 @@ import {
     loginFifthUser,
 } from './mocks'
 import { ICookie, parseCookie, sleep } from './utils/index'
-import { Db, MongoClient } from 'mongodb'
 
 let app: INestApplication
 let connection: MongoClient

@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Post, Req } from '@nestjs/common'
 import { UserBookService } from './user-book.service'
-import { UserResources } from '../decorators'
-import { JwtPayload } from '../interfaces'
+import { UserResources } from '../shared/decorators'
+import { JwtPayload } from '../shared/interfaces'
 import { ApiTags } from '@nestjs/swagger'
 
 type RequestWithUser = Request & { user: JwtPayload }
@@ -14,7 +14,7 @@ export class UserBookController {
 
     @Get('/getOwnedBooks')
     getOwnedBooks(@Req() request: RequestWithUser) {
-        let user = request.user
+        const user = request.user
         return this.userBookService.getBooksUser(user.userId)
     }
 
@@ -23,7 +23,7 @@ export class UserBookController {
         @Param('nameBook') nameBook: string,
         @Req() request: RequestWithUser,
     ) {
-        let user = request.user
+        const user = request.user
         return this.userBookService.addToYourself(user.userId, nameBook)
     }
 }

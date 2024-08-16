@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, UnauthorizedException } from '@nestjs/common'
-import { User } from '../entities/user'
+import { User } from '../shared/entities/user'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import {
@@ -9,11 +9,11 @@ import {
     Transport,
 } from '@nestjs/microservices'
 import { join } from 'path'
-import { MONGO_DB_LOCATION } from '../constants'
+import { MONGO_DB_LOCATION } from '../shared/constants'
 import { AuthDto } from './dto'
-import { JwtController, JwtPayload, Tokens } from '../interfaces'
+import { JwtController, JwtPayload, Tokens } from '../shared/interfaces'
 import { Metadata } from '@grpc/grpc-js'
-import { comparePasswords } from '../utils'
+import { comparePasswords } from '../shared/utils'
 import { catchError, lastValueFrom, take, throwError, timeout } from 'rxjs'
 
 @Injectable()

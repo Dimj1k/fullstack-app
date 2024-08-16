@@ -5,8 +5,8 @@ import {
     IsString,
     ValidateNested,
 } from 'class-validator'
-import { Match } from '../../decorators'
-import { GENDER } from '../../entities/user'
+import { Match } from '../../shared/decorators'
+import { GENDER } from '../../shared/entities/user'
 import { Transform, Type } from 'class-transformer'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 

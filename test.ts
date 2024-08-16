@@ -1,3 +1,5 @@
+import { hashSync } from 'bcrypt'
+
 type ObjectKeys = string | number | symbol
 
 class Chainable1<T extends Object> {
@@ -16,3 +18,5 @@ class Chainable1<T extends Object> {
         return this.chain[key]
     }
 }
+
+console.log(hashSync('tes1t', 10))

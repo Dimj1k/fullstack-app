@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common'
 import { UserBookController } from './user-book.controller'
 import { UserBookService } from './user-book.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Book } from '../entities/books'
-import { User } from '../entities/user'
+import { Book } from '../shared/entities/books'
+import { User } from '../shared/entities/user'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Book])],

@@ -1,6 +1,6 @@
 import { hashSync } from 'bcrypt'
 
-export let password = hashSync('test', 10)
+export const password = hashSync('test', 10)
 
 export const adminUser = {
     email: 'admin@admin.test',

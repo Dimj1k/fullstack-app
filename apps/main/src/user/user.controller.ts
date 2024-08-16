@@ -3,17 +3,20 @@ import {
     Controller,
     Delete,
     Get,
+    NotFoundException,
     Param,
     Patch,
     Req,
+    UnauthorizedException,
 } from '@nestjs/common'
 import { UserService } from './user.service'
-import { User } from '../entities/user'
+import { User } from '../shared/entities/user'
 import { UUID } from 'crypto'
 import { UpdateUserDto } from './dto'
 import { ApiParam, ApiTags } from '@nestjs/swagger'
-import { JwtPayload } from '../interfaces'
-import { UserResources } from '../decorators'
+import { JwtPayload } from '../shared/interfaces'
+import { UserResources } from '../shared/decorators'
+import { Request } from 'express'
 
 export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 
@@ -23,27 +26,28 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Get('find/:id')
-    async findUser(@Param('id') id: string) {
+    async findUser(@Param('id') id: UUID) {
         return this.userService.findUser({ id }, { relations: { books: true } })
     }
 
-    @ApiParam({ name: 'id' })
-    @Patch('/update/:id')
+    @UserResources()
+    @Patch('/update')
     async updateUser(
-        @Param('id') id: UUID,
+        @Req() req: Request & { user: JwtPayload },
         @Body() updateUserDto: UpdateUserDto,
     ) {
-        return this.userService.updateUser(id, updateUserDto)
+        let user = req.user
+        return this.userService.updateUser(user, updateUserDto)
     }
 
     @UserResources()
     @Get('/me')
     me(@Req() req: Request & { user: JwtPayload }) {
-        let user = req.user
+        const { email, userId, roles } = req.user
         return {
-            email: user.email,
-            userId: user.userId,
-            roles: user.roles,
+            email,
+            userId,
+            roles,
         }
     }
 

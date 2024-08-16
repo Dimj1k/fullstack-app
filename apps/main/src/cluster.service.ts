@@ -1,6 +1,8 @@
 import { availableParallelism } from 'node:os'
 import { Injectable, Logger } from '@nestjs/common'
 import { Cluster } from 'node:cluster'
+import { createIndexesFortemplates } from './shared/utils/create-indexes-template.util'
+import { join } from 'node:path'
 
 const cluster = require('node:cluster') as Cluster
 const numCPUs = availableParallelism()
@@ -21,6 +23,7 @@ export class AppClusterService {
                 logger.error(`Worker ${worker.process.pid} died. Restarting`)
                 cluster.fork()
             })
+            createIndexesFortemplates(join(__dirname, 'mailer', 'templates'))
         } else {
             logger.log(`Worker server started on ${process.pid}`)
             callback()

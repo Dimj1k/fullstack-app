@@ -2,18 +2,17 @@ import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { TestingModule, Test } from '@nestjs/testing'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import * as cookieParser from 'cookie-parser'
-import { DataSource } from 'typeorm'
+import { DataSource, Db, MongoClient, MongoRepository } from 'typeorm'
 import { AdminService } from '../src/administration'
 import { AppModule } from '../src/app.module'
-import { POSTGRES_ENTITIES } from '../src/entities'
+import { POSTGRES_ENTITIES } from '../src/shared/entities'
 import { RegistrService } from '../src/registration'
 import { UserService } from '../src/user'
 import { bookCreator, password, bookReceiver } from './mocks'
-import { Db, MongoClient } from 'mongodb'
 
 let app: INestApplication
-let connection: MongoClient
-let mongo: Db
+let connection: DataSource
+let mongo: any
 let pg: DataSource
 let server: any
 let userService: UserService
@@ -30,8 +29,13 @@ beforeAll(async () => {
     ])
     let adminService = moduleFixture.get<AdminService>(AdminService)
     await adminService.upgradeToAdmin(email)
-    connection = await MongoClient.connect('mongodb://localhost:27017')
-    mongo = connection.db('test')
+    connection = await new DataSource({
+        type: 'mongodb',
+        host: 'localhost',
+        port: 27017,
+        database: 'test',
+    }).initialize()
+    mongo = connection.getMongoRepository('token')
     pg = await new DataSource({
         type: 'postgres',
         host: 'localhost',

@@ -6,7 +6,7 @@ import {
     IsEnum,
     ValidateNested,
 } from 'class-validator'
-import { GENDER } from '../../entities/user'
+import { GENDER } from '../../shared/entities/user'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 export class UpdateUserInfoDto {
@@ -22,11 +22,6 @@ export class UpdateUserInfoDto {
 }
 
 export class UpdateUserDto {
-    @IsString()
-    @IsOptional()
-    @ApiPropertyOptional()
-    email?: string
-
     @IsString()
     @ApiProperty()
     password: string

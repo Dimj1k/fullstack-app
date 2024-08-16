@@ -4,19 +4,23 @@ import {
     Post,
     Body,
     ConflictException,
+    UseFilters,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { TimeoutInterceptor, MailerInterceptor } from '../interceptors'
+import { TimeoutInterceptor, MailerInterceptor } from '../shared/interceptors'
 import { IMail, TypeMails } from '../mailer'
 import {
     PasswordHasher,
     PasswordConfirmRemover,
     BirthdayDateCheck,
-} from '../pipes'
+} from '../shared/pipes'
 import { UserService } from '../user'
 import { CreateUserDto, RegisterCode } from './dto'
 import { RegistrService } from './registr.service'
+import { RegistrationExceptionFilter } from '../shared/filters'
+import { RpcExceptionFilter } from '../shared/filters'
 
+@UseFilters(RegistrationExceptionFilter, RpcExceptionFilter)
 @UseInterceptors(TimeoutInterceptor)
 @ApiTags('registration')
 @Controller('registration')
@@ -36,23 +40,23 @@ export class RegistrController {
             email: createUserDto.email,
         })
         if (foundedUser) throw new ConflictException("user's exists")
-        let registerCode =
+        let { code } =
             await this.registrationService.createInCacheUser(createUserDto)
         // registerCode.subscribe((code) => {
         return {
-            to: createUserDto.email,
+            to: [createUserDto.email],
             type: TypeMails.REGISTRATION_CODE,
-            content: { code: registerCode.code },
+            content: { code },
         }
         // })
     }
 
     @Post('/confirm')
-    async registrationConfirm(@Body() token: RegisterCode) {
+    async registrationConfirm(@Body() code: RegisterCode) {
         let confirmedUser =
-            await this.registrationService.returnByTokenUser(token)
+            await this.registrationService.returnByCodeUser(code)
         // confirmedUser.subscribe((res: UserFromMongo) => {
-        this.registrationService.createUserInSql(confirmedUser)
+        await this.registrationService.createUserInSql(confirmedUser)
         return { success: 'Вы успешно зарегистрировались' }
         // })
     }

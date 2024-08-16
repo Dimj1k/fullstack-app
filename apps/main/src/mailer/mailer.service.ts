@@ -1,10 +1,10 @@
 import { MailerService } from '@nestjs-modules/mailer'
 import { Injectable } from '@nestjs/common'
-import { makeMail } from './patterns'
-import { ContentMails } from '../interfaces'
+import { answers, makeMail } from './templates'
+import { ContentMails } from '../shared/interfaces'
 
 export interface IMailHeader {
-    to: string
+    to: string[]
     from?: string
 }
 
@@ -16,11 +16,22 @@ export class Mailer {
     constructor(private readonly mailerService: MailerService) {}
 
     async sendMail(header: IMailHeader, { type, content }: ContentMails) {
-        this.mailerService.sendMail({
-            to: header.to,
-            from: header?.from ?? this.from,
-            encoding: 'utf-8',
-            html: await makeMail(type, content),
-        })
+        return this.mailerService
+            .sendMail({
+                to: header.to,
+                from: header?.from ?? this.from,
+                encoding: 'utf-8',
+                html: await makeMail(type, content),
+            })
+            .then((sentInfo) => {
+                return ['2', '3'].includes(
+                    sentInfo.response.split(' ', 1)[0][0],
+                )
+                    ? answers.get(type)
+                    : {
+                          statusCode: 400,
+                          answer: { message: 'Письмо не было отправлено' },
+                      }
+            })
     }
 }

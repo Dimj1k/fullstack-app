@@ -2,8 +2,8 @@ import { ConflictException, Injectable } from '@nestjs/common'
 import { CreateBookDto, UpdateBookDto } from './dto'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Like, Repository } from 'typeorm'
-import { Book } from '../entities/books'
-import { User } from '../entities/user'
+import { Book } from '../shared/entities/books'
+import { User } from '../shared/entities/user'
 
 @Injectable()
 export class BooksService {

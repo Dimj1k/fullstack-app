@@ -3,17 +3,16 @@ import * as cookieParser from 'cookie-parser'
 import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { TestingModule, Test } from '@nestjs/testing'
 import { addDays } from 'date-fns'
-import { DataSource } from 'typeorm'
+import { DataSource, Db, MongoClient } from 'typeorm'
 import { AppModule } from '../src/app.module'
-import { POSTGRES_ENTITIES } from '../src/entities'
-import { User } from '../src/entities/user'
+import { POSTGRES_ENTITIES } from '../src/shared/entities'
+import { User } from '../src/shared/entities/user'
 import {
     registrationUserSuccess,
     secondUser,
     registrationUserFail,
 } from './mocks'
 import { sleep } from './utils'
-import { Db, MongoClient } from 'mongodb'
 
 let app: INestApplication
 let connection: MongoClient
@@ -21,7 +20,7 @@ let mongo: Db
 let pg: DataSource
 let server: any
 beforeAll(async () => {
-    connection = await MongoClient.connect('mongodb://localhost:27017')
+    connection = await new MongoClient('mongodb://localhost:27017').connect()
     mongo = connection.db('test')
     pg = await new DataSource({
         type: 'postgres',

@@ -6,14 +6,14 @@ import {
     RpcException,
     Transport,
 } from '@nestjs/microservices'
-import { RegisterController } from '../interfaces'
+import { RegisterController } from '../shared/interfaces'
 import { join } from 'path'
 import { Metadata } from '@grpc/grpc-js'
 import { RegisterCode } from './dto'
-import { MONGO_DB_LOCATION } from '../constants'
+import { MONGO_DB_LOCATION } from '../shared/constants'
 import { catchError, lastValueFrom, take, throwError, timeout } from 'rxjs'
 import { UserFromMongo } from '../user'
-import { User, UserInfo } from '../entities/user'
+import { User, UserInfo } from '../shared/entities/user'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
 
@@ -50,23 +50,13 @@ export class RegistrService implements OnModuleInit {
 
     async createInCacheUser(createUserDto: CreateUserDto, metadata?: Metadata) {
         return lastValueFrom(
-            this.registerService.createInCacheUser(createUserDto).pipe(
-                take(1),
-                catchError((error) =>
-                    throwError(() => new RpcException(error.response)),
-                ),
-            ),
+            this.registerService.createInCacheUser(createUserDto).pipe(take(1)),
         )
     }
 
-    async returnByTokenUser(token: RegisterCode) {
+    async returnByCodeUser(code: RegisterCode) {
         return lastValueFrom(
-            this.registerService.returnByTokenUser(token).pipe(
-                take(1),
-                catchError((error) =>
-                    throwError(() => new RpcException(error.response)),
-                ),
-            ),
+            this.registerService.returnByTokenUser(code).pipe(take(1)),
         )
     }
 

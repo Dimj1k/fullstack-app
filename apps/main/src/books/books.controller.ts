@@ -11,13 +11,9 @@ import {
 import { CreateBookDto } from './dto'
 import { UpdateBookDto } from './dto'
 import { BooksService } from './books.service'
-import { Request } from 'express'
-import { JwtPayload } from '../interfaces'
 import { ApiTags } from '@nestjs/swagger'
-import { Beetween } from '../pipes'
-import { AdminResources } from '../decorators'
-
-type RequestWithUser = Request & { user: JwtPayload }
+import { Beetween } from '../shared/pipes'
+import { AdminResources } from '../shared/decorators'
 
 @ApiTags('books')
 @Controller('books')

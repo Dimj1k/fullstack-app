@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { ROLE, User } from '../entities/user'
+import { ROLE, User } from '../shared/entities/user'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
@@ -13,6 +13,7 @@ export class AdminService {
     async upgradeToAdmin(email: string) {
         let foundedUser = await this.findUser({ email })
         if (!foundedUser) throw new NotFoundException()
+        if (foundedUser.role.some((value) => value === ROLE.ADMIN)) return
         foundedUser.role.push(ROLE.ADMIN)
         return this.userRepository.update({ email }, { role: foundedUser.role })
     }

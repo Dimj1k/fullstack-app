@@ -14,14 +14,15 @@ import {
 import { AuthService } from './auth.service'
 import { AuthDto } from './dto'
 import { Request, Response } from 'express'
-import { REFRESH_TOKEN, SECURE_COOKIES } from '../constants'
-import { Tokens } from '../interfaces'
-import { GetCookie } from '../decorators'
+import { REFRESH_TOKEN, SECURE_COOKIES } from '../shared/constants'
+import { Tokens } from '../shared/interfaces'
+import { GetCookie } from '../shared/decorators'
 import { ApiTags } from '@nestjs/swagger'
-import { AuthExceptionFilter } from '../filters'
-import { TimeoutInterceptor } from '../interceptors'
+import { AuthExceptionFilter } from '../shared/filters'
+import { TimeoutInterceptor } from '../shared/interceptors'
+import { RpcExceptionFilter } from '../shared/filters'
 
-@UseFilters(AuthExceptionFilter)
+@UseFilters(AuthExceptionFilter, RpcExceptionFilter)
 @UseInterceptors(TimeoutInterceptor)
 @ApiTags('auth')
 @Controller('auth')

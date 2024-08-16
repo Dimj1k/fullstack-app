@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, EntityManager, Repository } from 'typeorm'
-import { Book } from '../entities/books'
-import { User } from '../entities/user'
+import { Book } from '../shared/entities/books'
+import { User } from '../shared/entities/user'
+import { UUID } from 'crypto'
 
 @Injectable()
 export class UserBookService {
@@ -29,7 +30,7 @@ export class UserBookService {
         return { success: `${nameBook} добавлена` }
     }
 
-    async getBooksUser(userId: string) {
+    async getBooksUser(userId: UUID) {
         return this.userRepository
             .findOne({
                 where: { id: userId },
