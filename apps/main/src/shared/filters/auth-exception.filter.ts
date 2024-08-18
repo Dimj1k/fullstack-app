@@ -4,11 +4,12 @@ import {
     ArgumentsHost,
     UnauthorizedException,
     RequestTimeoutException,
+    NotFoundException,
 } from '@nestjs/common'
 import { Response } from 'express'
 import { REFRESH_TOKEN, SECURE_COOKIES } from '../constants'
 
-@Catch(UnauthorizedException, RequestTimeoutException)
+@Catch(UnauthorizedException, RequestTimeoutException, NotFoundException)
 export class AuthExceptionFilter implements ExceptionFilter {
     catch(
         exception: UnauthorizedException | RequestTimeoutException,

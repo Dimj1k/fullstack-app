@@ -4,7 +4,7 @@ import { answers, makeMail } from './templates'
 import { ContentMails } from '../shared/interfaces'
 
 export interface IMailHeader {
-    to: string[]
+    to: string[] | string
     from?: string
 }
 

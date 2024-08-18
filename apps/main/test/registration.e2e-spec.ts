@@ -15,13 +15,18 @@ import {
 import { sleep } from './utils'
 
 let app: INestApplication
-let connection: MongoClient
-let mongo: Db
+let connection: DataSource
+let mongo: any
 let pg: DataSource
 let server: any
 beforeAll(async () => {
-    connection = await new MongoClient('mongodb://localhost:27017').connect()
-    mongo = connection.db('test')
+    connection = await new DataSource({
+        type: 'mongodb',
+        host: 'localhost',
+        port: 27017,
+        database: 'test',
+    }).initialize()
+    mongo = connection.getMongoRepository('token')
     pg = await new DataSource({
         type: 'postgres',
         host: 'localhost',
@@ -60,9 +65,9 @@ afterAll(async () => {
                 emails: [registrationUserSuccess.email, secondUser.email],
             })
             .execute(),
-        mongo.collection('cache_user').deleteMany({}),
+        // mongo.deleteMany({}),
     ])
-    await Promise.all([pg.destroy(), connection.close()])
+    await Promise.all([pg.destroy(), connection.destroy()])
 })
 
 describe('UserRegistration (e2e)', () => {

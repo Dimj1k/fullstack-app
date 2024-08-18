@@ -43,4 +43,10 @@ export interface JwtController {
         metadata?: Metadata,
         callback?: Function,
     ): Observable<void>
+
+    deleteAllTokens(
+        { email }: { email: string },
+        metadata?: Metadata,
+        callback?: Function,
+    ): Observable<{ message: string }>
 }

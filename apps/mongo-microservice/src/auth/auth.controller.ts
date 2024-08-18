@@ -1,14 +1,31 @@
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js'
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import {
+    Injectable,
+    UnauthorizedException,
+    UsePipes,
+    ValidationPipe,
+} from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { GrpcMethod, Payload, RpcException } from '@nestjs/microservices'
+import { GrpcMethod, RpcException } from '@nestjs/microservices'
 import { InjectRepository } from '@nestjs/typeorm'
-import { randomUUID, UUID } from 'crypto'
-import { addMonths, addSeconds } from 'date-fns'
+import { randomUUID } from 'crypto'
+import { addMonths } from 'date-fns'
 import { Token } from './token.entity'
 import { MongoRepository } from 'typeorm'
 import { JwtPayload, JwtToken, Tokens } from './interfaces'
+import {
+    JwtPayloadDto,
+    RefreshTokenDto,
+    TokenWithJwtDto,
+} from '../dtos/auth.dto'
+import { EmailDto } from '../../../main/src/user/dto/forgot-password.dto'
 
+@UsePipes(
+    new ValidationPipe({
+        whitelist: true,
+        transform: true,
+    }),
+)
 @Injectable()
 export class AuthController {
     constructor(
@@ -19,7 +36,7 @@ export class AuthController {
 
     @GrpcMethod('AuthController', 'createTokens')
     async createTokens(
-        jwtPayload: JwtPayload,
+        jwtPayload: JwtPayloadDto,
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ) {
@@ -27,7 +44,7 @@ export class AuthController {
         let token = this.tokenRepository.create({
             ...tokens.refreshToken,
             ...jwtPayload,
-            userAgent: metadata.get('client-user-agent')[0].toString(),
+            userAgent: metadata.get('client-user-agent')?.[0]?.toString(),
         })
         await this.tokenRepository.insertOne(token).catch((err) => {
             throw new RpcException(err)
@@ -37,7 +54,7 @@ export class AuthController {
 
     @GrpcMethod('AuthController', 'checkToken')
     async checkToken(
-        refreshToken: { token: Tokens['refreshToken']['token'] },
+        refreshToken: RefreshTokenDto,
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ) {
@@ -52,10 +69,7 @@ export class AuthController {
 
     @GrpcMethod('AuthController', 'refreshTokens')
     async refreshTokens(
-        {
-            token: refreshToken,
-            ...jwtPayload
-        }: { token: Tokens['refreshToken']['token'] } & JwtPayload,
+        { token: refreshToken, ...jwtPayload }: TokenWithJwtDto,
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ) {
@@ -64,7 +78,7 @@ export class AuthController {
             token: refreshToken,
             userId: jwtPayload.userId,
         }
-        let userAgent = metadata.get('client-user-agent')[0].toString()
+        let userAgent = metadata.get('client-user-agent')?.[0]?.toString()
         let foundedToken = await this.tokenRepository.findOneAndUpdate(
             {
                 token: tokenFindBy.token,
@@ -75,7 +89,6 @@ export class AuthController {
                 $set: {
                     token: tokens.refreshToken.token,
                     expires: tokens.refreshToken.expires,
-                    roles: jwtPayload.roles,
                 },
             },
         )
@@ -85,7 +98,7 @@ export class AuthController {
 
     @GrpcMethod('AuthController', 'deleteTokens')
     async deleteTokens(
-        refreshToken: { token: Tokens['refreshToken']['token'] },
+        refreshToken: RefreshTokenDto,
         metadata: Metadata,
         call: ServerUnaryCall<any, any>,
     ) {
@@ -95,10 +108,22 @@ export class AuthController {
         return { message: 'token deleted' }
     }
 
+    @GrpcMethod('AuthController', 'deleteAllTokens')
+    async deleteAllTokens(
+        email: EmailDto,
+        metadata: Metadata,
+        call: ServerUnaryCall<any, any>,
+    ) {
+        this.tokenRepository.deleteMany(email).catch((err) => {
+            throw new RpcException(err)
+        })
+        return { message: 'tokens deleted' }
+    }
+
     private async getPairTokens(jwtPayload: JwtPayload) {
-        let accessToken = (await this.jwtService.signAsync(
-            jwtPayload,
-        )) as JwtToken
+        let accessToken = (await this.jwtService.signAsync({
+            ...jwtPayload,
+        })) as JwtToken
         let refreshToken = {
             token: randomUUID(),
             expires: addMonths(new Date(), 1),

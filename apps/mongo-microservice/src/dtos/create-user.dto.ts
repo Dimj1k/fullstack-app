@@ -34,5 +34,5 @@ export class CreateUserDto {
     @Type(() => UserInfoDto)
     @ValidateNested()
     @IsOptional()
-    info: UserInfoDto
+    info?: UserInfoDto
 }

@@ -1,17 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common'
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
-import {
-    Client,
-    ClientGrpc,
-    RpcException,
-    Transport,
-} from '@nestjs/microservices'
+import { ClientGrpc } from '@nestjs/microservices'
 import { RegisterController } from '../shared/interfaces'
-import { join } from 'path'
 import { Metadata } from '@grpc/grpc-js'
 import { RegisterCode } from './dto'
-import { MONGO_DB_LOCATION } from '../shared/constants'
-import { catchError, lastValueFrom, take, throwError, timeout } from 'rxjs'
+import { lastValueFrom, take } from 'rxjs'
 import { UserFromMongo } from '../user'
 import { User, UserInfo } from '../shared/entities/user'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
@@ -20,20 +13,6 @@ import { DataSource, Repository } from 'typeorm'
 @Injectable()
 export class RegistrService implements OnModuleInit {
     private registerService: RegisterController
-    @Client({
-        transport: Transport.GRPC,
-        options: {
-            url: MONGO_DB_LOCATION,
-            package: 'mongo',
-            protoPath: join(
-                __dirname,
-                __dirname.includes('registration') ? '..' : '.',
-                'protos',
-                'mongo.proto',
-            ),
-        },
-    })
-    client: ClientGrpc
 
     constructor(
         @InjectDataSource() private readonly dataSource: DataSource,
@@ -41,6 +20,7 @@ export class RegistrService implements OnModuleInit {
         private readonly userRepository: Repository<User>,
         @InjectRepository(UserInfo)
         private readonly userInfoRepository: Repository<UserInfo>,
+        @Inject('MONGO_DB_MICROSERVICE') private readonly client: ClientGrpc,
     ) {}
 
     onModuleInit() {

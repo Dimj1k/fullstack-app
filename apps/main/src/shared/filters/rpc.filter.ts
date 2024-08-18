@@ -25,6 +25,6 @@ export class RpcExceptionFilter implements ExceptionFilter {
                 ? (statuses[error['code'] || error['error']['code']] ??
                   HttpStatus.I_AM_A_TEAPOT)
                 : statuses[error]
-        response.status(status).json()
+        response.status(status).json(error['error'])
     }
 }

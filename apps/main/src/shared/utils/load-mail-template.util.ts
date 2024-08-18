@@ -11,19 +11,19 @@ import {
 import { isExists } from './is-exists.util'
 import { readJson } from 'fs-extra'
 
-export const loadMailtemplate = async (
-    dirTotemplate: PathLike,
+export const loadMailTemplate = async (
+    dirToTemplate: PathLike,
     content: IContentMail['content'],
 ) => {
-    dirTotemplate = dirTotemplate.toString()
-    let pathToJson = join(dirTotemplate, jsonIndexesName)
+    dirToTemplate = dirToTemplate.toString()
+    let pathToJson = join(dirToTemplate, jsonIndexesName)
     if (!(await isExists(pathToJson)))
-        return oldAlgorithm(dirTotemplate, content)
+        return oldAlgorithm(dirToTemplate, content)
     let indexes = (await readJson(pathToJson, {
         encoding: 'utf-8',
     })) as Indexes
     const rl = readline.createInterface({
-        input: createReadStream(join(dirTotemplate, 'template.html'), {
+        input: createReadStream(join(dirToTemplate, 'template.html'), {
             encoding: 'utf-8',
         }),
         crlfDelay: Infinity,
@@ -34,8 +34,8 @@ export const loadMailtemplate = async (
             let index = indexes[(++lineno).toString()] as
                 | undefined
                 | varNameInThisLine[]
-            if (index) line = await changeLine(index, content, line)
-            mail += line
+            if (index) line = changeLine(index, content, line)
+            mail += line.trim()
         }
         return mail
     } finally {
@@ -43,7 +43,7 @@ export const loadMailtemplate = async (
     }
 }
 
-async function changeLine(
+function changeLine(
     index: varNameInThisLine[],
     content: IContentMail['content'],
     line: string,
@@ -61,11 +61,11 @@ async function changeLine(
 }
 
 const oldAlgorithm = async (
-    dirTotemplate: PathLike,
+    dirToTemplate: PathLike,
     content: IContentMail['content'],
 ) => {
     let readed = await readFile(
-        join(dirTotemplate.toString(), 'template.html'),
+        join(dirToTemplate.toString(), 'template.html'),
         {
             encoding: 'utf-8',
         },

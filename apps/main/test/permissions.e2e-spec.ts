@@ -10,7 +10,7 @@ import { AdminService } from '../src/administration'
 import { AppModule } from '../src/app.module'
 import { POSTGRES_ENTITIES } from '../src/shared/entities'
 import { ROLE } from '../src/shared/entities/user'
-import { JwtPayload } from '../src/interfaces'
+import { JwtPayload } from '../src/shared/interfaces'
 import { RegistrService } from '../src/registration'
 import { UserService } from '../src/user'
 import { TypeUser } from './login.e2e-spec'
@@ -19,8 +19,8 @@ import { sleep } from './utils'
 import { fakeJwt } from './mocks/fakeJwt.json'
 
 let app: INestApplication
-let connection: MongoClient
-let mongo: Db
+let connection: DataSource
+let mongo: any
 let pg: DataSource
 let jwtService: JwtService
 let server: any
@@ -38,8 +38,13 @@ beforeAll(async () => {
     ])
     let adminService = moduleFixture.get<AdminService>(AdminService)
     await adminService.upgradeToAdmin(email)
-    connection = await MongoClient.connect('mongodb://localhost:27017')
-    mongo = connection.db('test')
+    connection = await new DataSource({
+        type: 'mongodb',
+        host: 'localhost',
+        port: 27017,
+        database: 'test',
+    }).initialize()
+    mongo = connection.getMongoRepository('token')
     pg = await new DataSource({
         type: 'postgres',
         host: 'localhost',
@@ -91,9 +96,9 @@ afterAll(async () => {
                 ],
             })
             .execute(),
-        mongo.collection('token').deleteMany({ userAgent: 'undefined' }),
+        // mongo.deleteMany({ userAgent: 'undefined' }),
     ])
-    await Promise.all([pg.destroy(), connection.close()])
+    await Promise.all([pg.destroy(), connection.destroy()])
 })
 
 async function getJwtToken(user: TypeUser): Promise<string>

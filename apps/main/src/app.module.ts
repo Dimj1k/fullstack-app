@@ -13,9 +13,11 @@ import { RegistrModule } from './registration'
 import { POSTGRES_SUBSCRIBERS } from './shared/subscribers'
 import { UserModule } from './user'
 import { UserBookModule } from './user-book'
+import { GlobalClientsWrapperModule } from './clients-wrapper.module'
 
 @Module({
     imports: [
+        GlobalClientsWrapperModule,
         AuthModule,
         JwtModule.register({
             global: true,

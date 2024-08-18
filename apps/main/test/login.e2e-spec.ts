@@ -16,14 +16,19 @@ import {
 import { ICookie, parseCookie, sleep } from './utils/index'
 
 let app: INestApplication
-let connection: MongoClient
-let mongo: Db
+let connection: DataSource
+let mongo: any
 let pg: DataSource
 let server: any
 let secondUserAgent = 'no undefined'
 beforeAll(async () => {
-    connection = await MongoClient.connect('mongodb://localhost:27017')
-    mongo = connection.db('test')
+    connection = await new DataSource({
+        type: 'mongodb',
+        host: 'localhost',
+        port: 27017,
+        database: 'test',
+    }).initialize()
+    mongo = connection.getMongoRepository('token')
     pg = await new DataSource({
         type: 'postgres',
         host: 'localhost',
@@ -68,9 +73,9 @@ afterAll(async () => {
                 ],
             })
             .execute(),
-        mongo.collection('token').deleteMany({ userAgent: 'undefined' }),
+        // mongo.deleteMany({ userAgent: 'undefined' }),
     ])
-    await Promise.all([pg.destroy(), connection.close()])
+    await Promise.all([pg.destroy(), connection.destroy()])
 })
 
 const checkJwtToken = (jwtToken: string) => {

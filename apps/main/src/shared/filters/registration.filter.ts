@@ -4,10 +4,11 @@ import {
     ArgumentsHost,
     RequestTimeoutException,
     ConflictException,
+    NotFoundException,
 } from '@nestjs/common'
 import { Request, Response } from 'express'
 
-@Catch(RequestTimeoutException, ConflictException)
+@Catch(RequestTimeoutException, ConflictException, NotFoundException)
 export class RegistrationExceptionFilter implements ExceptionFilter {
     catch(
         exception: RequestTimeoutException | ConflictException,

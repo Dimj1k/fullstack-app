@@ -1,4 +1,10 @@
-import { Injectable, OnModuleInit, UnauthorizedException } from '@nestjs/common'
+import {
+    Inject,
+    Injectable,
+    NotFoundException,
+    OnModuleInit,
+    UnauthorizedException,
+} from '@nestjs/common'
 import { User } from '../shared/entities/user'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -8,8 +14,6 @@ import {
     RpcException,
     Transport,
 } from '@nestjs/microservices'
-import { join } from 'path'
-import { MONGO_DB_LOCATION } from '../shared/constants'
 import { AuthDto } from './dto'
 import { JwtController, JwtPayload, Tokens } from '../shared/interfaces'
 import { Metadata } from '@grpc/grpc-js'
@@ -18,21 +22,12 @@ import { catchError, lastValueFrom, take, throwError, timeout } from 'rxjs'
 
 @Injectable()
 export class AuthService implements OnModuleInit {
-    @Client({
-        transport: Transport.GRPC,
-        options: {
-            url: MONGO_DB_LOCATION,
-            package: 'mongo',
-            protoPath: join(__dirname, 'protos', 'mongo.proto'),
-        },
-    })
-    client: ClientGrpc
-
     private jwtService: JwtController
 
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
+        @Inject('MONGO_DB_MICROSERVICE') private readonly client: ClientGrpc,
     ) {}
 
     onModuleInit() {
@@ -40,11 +35,11 @@ export class AuthService implements OnModuleInit {
             this.client.getService<JwtController>('AuthController')
     }
 
-    async login(dto: AuthDto, userAgent: string) {
+    async login({ email, password }: AuthDto, userAgent: string) {
         let user = await this.userRepository.findOne({
-            where: { email: dto.email },
+            where: { email },
         })
-        if (!user || !(await comparePasswords(dto.password, user.password))) {
+        if (!user || !(await comparePasswords(password, user.password))) {
             throw new UnauthorizedException('incorrect login or password')
         }
         let metadata = new Metadata()

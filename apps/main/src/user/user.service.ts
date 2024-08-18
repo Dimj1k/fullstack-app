@@ -1,7 +1,5 @@
 import {
     BadRequestException,
-    HttpException,
-    HttpStatus,
     Injectable,
     NotFoundException,
     UnauthorizedException,
@@ -10,11 +8,10 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, EntityManager, FindOneOptions, Repository } from 'typeorm'
 import { UpdateUserDto } from './dto'
 import { User, UserInfo } from '../shared/entities/user'
-import { UUID } from 'crypto'
-import { comparePasswords, crypt } from '../shared/utils'
+import { comparePasswords } from '../shared/utils'
 import { JwtPayload } from '../shared/interfaces'
 import { differences } from '../shared/utils/differences.util'
-// import { JwtGuard } from '../guards/jwt.guard'
+import { UUID } from 'crypto'
 
 @Injectable()
 export class UserService {
@@ -26,21 +23,28 @@ export class UserService {
         private readonly userInfoRepository: Repository<UserInfo>,
     ) {}
 
-    async updateUser(user: JwtPayload, updateUserDto: Partial<UpdateUserDto>) {
+    async updateUser(
+        user: Partial<JwtPayload>,
+        updateUserDto: Partial<UpdateUserDto>,
+        resetPassword = false,
+    ) {
         let foundedUser = await this.findUser(
-            { id: user.userId },
+            { email: user.email },
             {
                 relations: { info: true },
                 select: ['id', 'email', 'password', 'info'],
             },
         )
         if (!foundedUser) throw new NotFoundException()
-        let isCorrectPassword = await comparePasswords(
-            updateUserDto.password,
-            foundedUser.password,
-        )
-        if (!isCorrectPassword)
-            throw new UnauthorizedException('Неверный пароль')
+        let isCorrectPasswords: boolean = true
+        if (!resetPassword) {
+            isCorrectPasswords = await comparePasswords(
+                updateUserDto.password,
+                foundedUser.password,
+            )
+            if (!isCorrectPasswords)
+                throw new UnauthorizedException('Неверный пароль')
+        }
         let { info: userInfoDiff, ...userDiff } = differences(
             (({ newPassword, ...upd }) => upd)({
                 ...updateUserDto,

@@ -7,12 +7,12 @@ import { isExists } from './is-exists.util'
 
 export const jsonIndexesName = 'indexes.json'
 
-export const createIndexesFortemplates = async (pathTotemplates: PathLike) => {
-    if (!(await isExists(pathTotemplates, 'Directory'))) {
-        console.warn(`${pathTotemplates} - не директория`)
+export const createIndexesForTemplates = async (pathToTemplates: PathLike) => {
+    if (!(await isExists(pathToTemplates, 'Directory'))) {
+        console.warn(`${pathToTemplates} - не директория`)
         return
     }
-    let rootDir = await opendir(pathTotemplates, { recursive: true })
+    let rootDir = await opendir(pathToTemplates, { recursive: true })
     try {
         let file: Dirent | null
         while ((file = await rootDir.read())) {
@@ -43,7 +43,7 @@ async function createIndexes(templatePath: string) {
         let lineno = 0
         for await (let line of rl) {
             let matched = line.matchAll(reVariable)
-            let linenoAsString = (++lineno).toString()
+            let linenoAsString = (++lineno).toString() //
             for (let m of matched) {
                 let varName = m[0].replaceAll(reBrackets, '')
                 if (!(linenoAsString in indexes))

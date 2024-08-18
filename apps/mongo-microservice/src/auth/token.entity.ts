@@ -15,6 +15,9 @@ export class Token {
     expires: Date
 
     @Column()
+    email: string
+
+    @Column()
     userAgent: string
 
     @Column()
