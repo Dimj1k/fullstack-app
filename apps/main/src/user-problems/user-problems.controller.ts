@@ -8,13 +8,14 @@ import {
     Query,
     Redirect,
     Res,
+    UseFilters,
     UseInterceptors,
 } from '@nestjs/common'
 import { UserProblemsService } from './user-problems.service'
 import { UUID } from 'node:crypto'
 import { IMail, TypeMails } from '../mailer'
 import { HOST, SECURE_COOKIES } from '../shared/constants'
-import { GetCookie } from '../shared/decorators'
+import { GetCookie, UserResources } from '../shared/decorators'
 import { MailerInterceptor } from '../shared/interceptors'
 import { UuidPipe } from '../shared/pipes'
 import { EmailDto, ChangePasswordDto } from '../user/dto/forgot-password.dto'
@@ -22,7 +23,15 @@ import * as QueryString from 'qs'
 import { UserService } from '../user/user.service'
 import { Response } from 'express'
 import { EmailUrlDto } from './dto/email-url.dto'
+import { ApiQuery, ApiTags } from '@nestjs/swagger'
+import { JwtPayload } from '../shared/interfaces'
+import {
+    RegistrationExceptionFilter,
+    RpcExceptionFilter,
+} from '../shared/filters'
 
+@UseFilters(RpcExceptionFilter, RegistrationExceptionFilter)
+@ApiTags('user-problems')
 @Controller('user-problems')
 export class UserProblemsController {
     constructor(
@@ -32,7 +41,7 @@ export class UserProblemsController {
 
     @UseInterceptors(MailerInterceptor)
     @Post('forgot-password')
-    async forgotPassword(@Body() { email }: EmailDto): Promise<IMail> {
+    async forgotPassword(@Body() { email }: EmailDto): IMail {
         let foundedUser = await this.userService.findUser({ email })
         if (!foundedUser) throw new NotFoundException()
         let linkToResetPassword =
@@ -54,6 +63,7 @@ export class UserProblemsController {
         }
     }
 
+    @ApiQuery({ schema: { $ref: '?' }, name: 'request' })
     @Redirect(HOST + '/user/reset-password')
     @Get('forgot-password')
     async redirectToResetPassword(
@@ -75,19 +85,27 @@ export class UserProblemsController {
         )
     }
 
+    @UserResources()
+    @Post('delete-all-tokens')
+    async deleteAllTokens({ email }: Pick<JwtPayload, 'email'>) {
+        return this.userProblemsService.deleteAllTokens({ email })
+    }
+
     @UseInterceptors(MailerInterceptor)
     @Post('reset-password')
     async resetPassword(
         @GetCookie('reset-password-for') { email, url }: EmailUrlDto,
         @Body() { password: newPassword }: ChangePasswordDto,
         @Res() response: Response,
-    ): Promise<IMail> {
+    ): IMail {
         if (!email) throw new BadRequestException()
         return this.userService
             .updateUser({ email }, { newPassword }, true)
             .then(async () => {
-                await this.userProblemsService.deleteAllTokens({ email })
-                await this.userProblemsService.deleteTempUrl({ url })
+                await Promise.all([
+                    this.deleteAllTokens({ email }),
+                    this.userProblemsService.deleteTempUrl({ url }),
+                ])
                 response.clearCookie('reset-password-for', {
                     path: '/api/user-problems/reset-password',
                 })

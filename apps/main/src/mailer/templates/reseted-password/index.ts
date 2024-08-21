@@ -1,6 +1,6 @@
 import { join } from 'path'
-import { PasswordResetedMail } from '../../../shared/interfaces'
-import { loadMailTemplate } from '../../../shared/utils'
+import { PasswordResetedMail } from '../../'
+import { loadMailTemplate } from '../../utils'
 
 export async function passwordResetedTemplate(
     content: PasswordResetedMail['content'],

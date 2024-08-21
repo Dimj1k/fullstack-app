@@ -25,6 +25,7 @@ export class TempUrl {
     @Column()
     email: string
 
+    @Index({ unique: true })
     @Column()
     url: string
 

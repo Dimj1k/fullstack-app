@@ -55,8 +55,7 @@ export class User {
     @Exclude()
     id: UUID
 
-    @Column({ type: 'varchar', length: 60 })
-    @ApiProperty({ example: 'dsa@das.com', description: 'email' })
+    @Column({ type: 'varchar', length: 255 })
     email: string
 
     @Column({ type: 'text', name: 'password_hash' })

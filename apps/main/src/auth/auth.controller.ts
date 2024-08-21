@@ -19,11 +19,9 @@ import { Tokens } from '../shared/interfaces'
 import { GetCookie } from '../shared/decorators'
 import { ApiTags } from '@nestjs/swagger'
 import { AuthExceptionFilter } from '../shared/filters'
-import { TimeoutInterceptor } from '../shared/interceptors'
 import { RpcExceptionFilter } from '../shared/filters'
 
 @UseFilters(AuthExceptionFilter, RpcExceptionFilter)
-@UseInterceptors(TimeoutInterceptor)
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {

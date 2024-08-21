@@ -1,5 +1,5 @@
 import { PathLike, StatsBase } from 'fs'
-import { lstat } from 'fs/promises'
+import { access, constants, lstat } from 'fs/promises'
 
 type PickByType<T, V> = {
     [key in keyof T as T[key] extends V ? key : never]: V
@@ -14,7 +14,7 @@ export const isExists = async (
 ) => {
     try {
         if (!itIs) {
-            await lstat(path)
+            await access(path, constants.F_OK)
             return true
         }
         if ((await lstat(path))[`is${itIs}`]()) {
@@ -23,7 +23,7 @@ export const isExists = async (
         logging && console.warn(`${path} - не ${itIs}`)
         return false
     } catch {
-        console.error(`${path} - не существует`)
+        logging && console.error(`${path} - не существует`)
         return false
     }
 }

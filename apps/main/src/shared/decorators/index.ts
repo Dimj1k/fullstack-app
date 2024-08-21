@@ -1,5 +1,6 @@
 export * from './admin-resource.decorator'
 export * from './get-cookie.decorator'
+export * from './is-file.decorator'
 export * from './match.decorator'
 export * from './roles.decorator'
 export * from './user-resource.decorator'

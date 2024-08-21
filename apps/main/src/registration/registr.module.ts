@@ -4,16 +4,11 @@ import { RegistrService } from './registr.service'
 import { UserService } from '../user'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { User, UserInfo } from '../shared/entities/user'
-import { Mailer } from '../mailer'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, UserInfo])],
     controllers: [RegistrController],
-    providers: [
-        RegistrService,
-        UserService,
-        { provide: 'Mailer', useClass: Mailer },
-    ],
+    providers: [RegistrService, UserService],
     exports: [],
 })
 export class RegistrModule {}

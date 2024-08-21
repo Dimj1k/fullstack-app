@@ -5,9 +5,43 @@ import { JwtStrategy } from '../shared/strategies'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Book } from '../shared/entities/books'
 import { User } from '../shared/entities/user'
+import { uploadDir } from '../shared/constants'
+import { MulterModule } from '@nestjs/platform-express'
+import { randomUUID } from 'crypto'
+import { ensureDir } from 'fs-extra'
+import { diskStorage, memoryStorage } from 'multer'
+import { join } from 'path'
+import { format } from 'date-fns'
+import { FilesModule, FilesService } from '../files'
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Book, User])],
+    imports: [
+        TypeOrmModule.forFeature([Book]),
+        MulterModule.register({
+            dest: uploadDir,
+            fileFilter: (req: Request, file: Express.Multer.File, cb) => {
+                file.originalname = randomUUID()
+                return cb(null, true)
+            },
+            limits: { fileSize: 25 << 20 },
+            storage: memoryStorage(),
+            // storage: diskStorage({
+            //     destination: uploadDir,
+            //     filename: async (req, file, cb) => {
+            //         let dateFolder = format(new Date(), 'dd-MM-yyyy')
+            //         return ensureDir(join(uploadDir, dateFolder)).then(() =>
+            //             cb(
+            //                 null,
+            //                 join(
+            //                     dateFolder,
+            //                     `${Date.now()}-${file.originalname}`,
+            //                 ),
+            //             ),
+            //         )
+            //     },
+            // }),
+        }),
+    ],
     controllers: [BooksController],
     providers: [BooksService, JwtStrategy],
     exports: [],

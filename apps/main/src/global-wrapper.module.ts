@@ -1,13 +1,13 @@
 import { Global, Module } from '@nestjs/common'
 import { ClientsModule, Transport } from '@nestjs/microservices'
 import { join } from 'path'
+import { FilesModule } from './files/files.module'
+import { Mailer } from './mailer'
 import { MONGO_DB_LOCATION } from './shared/constants'
-import { UserProblemsModule } from './user-problems/user-problems.module'
 
 @Global()
 @Module({
     imports: [
-        UserProblemsModule,
         ClientsModule.register([
             {
                 name: 'MONGO_DB_MICROSERVICE',
@@ -20,6 +20,7 @@ import { UserProblemsModule } from './user-problems/user-problems.module'
             },
         ]),
     ],
-    exports: [ClientsModule],
+    providers: [{ provide: 'Mailer', useClass: Mailer }],
+    exports: [ClientsModule, { provide: 'Mailer', useClass: Mailer }],
 })
-export class GlobalClientsWrapperModule {}
+export class GlobalWrapperModules {}

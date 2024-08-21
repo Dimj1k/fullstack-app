@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import {
     IsString,
     IsDateString,
@@ -22,10 +22,12 @@ export class UpdateUserInfoDto {
 }
 
 export class UpdateUserDto {
+    @Transform(({ value }) => value.trim())
     @IsString()
     @ApiProperty()
     password: string
 
+    @Transform(({ value }) => value.trim())
     @IsString()
     @IsOptional()
     @ApiPropertyOptional()

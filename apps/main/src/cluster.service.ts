@@ -1,8 +1,8 @@
 import { availableParallelism } from 'node:os'
 import { Injectable, Logger } from '@nestjs/common'
 import { Cluster } from 'node:cluster'
-import { createIndexesForTemplates } from './shared/utils/create-indexes-template.util'
 import { join } from 'node:path'
+import { createIndexesForTemplates } from './mailer/utils'
 
 const cluster = require('node:cluster') as Cluster
 const numCPUs = availableParallelism()

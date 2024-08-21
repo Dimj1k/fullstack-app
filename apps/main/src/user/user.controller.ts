@@ -26,7 +26,6 @@ import { ApiParam, ApiTags } from '@nestjs/swagger'
 import { JwtPayload } from '../shared/interfaces'
 import { UserResources } from '../shared/decorators'
 import { Request } from 'express'
-import { TimeoutInterceptor } from '../shared/interceptors'
 import {
     RegistrationExceptionFilter,
     RpcExceptionFilter,
@@ -35,7 +34,6 @@ import {
 export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 
 @UseFilters(RpcExceptionFilter, RegistrationExceptionFilter)
-@UseInterceptors(TimeoutInterceptor)
 @ApiTags('users')
 @Controller('users')
 export class UserController {
@@ -58,13 +56,8 @@ export class UserController {
 
     @UserResources()
     @Get('/me')
-    me(@Req() req: Request & { user: JwtPayload }) {
-        const { email, userId, roles } = req.user
-        return {
-            email,
-            userId,
-            roles,
-        }
+    me(@Req() { user }: Request & { user: JwtPayload }) {
+        return user
     }
 
     @ApiParam({ name: 'id' })

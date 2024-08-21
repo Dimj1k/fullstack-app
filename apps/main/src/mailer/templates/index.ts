@@ -1,4 +1,4 @@
-import { ContentMails, IContentMail } from '../../shared/interfaces'
+import { ContentMails, IContentMail } from '../'
 import { Chainable } from '../../shared/utils'
 import { TypeMails } from '../type-mails.types'
 import { forgotPasswordTemplate } from './forgot-password'

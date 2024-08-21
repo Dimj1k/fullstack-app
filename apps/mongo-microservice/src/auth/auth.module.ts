@@ -14,7 +14,7 @@ const SECRET_KEY = readFileSync(
     imports: [
         JwtModule.register({
             privateKey: SECRET_KEY,
-            signOptions: { expiresIn: '600s', algorithm: 'RS256' },
+            signOptions: { expiresIn: '3600s', algorithm: 'RS256' },
         }),
         TypeOrmModule.forFeature([Token]),
     ],

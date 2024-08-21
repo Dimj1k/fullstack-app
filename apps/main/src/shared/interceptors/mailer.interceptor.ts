@@ -6,11 +6,9 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common'
-import { catchError, map, Observable, throwError } from 'rxjs'
-import { Mailer, IMail } from '../../mailer'
+import { map, Observable } from 'rxjs'
+import { Mailer, IMail, ContentMails } from '../../mailer'
 import { Response } from 'express'
-import { ContentMails } from '../interfaces'
-import { RpcException } from '@nestjs/microservices'
 
 @Injectable()
 export class MailerInterceptor implements NestInterceptor {
@@ -18,7 +16,7 @@ export class MailerInterceptor implements NestInterceptor {
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         return next.handle().pipe(
-            map(async ({ content, type, ...header }: IMail) => {
+            map(async ({ content, type, ...header }: Awaited<IMail>) => {
                 let response = context.switchToHttp().getResponse<Response>()
                 await this.mailer
                     .sendMail(

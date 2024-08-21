@@ -1,6 +1,6 @@
 import { join } from 'path'
-import { RegisterCodeMail } from '../../../shared/interfaces'
-import { loadMailTemplate } from '../../../shared/utils'
+import { RegisterCodeMail } from '../../'
+import { loadMailTemplate } from '../../utils'
 
 export async function registerCodeTemplate(
     content: RegisterCodeMail['content'],

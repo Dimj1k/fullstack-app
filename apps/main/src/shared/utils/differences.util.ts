@@ -1,18 +1,18 @@
+import { reduce } from 'async'
 import { ObjectKeys } from './chainable-class.util'
 
-export function differences<T1 extends Record<ObjectKeys, any>>(
-    objectFoundDiff: T1,
-    originalObject: T1,
-): Partial<T1> {
-    let differencesByObjects: Record<ObjectKeys, any> = {}
-    for (let key in objectFoundDiff) {
-        let [d, orig] = [objectFoundDiff[key], originalObject[key]]
-        if (typeof d !== 'object' && d !== orig) differencesByObjects[key] = d
-        else if (typeof d === 'object') {
-            differencesByObjects[key] = differences(d, orig)
-            if (!Object.keys(differencesByObjects[key]).length)
-                delete differencesByObjects[key]
-        }
-    }
-    return differencesByObjects
+export async function differencesNoArray<T extends Record<ObjectKeys, any>>(
+    objectFoundDiff: T,
+    originalObject: { [key in keyof T]: T[key] },
+): Promise<Partial<T>> {
+    return reduce(Object.keys(objectFoundDiff), {}, async (memo, key) => {
+        let item = objectFoundDiff[key]
+        let origItem = originalObject[key]
+        if (!origItem) memo[key] = item
+        else if (item && typeof item == 'object') {
+            memo[key] = await differencesNoArray(item, origItem)
+            if (!Object.keys(memo[key]).length) delete memo[key]
+        } else if (item !== origItem) memo[key] = item
+        return memo
+    })
 }

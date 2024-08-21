@@ -3,29 +3,6 @@
   "compilerOptions": {
     "declaration": false,
     "outDir": "../../dist/apps/main",
-    "paths": {
-      "~utils/*": [
-        "./utils/*"
-      ],
-      "~configs/*": [
-        "./configs/*"
-      ],
-      "~constants/*": [
-        "./constants/*"
-      ],
-      "~entities/*": [
-        "./entities/*"
-      ],
-      "~decorators/*": [
-        "./decorators/*"
-      ],
-      "~subscribers/*": [
-        "./subscribers/*"
-      ],
-      "~interceptors/*": [
-        "./interceptors/*"
-      ]
-    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"],

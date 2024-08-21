@@ -1,15 +1,16 @@
 import { createReadStream, PathLike } from 'fs'
 import * as readline from 'readline/promises'
-import { IContentMail } from '../interfaces'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import {
     Indexes,
     jsonIndexesName,
-    varNameInThisLine,
+    setAsyncDispose,
+    varNameOnThisLine,
 } from './create-indexes-template.util'
-import { isExists } from './is-exists.util'
 import { readJson } from 'fs-extra'
+import { IContentMail } from '../../mailer'
+import { isExists } from '../../shared/utils'
 
 export const loadMailTemplate = async (
     dirToTemplate: PathLike,
@@ -22,29 +23,27 @@ export const loadMailTemplate = async (
     let indexes = (await readJson(pathToJson, {
         encoding: 'utf-8',
     })) as Indexes
-    const rl = readline.createInterface({
-        input: createReadStream(join(dirToTemplate, 'template.html'), {
-            encoding: 'utf-8',
+    await using rl = setAsyncDispose(
+        readline.createInterface({
+            input: createReadStream(join(dirToTemplate, 'template.html'), {
+                encoding: 'utf-8',
+            }),
+            crlfDelay: Infinity,
         }),
-        crlfDelay: Infinity,
-    })
-    try {
-        let [lineno, mail] = [0, '']
-        for await (let line of rl) {
-            let index = indexes[(++lineno).toString()] as
-                | undefined
-                | varNameInThisLine[]
-            if (index) line = changeLine(index, content, line)
-            mail += line.trim()
-        }
-        return mail
-    } finally {
-        rl.close()
+    )
+    let [lineno, mail] = [0, '']
+    for await (let line of rl) {
+        let index = indexes[(++lineno).toString()] as
+            | undefined
+            | varNameOnThisLine[]
+        if (index) line = changeLine(index, content, line)
+        mail += line.trim()
     }
+    return mail
 }
 
 function changeLine(
-    index: varNameInThisLine[],
+    index: varNameOnThisLine[],
     content: IContentMail['content'],
     line: string,
 ) {

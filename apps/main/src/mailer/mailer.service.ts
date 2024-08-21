@@ -1,14 +1,14 @@
 import { MailerService } from '@nestjs-modules/mailer'
 import { Injectable } from '@nestjs/common'
 import { answers, makeMail } from './templates'
-import { ContentMails } from '../shared/interfaces'
+import { ContentMails } from './content-mails.interface'
 
 export interface IMailHeader {
     to: string[] | string
     from?: string
 }
 
-export type IMail = IMailHeader & ContentMails
+export type IMail = Promise<IMailHeader & ContentMails>
 
 @Injectable()
 export class Mailer {

@@ -1,6 +1,6 @@
 import { join } from 'path'
-import { ForgotPasswordMail } from '../../../shared/interfaces'
-import { loadMailTemplate } from '../../../shared/utils'
+import { ForgotPasswordMail } from '../../'
+import { loadMailTemplate } from '../../utils'
 
 export async function forgotPasswordTemplate(
     content: ForgotPasswordMail['content'],

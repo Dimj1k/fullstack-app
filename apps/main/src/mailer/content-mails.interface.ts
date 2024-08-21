@@ -1,4 +1,4 @@
-import { TypeMails } from '../../mailer'
+import { TypeMails } from './type-mails.types'
 
 export interface IContentMail {
     type: TypeMails

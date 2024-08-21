@@ -14,6 +14,6 @@ export class ChangePasswordDto {
     password: string
 
     @Match(ChangePasswordDto, (dto) => dto.password)
-    @ApiProperty({ name: 'password' })
-    repeatPassword: string
+    @ApiProperty({ name: 'passwordConfirm' })
+    passwordConfirm: string
 }

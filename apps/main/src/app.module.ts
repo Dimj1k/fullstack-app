@@ -13,12 +13,16 @@ import { RegistrModule } from './registration'
 import { POSTGRES_SUBSCRIBERS } from './shared/subscribers'
 import { UserModule } from './user'
 import { UserBookModule } from './user-book'
-import { GlobalClientsWrapperModule } from './clients-wrapper.module'
+import { GlobalWrapperModules } from './global-wrapper.module'
+import { UserProblemsModule } from './user-problems/user-problems.module'
+import { FilesModule } from './files'
 
 @Module({
     imports: [
-        GlobalClientsWrapperModule,
+        GlobalWrapperModules,
+        UserProblemsModule,
         AuthModule,
+        FilesModule,
         JwtModule.register({
             global: true,
             publicKey: PUBLIC_KEY,
@@ -48,6 +52,10 @@ import { GlobalClientsWrapperModule } from './clients-wrapper.module'
                     subscribers: POSTGRES_SUBSCRIBERS,
                     autoLoadEntities: true,
                     migrationsTableName: 'migration_table',
+                    extra: {
+                        options:
+                            '-c lock_timeout=100ms -c statement_timeout=200ms',
+                    },
                 }
             },
         }),

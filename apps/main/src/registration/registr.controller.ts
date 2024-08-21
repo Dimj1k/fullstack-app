@@ -7,7 +7,7 @@ import {
     UseFilters,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { TimeoutInterceptor, MailerInterceptor } from '../shared/interceptors'
+import { MailerInterceptor } from '../shared/interceptors'
 import { IMail, TypeMails } from '../mailer'
 import {
     PasswordHasher,
@@ -21,7 +21,6 @@ import { RegistrationExceptionFilter } from '../shared/filters'
 import { RpcExceptionFilter } from '../shared/filters'
 
 @UseFilters(RegistrationExceptionFilter, RpcExceptionFilter)
-@UseInterceptors(TimeoutInterceptor)
 @ApiTags('registration')
 @Controller('registration')
 export class RegistrController {
@@ -35,7 +34,7 @@ export class RegistrController {
     async registration(
         @Body(PasswordHasher, PasswordConfirmRemover, BirthdayDateCheck)
         createUserDto: CreateUserDto,
-    ): Promise<IMail> {
+    ): IMail {
         let foundedUser = await this.userService.findUser({
             email: createUserDto.email,
         })
@@ -44,7 +43,7 @@ export class RegistrController {
             await this.registrationService.createInCacheUser(createUserDto)
         // registerCode.subscribe((code) => {
         return {
-            to: [createUserDto.email],
+            to: createUserDto.email,
             type: TypeMails.REGISTRATION_CODE,
             content: { code },
         }
