@@ -2,11 +2,13 @@ import {
     BadRequestException,
     Body,
     Controller,
+    Delete,
     Get,
     NotFoundException,
     Post,
     Query,
     Redirect,
+    Req,
     Res,
     UseFilters,
     UseInterceptors,
@@ -21,14 +23,14 @@ import { UuidPipe } from '../shared/pipes'
 import { EmailDto, ChangePasswordDto } from '../user/dto/forgot-password.dto'
 import * as QueryString from 'qs'
 import { UserService } from '../user/user.service'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { EmailUrlDto } from './dto/email-url.dto'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
-import { JwtPayload } from '../shared/interfaces'
 import {
     RegistrationExceptionFilter,
     RpcExceptionFilter,
 } from '../shared/filters'
+import { JwtPayload } from '../shared/interfaces'
 
 @UseFilters(RpcExceptionFilter, RegistrationExceptionFilter)
 @ApiTags('user-problems')
@@ -86,8 +88,10 @@ export class UserProblemsController {
     }
 
     @UserResources()
-    @Post('delete-all-tokens')
-    async deleteAllTokens({ email }: Pick<JwtPayload, 'email'>) {
+    @Delete('delete-all-tokens')
+    async deleteAllTokens(
+        @Req() { user: { email } }: Request & { user: JwtPayload },
+    ) {
         return this.userProblemsService.deleteAllTokens({ email })
     }
 
@@ -104,7 +108,7 @@ export class UserProblemsController {
             .updateUser({ email }, { newPassword }, true)
             .then(async () => {
                 await Promise.all([
-                    this.deleteAllTokens({ email }),
+                    this.userProblemsService.deleteAllTokens({ email }),
                     this.userProblemsService.deleteTempUrl({ url }),
                 ])
                 response.clearCookie('reset-password-for', {
