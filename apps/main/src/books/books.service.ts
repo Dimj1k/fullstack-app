@@ -53,12 +53,16 @@ export class BooksService {
             .select(['name_book', 'book_id', 'created_at', 'description'])
             .addSelect("images->'big'", 'image')
             .where('name_book = :nameBook', { nameBook })
-            .getRawOne()
+            .getOne()
     }
 
     async update(bookId: string, { image, ...book }: UpdateBookDto) {
         return this.dataSource.transaction(
             async (transactionalEntityManager) => {
+                let images = await this.fileService.convertImageToWebp(image, {
+                    small: { height: 300, width: 200 },
+                    big: { height: 600, width: 400 },
+                })
                 let foundedBook = await transactionalEntityManager
                     .createQueryBuilder(Book, 'books')
                     .useTransaction(true)
@@ -68,10 +72,6 @@ export class BooksService {
                     .catch((err) => {
                         throw new ConflictException(err)
                     })
-                let images = await this.fileService.convertImageToWebp(image, {
-                    small: { height: 300, width: 200 },
-                    big: { height: 600, width: 400 },
-                })
                 let updBook = this.bookRepository.create({
                     bookId,
                     ...book,

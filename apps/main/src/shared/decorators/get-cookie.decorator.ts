@@ -8,8 +8,6 @@ import { Request } from 'express'
 export const GetCookie = createParamDecorator(
     (key: string, ctx: ExecutionContext) => {
         const request = ctx.switchToHttp().getRequest() as Request
-        return key in request.cookies
-            ? request.cookies[key]
-            : new BadRequestException()
+        return key in request.cookies ? request.cookies[key] : null
     },
 )

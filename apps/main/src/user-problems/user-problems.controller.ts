@@ -94,11 +94,12 @@ export class UserProblemsController {
     @UseInterceptors(MailerInterceptor)
     @Post('reset-password')
     async resetPassword(
-        @GetCookie('reset-password-for') { email, url }: EmailUrlDto,
+        @GetCookie('reset-password-for') resetPasswordFor: EmailUrlDto,
         @Body() { password: newPassword }: ChangePasswordDto,
         @Res() response: Response,
     ): IMail {
-        if (!email) throw new BadRequestException()
+        if (!resetPasswordFor) throw new BadRequestException()
+        let { email, url } = resetPasswordFor
         return this.userService
             .updateUser({ email }, { newPassword }, true)
             .then(async () => {

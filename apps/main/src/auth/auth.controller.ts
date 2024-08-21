@@ -21,7 +21,7 @@ import { ApiTags } from '@nestjs/swagger'
 import { AuthExceptionFilter } from '../shared/filters'
 import { RpcExceptionFilter } from '../shared/filters'
 
-@UseFilters(AuthExceptionFilter, RpcExceptionFilter)
+@UseFilters(AuthExceptionFilter)
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {

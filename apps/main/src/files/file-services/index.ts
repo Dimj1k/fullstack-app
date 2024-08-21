@@ -1,7 +1,7 @@
 export * from './disk-storage-file.service'
 export * from './memory-storage-file.service'
 
-import { Injectable } from '@nestjs/common'
+import { BadGatewayException, Injectable } from '@nestjs/common'
 import * as sharp from 'sharp'
 import { DiskStorageFilesService } from './disk-storage-file.service'
 import { MemoryStorageFilesService } from './memory-storage-file.service'
@@ -24,12 +24,11 @@ export class FilesService {
     ) {
         if (!image) return undefined
         let fileService = this.switchFileService(image)
-        return fileService.convertImageToWebp(
-            image,
-            sizes,
-            options,
-            webpOptions,
-        )
+        return fileService
+            .convertImageToWebp(image, sizes, options, webpOptions)
+            .catch((err) => {
+                throw new BadGatewayException(err)
+            })
     }
 
     private switchFileService(file: Express.Multer.File) {
