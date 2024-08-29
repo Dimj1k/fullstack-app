@@ -37,7 +37,7 @@ export const createIndexesForTemplates = async (pathToTemplates: PathLike) => {
 
 async function createIndexes(templatePath: string) {
     let indexes: Indexes = {}
-    const rl = setAsyncDispose(
+    await using rl = setAsyncDispose(
         readline.createInterface({
             input: createReadStream(templatePath, { encoding: 'utf-8' }),
             crlfDelay: Infinity,
@@ -48,11 +48,11 @@ async function createIndexes(templatePath: string) {
     let lineno = 0
     for await (let line of rl) {
         let matched = line.matchAll(reVariable)
-        let linenoAsString = (++lineno).toString() //\\
+        ++lineno
         for (let m of matched) {
             let varName = m[0].replaceAll(reBrackets, '')
-            if (!(linenoAsString in indexes))
-                indexes[linenoAsString] = [
+            if (!(lineno in indexes))
+                indexes[lineno] = [
                     {
                         varName,
                         startCol: m.index,
@@ -60,7 +60,7 @@ async function createIndexes(templatePath: string) {
                     },
                 ]
             else
-                indexes[linenoAsString].push({
+                indexes[lineno].push({
                     varName,
                     startCol: m.index,
                     endCol: m.index + m[0].length,

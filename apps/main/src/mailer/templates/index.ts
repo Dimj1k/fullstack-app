@@ -1,5 +1,5 @@
+import { HttpStatus } from '@nestjs/common'
 import { ContentMails, IContentMail } from '../'
-import { Chainable } from '../../shared/utils'
 import { TypeMails } from '../type-mails.types'
 import { forgotPasswordTemplate } from './forgot-password'
 import { registerCodeTemplate } from './register-code'
@@ -9,37 +9,39 @@ export function makeMail<T extends TypeMails>(
     mailType: T,
     content: GetContentMail<ContentMails, T>,
 ) {
-    let mailTemplate = mailTemplates.get(mailType)
+    let mailTemplate = mailTemplates[mailType]
     return mailTemplate(content)
 }
 
-const mailTemplates = new Chainable<mailTemplateFn>({})
-    .add(TypeMails.REGISTRATION_CODE, registerCodeTemplate)
-    .add(TypeMails.FORGET_PASSWORD, forgotPasswordTemplate)
-    .add(TypeMails.RESET_PASSWORD, passwordResetedTemplate)
+export const mailTemplates: Record<TypeMails, mailTemplateFn> = {
+    [TypeMails.REGISTRATION_CODE]: registerCodeTemplate,
+    [TypeMails.FORGET_PASSWORD]: forgotPasswordTemplate,
+    [TypeMails.RESET_PASSWORD]: passwordResetedTemplate,
+}
 
-export const answers = new Chainable<{
-    statusCode: number
-    answer: Record<string, string>
-}>({})
-    .add(TypeMails.REGISTRATION_CODE, {
+export const answers: Record<
+    TypeMails,
+    { statusCode: HttpStatus; answer: Record<string | symbol | number, string> }
+> = {
+    [TypeMails.REGISTRATION_CODE]: {
         statusCode: 201,
         answer: {
             message: 'Если почта существует - Вы получите сообщение с кодом',
         },
-    })
-    .add(TypeMails.FORGET_PASSWORD, {
+    },
+    [TypeMails.FORGET_PASSWORD]: {
         statusCode: 201,
         answer: {
             message: 'Ссылка на сброс пароля отправлена вам на почту',
         },
-    })
-    .add(TypeMails.RESET_PASSWORD, {
-        statusCode: 201,
+    },
+    [TypeMails.RESET_PASSWORD]: {
+        statusCode: 200,
         answer: {
             message: 'Ваш пароль был сброшен',
         },
-    })
+    },
+}
 
 export type GetContentMail<
     T extends IContentMail,
@@ -60,8 +62,5 @@ type Equal<X, Y> =
 type Expect<T extends true> = T
 
 type mailTemplateEqualAnswers = Expect<
-    Equal<
-        keyof (typeof answers)['chain'],
-        keyof (typeof mailTemplates)['chain']
-    >
+    Equal<keyof typeof answers, keyof typeof mailTemplates>
 >

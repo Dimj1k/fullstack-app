@@ -20,10 +20,7 @@ export class BooksService {
         private readonly fileService: FilesService,
     ) {}
 
-    async create(
-        book: Omit<CreateBookDto, 'image'>,
-        image: Express.Multer.File,
-    ) {
+    async create({ image, ...book }: CreateBookDto) {
         let foundedBook = await this.bookRepository.findOneBy({
             nameBook: book.nameBook,
         })
@@ -40,7 +37,7 @@ export class BooksService {
     async findAll(skip: number = 0, take: number = 20) {
         return this.bookRepository
             .createQueryBuilder()
-            .select(['name_book', 'book_id', 'created_at'])
+            .select(['name_book', 'book_id', 'created_at', 'likes'])
             .addSelect("images->'small'", 'image')
             .skip(skip)
             .limit(take)
@@ -50,10 +47,16 @@ export class BooksService {
     async getOne(nameBook: string) {
         return this.bookRepository
             .createQueryBuilder()
-            .select(['name_book', 'book_id', 'created_at', 'description'])
-            .addSelect("images->'big'", 'image')
+            .select("images->'big'", 'image')
+            .addSelect([
+                'name_book',
+                'book_id',
+                'created_at',
+                'description',
+                'likes',
+            ])
             .where('name_book = :nameBook', { nameBook })
-            .getOne()
+            .getRawOne()
     }
 
     async update(bookId: string, { image, ...book }: UpdateBookDto) {

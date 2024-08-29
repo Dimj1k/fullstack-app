@@ -21,7 +21,7 @@ import { FilesModule, FilesService } from '../files'
             dest: uploadDir,
             fileFilter: (req: Request, file: Express.Multer.File, cb) => {
                 file.originalname = randomUUID()
-                return cb(null, true)
+                return cb(null, file.mimetype.includes('image'))
             },
             limits: { fileSize: 25 << 20 },
             storage: memoryStorage(),

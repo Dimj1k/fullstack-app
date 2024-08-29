@@ -30,6 +30,7 @@ import {
     RegistrationExceptionFilter,
     RpcExceptionFilter,
 } from '../shared/filters'
+import { UuidPipe } from '../shared/pipes'
 
 export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 
@@ -39,8 +40,9 @@ export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
+    @ApiParam({ name: 'id' })
     @Get('find/:id')
-    async findUser(@Param('id') id: UUID) {
+    async findUser(@Param('id', UuidPipe) id: UUID) {
         return this.userService.findUser({ id }, { relations: { books: true } })
     }
 

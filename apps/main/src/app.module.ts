@@ -54,7 +54,7 @@ import { FilesModule } from './files'
                     migrationsTableName: 'migration_table',
                     extra: {
                         options:
-                            '-c lock_timeout=100ms -c statement_timeout=200ms',
+                            '-c lock_timeout=300ms -c statement_timeout=200ms',
                     },
                 }
             },

@@ -13,20 +13,24 @@ import {
     registrationUserFail,
 } from './mocks'
 import { sleep } from './utils'
+import { ClientsModule, Transport } from '@nestjs/microservices'
+import { join } from 'path'
+import { Mailer } from '../src/mailer'
+import { MONGO_DB_LOCATION } from '../src/shared/constants'
+import { CacheUser, MONGO_ENTITIES } from './mongo-entities'
 
 let app: INestApplication
-let connection: DataSource
-let mongo: any
+let mongo: DataSource
 let pg: DataSource
 let server: any
 beforeAll(async () => {
-    connection = await new DataSource({
+    mongo = await new DataSource({
         type: 'mongodb',
         host: 'localhost',
         port: 27017,
         database: 'test',
+        entities: MONGO_ENTITIES,
     }).initialize()
-    mongo = connection.getMongoRepository('token')
     pg = await new DataSource({
         type: 'postgres',
         host: 'localhost',
@@ -36,24 +40,18 @@ beforeAll(async () => {
         database: 'test-typeorm-pg',
         entities: POSTGRES_ENTITIES,
     }).initialize()
-})
-beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
+        providers: [{ provide: '$ENABLE_MAILER$', useValue: false }],
     }).compile()
-
     app = moduleFixture.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
     app.setGlobalPrefix('api')
     app.use(cookieParser())
 
-    await app.startAllMicroservices()
     await app.init()
 
     server = app.getHttpServer()
-})
-afterEach(async () => {
-    await app.close()
 })
 afterAll(async () => {
     await Promise.all([
@@ -65,9 +63,10 @@ afterAll(async () => {
                 emails: [registrationUserSuccess.email, secondUser.email],
             })
             .execute(),
-        // mongo.deleteMany({}),
+        mongo.getMongoRepository(CacheUser).deleteMany({}),
     ])
-    await Promise.all([pg.destroy(), connection.destroy()])
+    await Promise.all([pg.destroy(), mongo.destroy()])
+    await app.close()
 })
 
 describe('UserRegistration (e2e)', () => {
@@ -79,7 +78,7 @@ describe('UserRegistration (e2e)', () => {
                 message:
                     'Если почта существует - Вы получите сообщение с кодом',
             })
-        let { code } = await mongo.collection('cache_user').findOne({
+        let { code } = await mongo.getMongoRepository(CacheUser).findOneBy({
             email: registrationUserSuccess.email,
         })
         await request(server)
@@ -88,10 +87,10 @@ describe('UserRegistration (e2e)', () => {
             .expect(201, { success: 'Вы успешно зарегистрировались' })
         await sleep(100)
         expect(
-            await pg.getRepository(User).findOneOrFail({
+            await pg.getRepository(User).findOne({
                 where: { email: registrationUserSuccess.email },
             }),
-        ).toBeDefined()
+        ).not.toBeNull()
     })
 
     test(`Registration User - error`, async () => {
@@ -134,8 +133,8 @@ describe('UserRegistration (e2e)', () => {
             .send(secondUser)
             .expect(201)
         let { code } = await mongo
-            .collection('cache_user')
-            .findOne({ email: secondUser.email })
+            .getMongoRepository(CacheUser)
+            .findOneBy({ email: secondUser.email })
         await request(server)
             .post('/api/registration/confirm')
             .send({ code })
@@ -143,10 +142,10 @@ describe('UserRegistration (e2e)', () => {
         await request(server)
             .post('/api/registration')
             .send(secondUser)
-            .expect(409, {
+            .expect(400, {
                 message: "user's exists",
-                error: 'Conflict',
-                statusCode: 409,
+                error: 'Bad Request',
+                statusCode: 400,
             })
     })
 })

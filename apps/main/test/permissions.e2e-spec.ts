@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { TestingModule, Test } from '@nestjs/testing'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { DataSource, Db, MongoClient } from 'typeorm'
+import { DataSource } from 'typeorm'
 import { AdminService } from '../src/administration'
 import { AppModule } from '../src/app.module'
 import { POSTGRES_ENTITIES } from '../src/shared/entities'
@@ -19,8 +19,7 @@ import { sleep } from './utils'
 import { fakeJwt } from './mocks/fakeJwt.json'
 
 let app: INestApplication
-let connection: DataSource
-let mongo: any
+let mongo: DataSource
 let pg: DataSource
 let jwtService: JwtService
 let server: any
@@ -38,13 +37,12 @@ beforeAll(async () => {
     ])
     let adminService = moduleFixture.get<AdminService>(AdminService)
     await adminService.upgradeToAdmin(email)
-    connection = await new DataSource({
+    mongo = await new DataSource({
         type: 'mongodb',
         host: 'localhost',
         port: 27017,
         database: 'test',
     }).initialize()
-    mongo = connection.getMongoRepository('token')
     pg = await new DataSource({
         type: 'postgres',
         host: 'localhost',
@@ -54,11 +52,6 @@ beforeAll(async () => {
         database: 'test-typeorm-pg',
         entities: POSTGRES_ENTITIES,
     }).initialize()
-})
-beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [AppModule],
-    }).compile()
 
     app = moduleFixture.createNestApplication<NestExpressApplication>()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -71,10 +64,6 @@ beforeEach(async () => {
 
     server = app.getHttpServer()
 })
-afterEach(async () => {
-    await app.close()
-})
-
 afterAll(async () => {
     await Promise.all([
         pg
@@ -98,7 +87,8 @@ afterAll(async () => {
             .execute(),
         // mongo.deleteMany({ userAgent: 'undefined' }),
     ])
-    await Promise.all([pg.destroy(), connection.destroy()])
+    await Promise.all([pg.destroy(), mongo.destroy()])
+    await app.close()
 })
 
 async function getJwtToken(user: TypeUser): Promise<string>

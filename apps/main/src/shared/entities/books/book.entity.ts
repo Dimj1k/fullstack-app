@@ -2,7 +2,9 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
     ManyToMany,
+    PrimaryColumn,
     PrimaryGeneratedColumn,
 } from 'typeorm'
 import { User } from '../user'
@@ -18,7 +20,12 @@ export class Book {
     })
     images: { small: string; big: string; default: string }
 
-    @Column({ type: 'varchar', length: 63, name: 'name_book', unique: true })
+    @Index({ unique: true })
+    @Column({
+        type: 'varchar',
+        length: 100,
+        name: 'name_book',
+    })
     nameBook: string
 
     @Column({ type: 'text' })

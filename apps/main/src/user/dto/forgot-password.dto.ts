@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString } from 'class-validator'
+import { IsEmail, IsString } from 'class-validator'
 import { Match } from '../../shared/decorators'
 
 export class EmailDto {
-    @IsString()
+    @IsEmail()
     @ApiProperty({ name: 'email' })
     email: string
 }

@@ -1,5 +1,5 @@
 import { reduce } from 'async'
-import { ObjectKeys } from './chainable-class.util'
+type ObjectKeys = string | symbol | number
 
 export async function differencesNoArray<T extends Record<ObjectKeys, any>>(
     objectFoundDiff: T,

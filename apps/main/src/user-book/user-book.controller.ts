@@ -13,17 +13,15 @@ export class UserBookController {
     constructor(private readonly userBookService: UserBookService) {}
 
     @Get('/getOwnedBooks')
-    getOwnedBooks(@Req() request: RequestWithUser) {
-        const user = request.user
-        return this.userBookService.getBooksUser(user.userId)
+    getOwnedBooks(@Req() { user: { userId } }: RequestWithUser) {
+        return this.userBookService.getBooksUser(userId)
     }
 
     @Post('/addToYourself/:nameBook')
     addToYourself(
         @Param('nameBook') nameBook: string,
-        @Req() request: RequestWithUser,
+        @Req() { user: { userId } }: RequestWithUser,
     ) {
-        const user = request.user
-        return this.userBookService.addToYourself(user.userId, nameBook)
+        return this.userBookService.addToYourself(userId, nameBook)
     }
 }

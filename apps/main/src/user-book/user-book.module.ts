@@ -3,10 +3,9 @@ import { UserBookController } from './user-book.controller'
 import { UserBookService } from './user-book.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Book } from '../shared/entities/books'
-import { User } from '../shared/entities/user'
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User, Book])],
+    imports: [TypeOrmModule.forFeature([Book])],
     controllers: [UserBookController],
     providers: [UserBookService],
     exports: [],

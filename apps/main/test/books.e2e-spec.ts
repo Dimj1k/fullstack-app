@@ -19,7 +19,11 @@ let userService: UserService
 beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule, TypeOrmModule.forFeature(POSTGRES_ENTITIES)],
-        providers: [RegistrService, AdminService],
+        providers: [
+            RegistrService,
+            AdminService,
+            { provide: '$ENABLE_MAILER$', useValue: false },
+        ],
     }).compile()
     let registrationService = moduleFixture.get<RegistrService>(RegistrService)
     userService = moduleFixture.get<UserService>(UserService)

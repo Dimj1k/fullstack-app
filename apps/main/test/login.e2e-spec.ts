@@ -2,7 +2,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { TestingModule, Test } from '@nestjs/testing'
 import * as cookieParser from 'cookie-parser'
 import * as request from 'supertest'
-import { DataSource, Db, MongoClient } from 'typeorm'
+import { DataSource } from 'typeorm'
 import { AppModule } from '../src/app.module'
 import { REFRESH_TOKEN } from '../src/shared/constants/index'
 import { POSTGRES_ENTITIES } from '../src/shared/entities'
@@ -14,21 +14,22 @@ import {
     loginFifthUser,
 } from './mocks'
 import { ICookie, parseCookie, sleep } from './utils/index'
+import { CacheUser, MONGO_ENTITIES, Token } from './mongo-entities'
 
 let app: INestApplication
 let connection: DataSource
-let mongo: any
+let mongo: DataSource
 let pg: DataSource
 let server: any
 let secondUserAgent = 'no undefined'
 beforeAll(async () => {
-    connection = await new DataSource({
+    mongo = await new DataSource({
         type: 'mongodb',
         host: 'localhost',
         port: 27017,
         database: 'test',
+        entities: MONGO_ENTITIES,
     }).initialize()
-    mongo = connection.getMongoRepository('token')
     pg = await new DataSource({
         type: 'postgres',
         host: 'localhost',
@@ -38,12 +39,10 @@ beforeAll(async () => {
         database: 'test-typeorm-pg',
         entities: POSTGRES_ENTITIES,
     }).initialize()
-})
-beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
+        providers: [{ provide: '$ENABLE_MAILER$', useValue: false }],
     }).compile()
-
     app = moduleFixture.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
     app.setGlobalPrefix('api')
@@ -53,9 +52,6 @@ beforeEach(async () => {
     await app.init()
 
     server = app.getHttpServer()
-})
-afterEach(async () => {
-    await app.close()
 })
 afterAll(async () => {
     await Promise.all([
@@ -75,7 +71,8 @@ afterAll(async () => {
             .execute(),
         // mongo.deleteMany({ userAgent: 'undefined' }),
     ])
-    await Promise.all([pg.destroy(), connection.destroy()])
+    await Promise.all([pg.destroy(), mongo.destroy()])
+    await app.close()
 })
 
 const checkJwtToken = (jwtToken: string) => {
@@ -91,7 +88,7 @@ export type TypeUser = { email: string; password: string }
 export const registrationUser = async (user: TypeUser) => {
     const createUser = { ...user, passwordConfirm: user.password }
     await request(server).post('/api/registration').send(createUser).expect(201)
-    let { code } = await mongo.collection('cache_user').findOne({
+    let { code } = await mongo.getMongoRepository(CacheUser).findOneBy({
         email: createUser.email,
     })
     await request(server)
@@ -212,8 +209,8 @@ describe('Auth Controller (e2e)', () => {
                 .expect(401)
             expect(
                 await mongo
-                    .collection('token')
-                    .findOne({ token: cookie.value }),
+                    .getMongoRepository(Token)
+                    .findOneBy({ token: cookie.value }),
             ).not.toBeNull()
         })
     })
@@ -233,7 +230,7 @@ describe('Auth Controller (e2e)', () => {
                         .send()
                         .expect(200)
                     expect(
-                        await mongo.collection('token').findOne({
+                        await mongo.getMongoRepository(Token).findOneBy({
                             token: parseCookie(refreshToken).value,
                         }),
                     ).toBeNull()

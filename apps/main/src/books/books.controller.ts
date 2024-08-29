@@ -28,8 +28,8 @@ export class BooksController {
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileInterceptor('image'), FileToBodyInterceptor)
     @Post('/create')
-    create(@Body() { image, ...book }: CreateBookDto) {
-        return this.booksService.create(book, image)
+    create(@Body() createBookDto: CreateBookDto) {
+        return this.booksService.create(createBookDto)
     }
 
     @Get('/findAll')

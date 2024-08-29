@@ -9,6 +9,6 @@ export class PasswordHasher implements PipeTransform {
         metadata: ArgumentMetadata,
     ) {
         if (metadata.type !== 'body') return user
-        return { ...user, password: await crypt(user.password.trim()) }
+        return { ...user, password: await crypt(user.password) }
     }
 }

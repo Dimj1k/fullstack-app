@@ -1,7 +1,6 @@
 import { Global, Module } from '@nestjs/common'
 import { ClientsModule, Transport } from '@nestjs/microservices'
 import { join } from 'path'
-import { FilesModule } from './files/files.module'
 import { Mailer } from './mailer'
 import { MONGO_DB_LOCATION } from './shared/constants'
 
@@ -20,7 +19,10 @@ import { MONGO_DB_LOCATION } from './shared/constants'
             },
         ]),
     ],
-    providers: [{ provide: 'Mailer', useClass: Mailer }],
+    providers: [
+        { provide: 'Mailer', useClass: Mailer },
+        { provide: '$ENABLE_MAILER$', useValue: false },
+    ],
     exports: [ClientsModule, { provide: 'Mailer', useClass: Mailer }],
 })
 export class GlobalWrapperModules {}

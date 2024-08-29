@@ -1,5 +1,6 @@
 import {
     IsDateString,
+    IsEmail,
     IsEnum,
     IsOptional,
     IsString,
@@ -24,7 +25,7 @@ export class UserInfoDto {
 
 export class CreateUserDto {
     @Transform(({ value }: { value: string }) => value.trim().toLowerCase())
-    @IsString()
+    @IsEmail()
     @ApiProperty()
     email: string
 

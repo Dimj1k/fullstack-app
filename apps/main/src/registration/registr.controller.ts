@@ -3,8 +3,8 @@ import {
     Controller,
     Post,
     Body,
-    ConflictException,
     UseFilters,
+    BadRequestException,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { MailerInterceptor } from '../shared/interceptors'
@@ -38,7 +38,7 @@ export class RegistrController {
         let foundedUser = await this.userService.findUser({
             email: createUserDto.email,
         })
-        if (foundedUser) throw new ConflictException("user's exists")
+        if (foundedUser) throw new BadRequestException("user's exists")
         let { code } =
             await this.registrationService.createInCacheUser(createUserDto)
         // registerCode.subscribe((code) => {

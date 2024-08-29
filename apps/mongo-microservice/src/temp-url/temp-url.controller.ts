@@ -1,6 +1,5 @@
 import {
-    BadGatewayException,
-    ConflictException,
+    BadRequestException,
     Injectable,
     NotFoundException,
     UsePipes,
@@ -40,7 +39,7 @@ export class TempUrlController {
         await this.tempUrlRepository
             .updateOne({ action, email }, { $set: tempUrl }, { upsert: true })
             .catch((err) => {
-                throw new RpcException(new ConflictException(err))
+                throw new RpcException(new BadRequestException(err))
             })
         return { url }
     }
