@@ -6,7 +6,6 @@ import { AppClusterService } from './cluster.service'
 import * as cookieParser from 'cookie-parser'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { TimeoutInterceptor } from './shared/interceptors'
-import * as bodyParser from 'body-parser'
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule)
