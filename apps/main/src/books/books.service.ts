@@ -8,7 +8,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Like, Repository } from 'typeorm'
 import { Book } from '../shared/entities/books'
 import { FilesService } from '../files'
-import { differencesNoArray } from '../shared/utils'
+import { diff } from '../shared/utils'
 import { sleep } from '../../test/utils'
 
 @Injectable()
@@ -37,10 +37,10 @@ export class BooksService {
     async findAll(skip: number = 0, take: number = 20) {
         return this.bookRepository
             .createQueryBuilder()
-            .select(['name_book', 'book_id', 'created_at', 'likes'])
+            .select(['name_book', 'book_id', 'created_at', 'likes', 'genre'])
             .addSelect("images->'small'", 'image')
+            .take(take)
             .skip(skip)
-            .limit(take)
             .execute()
     }
 
@@ -54,6 +54,7 @@ export class BooksService {
                 'created_at',
                 'description',
                 'likes',
+                'genre',
             ])
             .where('name_book = :nameBook', { nameBook })
             .getRawOne()
@@ -80,10 +81,10 @@ export class BooksService {
                     ...book,
                     images,
                 })
-                let differences = await differencesNoArray(updBook, foundedBook)
+                let differences = await diff(updBook, foundedBook)
                 if (!Object.keys(differences).length)
                     throw new BadRequestException('Вы ничего не меняете')
-                return transactionalEntityManager
+                return await transactionalEntityManager
                     .createQueryBuilder(Book, 'books')
                     .where('book_id = :bookId', { bookId })
                     .update()

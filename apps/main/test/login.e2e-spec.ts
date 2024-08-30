@@ -12,17 +12,25 @@ import {
     loginThirdUser,
     loginFourthUser,
     loginFifthUser,
+    MockMailer,
 } from './mocks'
 import { ICookie, parseCookie, sleep } from './utils/index'
 import { CacheUser, MONGO_ENTITIES, Token } from './mongo-entities'
+import { ConfigService } from '@nestjs/config'
 
 let app: INestApplication
-let connection: DataSource
 let mongo: DataSource
 let pg: DataSource
 let server: any
 let secondUserAgent = 'no undefined'
 beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+        imports: [AppModule],
+    })
+        .overrideProvider('Mailer')
+        .useClass(MockMailer)
+        .compile()
+    let configService = moduleFixture.get(ConfigService)
     mongo = await new DataSource({
         type: 'mongodb',
         host: 'localhost',
@@ -31,24 +39,19 @@ beforeAll(async () => {
         entities: MONGO_ENTITIES,
     }).initialize()
     pg = await new DataSource({
-        type: 'postgres',
-        host: 'localhost',
-        port: 5432,
-        username: 'test',
-        password: 'test',
-        database: 'test-typeorm-pg',
+        type: configService.get<'postgres'>('TYPEORM_DRIVER'),
+        host: configService.get('TYPEORM_HOST'),
+        port: configService.get('TYPEORM_PORT'),
+        username: configService.get('TYPEORM_USERNAME'),
+        password: configService.get('TYPEORM_PASSWORD'),
+        database: configService.get<string>('TYPEORM_DATABASE'),
         entities: POSTGRES_ENTITIES,
     }).initialize()
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [AppModule],
-        providers: [{ provide: '$ENABLE_MAILER$', useValue: false }],
-    }).compile()
     app = moduleFixture.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
     app.setGlobalPrefix('api')
     app.use(cookieParser())
 
-    await app.startAllMicroservices()
     await app.init()
 
     server = app.getHttpServer()
@@ -69,7 +72,7 @@ afterAll(async () => {
                 ],
             })
             .execute(),
-        // mongo.deleteMany({ userAgent: 'undefined' }),
+        mongo.getMongoRepository(Token).deleteMany({ userAgent: 'undefined' }),
     ])
     await Promise.all([pg.destroy(), mongo.destroy()])
     await app.close()

@@ -4,7 +4,6 @@ import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { TestingModule, Test } from '@nestjs/testing'
-import { TypeOrmModule } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
 import { AdminService } from '../src/administration'
 import { AppModule } from '../src/app.module'
@@ -14,9 +13,17 @@ import { JwtPayload } from '../src/shared/interfaces'
 import { RegistrService } from '../src/registration'
 import { UserService } from '../src/user'
 import { TypeUser } from './login.e2e-spec'
-import { adminUser, password, noAdminUser, mockBook } from './mocks'
+import {
+    adminUser,
+    password,
+    noAdminUser,
+    permissionBook,
+    MockMailer,
+} from './mocks'
 import { sleep } from './utils'
+import { MONGO_ENTITIES, Token } from './mongo-entities'
 import { fakeJwt } from './mocks/fakeJwt.json'
+import { ConfigService } from '@nestjs/config'
 
 let app: INestApplication
 let mongo: DataSource
@@ -26,9 +33,11 @@ let server: any
 let userService: UserService
 beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [AppModule, TypeOrmModule.forFeature(POSTGRES_ENTITIES)],
-        providers: [RegistrService],
-    }).compile()
+        imports: [AppModule],
+    })
+        .overrideProvider('Mailer')
+        .useClass(MockMailer)
+        .compile()
     let registrationService = moduleFixture.get<RegistrService>(RegistrService)
     userService = moduleFixture.get<UserService>(UserService)
     let [{ email }, _] = await Promise.all([
@@ -37,19 +46,21 @@ beforeAll(async () => {
     ])
     let adminService = moduleFixture.get<AdminService>(AdminService)
     await adminService.upgradeToAdmin(email)
+    let configService = moduleFixture.get(ConfigService)
     mongo = await new DataSource({
         type: 'mongodb',
         host: 'localhost',
         port: 27017,
         database: 'test',
+        entities: MONGO_ENTITIES,
     }).initialize()
     pg = await new DataSource({
-        type: 'postgres',
-        host: 'localhost',
-        port: 5432,
-        username: 'test',
-        password: 'test',
-        database: 'test-typeorm-pg',
+        type: configService.get<'postgres'>('TYPEORM_DRIVER'),
+        host: configService.get('TYPEORM_HOST'),
+        port: configService.get('TYPEORM_PORT'),
+        username: configService.get('TYPEORM_USERNAME'),
+        password: configService.get('TYPEORM_PASSWORD'),
+        database: configService.get<string>('TYPEORM_DATABASE'),
         entities: POSTGRES_ENTITIES,
     }).initialize()
 
@@ -80,12 +91,14 @@ afterAll(async () => {
             .from('books')
             .where('books.name_book = any (:nameBooks)', {
                 nameBooks: [
-                    mockBook.nameBook + 'Admin',
-                    mockBook.nameBook + 'User',
+                    permissionBook.nameBook + 'Admin',
+                    permissionBook.nameBook + 'User',
                 ],
             })
             .execute(),
-        // mongo.deleteMany({ userAgent: 'undefined' }),
+        mongo
+            .getMongoRepository(Token)
+            .deleteMany({ userAgent: 'permissionTest' }),
     ])
     await Promise.all([pg.destroy(), mongo.destroy()])
     await app.close()
@@ -98,7 +111,11 @@ async function getJwtToken(
 ): Promise<[string, string]>
 async function getJwtToken(user: TypeUser, withType = false) {
     let accessToken = (
-        await request(server).post('/api/auth/login').send(user).expect(200)
+        await request(server)
+            .post('/api/auth/login')
+            .set('user-agent', 'permissionTest')
+            .send(user)
+            .expect(200)
     ).body.accessToken as string
     return withType ? accessToken.split(' ') : accessToken
 }
@@ -123,12 +140,14 @@ describe('Permissions check (e2e)', () => {
             let res = await request(server)
                 .post('/api/books/create')
                 .set('authorization', jwtToken)
-                .send({ ...mockBook, nameBook: mockBook.nameBook + role })
+                .send({
+                    ...permissionBook,
+                    nameBook: permissionBook.nameBook + role,
+                })
                 .expect(statusCode)
-            await sleep(200)
             if (res.accepted) {
                 await request(server)
-                    .post('/api/books/delete/' + mockBook.nameBook + role)
+                    .post('/api/books/delete/' + permissionBook.nameBook + role)
                     .expect(200)
             }
         })
@@ -168,7 +187,7 @@ describe('Permissions check (e2e)', () => {
         ])('user with fake jwt to %s resource', async (role, path, method) => {
             await request(server)
                 [method](path)
-                .set('authorization', 'bearer ' + fakeJwt)
+                .set('authorization', 'Bearer ' + fakeJwt)
                 .expect(401)
         })
     })

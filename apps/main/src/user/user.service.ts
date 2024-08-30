@@ -10,7 +10,7 @@ import { UpdateUserDto } from './dto'
 import { User, UserInfo } from '../shared/entities/user'
 import { comparePasswords } from '../shared/utils'
 import { JwtPayload } from '../shared/interfaces'
-import { differencesNoArray } from '../shared/utils/differences.util'
+import { diff } from '../shared/utils/differences.util'
 import { UUID } from 'crypto'
 
 @Injectable()
@@ -45,7 +45,7 @@ export class UserService {
             if (!isCorrectPasswords)
                 throw new UnauthorizedException('Неверный пароль')
         }
-        let { info: userInfoDiff, ...userDiff } = await differencesNoArray(
+        let { info: userInfoDiff, ...userDiff } = await diff(
             (({ newPassword, ...upd }) => upd)({
                 ...updateUserDto,
                 password: updateUserDto.newPassword,

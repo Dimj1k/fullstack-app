@@ -4,7 +4,6 @@ import {
     Entity,
     Index,
     ManyToMany,
-    PrimaryColumn,
     PrimaryGeneratedColumn,
 } from 'typeorm'
 import { User } from '../user'
@@ -36,6 +35,14 @@ export class Book {
 
     @Column({ type: 'bigint', default: 0 })
     likes: number
+
+    @Index()
+    @Column({
+        type: 'varchar',
+        length: 63,
+        array: true,
+    })
+    genre: string[]
 
     @ManyToMany(() => User, {
         nullable: true,

@@ -2,6 +2,12 @@ import { hashSync } from 'bcrypt'
 
 export const password = hashSync('test', 10)
 
+export const permissionBook = {
+    nameBook: 'permBook',
+    description: 'book mock',
+    genre: ['mock', 'permission'],
+}
+
 export const adminUser = {
     email: 'admin@admin.test',
     password: 'test',

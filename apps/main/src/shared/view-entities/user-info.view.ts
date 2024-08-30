@@ -1,8 +1,8 @@
 import { DataSource, ViewEntity } from 'typeorm'
-
-import { User, UserInfo } from './user.entity'
+import { User, UserInfo } from '../entities/user'
 
 @ViewEntity({
+    name: 'total_users',
     expression: (connection: DataSource) =>
         connection
             .createQueryBuilder()
@@ -13,4 +13,4 @@ import { User, UserInfo } from './user.entity'
             .from(User, 'users')
             .leftJoin(UserInfo, 'users_info', 'users.info_id = users_info.id'),
 })
-export class UserInfoView {}
+export class TotalUsers {}

@@ -24,22 +24,22 @@ import { FilesModule, FilesService } from '../files'
                 return cb(null, file.mimetype.includes('image'))
             },
             limits: { fileSize: 25 << 20 },
-            storage: memoryStorage(),
-            // storage: diskStorage({
-            //     destination: uploadDir,
-            //     filename: async (req, file, cb) => {
-            //         let dateFolder = format(new Date(), 'dd-MM-yyyy')
-            //         return ensureDir(join(uploadDir, dateFolder)).then(() =>
-            //             cb(
-            //                 null,
-            //                 join(
-            //                     dateFolder,
-            //                     `${Date.now()}-${file.originalname}`,
-            //                 ),
-            //             ),
-            //         )
-            //     },
-            // }),
+            // storage: memoryStorage(),
+            storage: diskStorage({
+                destination: uploadDir,
+                filename: async (req, file, cb) => {
+                    let dateFolder = format(new Date(), 'dd-MM-yyyy')
+                    return ensureDir(join(uploadDir, dateFolder)).then(() =>
+                        cb(
+                            null,
+                            join(
+                                dateFolder,
+                                `${Date.now()}-${file.originalname}`,
+                            ),
+                        ),
+                    )
+                },
+            }),
         }),
     ],
     controllers: [BooksController],

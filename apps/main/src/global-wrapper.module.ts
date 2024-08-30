@@ -19,10 +19,7 @@ import { MONGO_DB_LOCATION } from './shared/constants'
             },
         ]),
     ],
-    providers: [
-        { provide: 'Mailer', useClass: Mailer },
-        { provide: '$ENABLE_MAILER$', useValue: false },
-    ],
+    providers: [{ provide: 'Mailer', useClass: Mailer }],
     exports: [ClientsModule, { provide: 'Mailer', useClass: Mailer }],
 })
 export class GlobalWrapperModules {}

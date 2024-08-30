@@ -13,31 +13,26 @@ export type IMail = Promise<IMailHeader & ContentMails>
 @Injectable()
 export class Mailer {
     private from: string = 'dh7fm391j@yandex.ru'
-    constructor(
-        private readonly mailerService: MailerService,
-        @Inject('$ENABLE_MAILER$') private readonly enableMailer: boolean,
-    ) {}
+    constructor(private readonly mailerService: MailerService) {}
 
     async sendMail(header: IMailHeader, { type, content }: ContentMails) {
-        if (this.enableMailer)
-            return this.mailerService
-                .sendMail({
-                    to: lowerCase(header.to),
-                    from: lowerCase(header?.from ?? this.from),
-                    encoding: 'utf-8',
-                    html: await makeMail(type, content),
-                })
-                .then((sentInfo) => {
-                    return ['2', '3'].includes(
-                        sentInfo.response.split(' ', 1)[0][0],
-                    )
-                        ? answers[type]
-                        : {
-                              statusCode: 400,
-                              answer: { message: 'Письмо не было отправлено' },
-                          }
-                })
-        return answers[type]
+        return this.mailerService
+            .sendMail({
+                to: lowerCase(header.to),
+                from: lowerCase(header?.from ?? this.from),
+                encoding: 'utf-8',
+                html: await makeMail(type, content),
+            })
+            .then((sentInfo) => {
+                return ['2', '3'].includes(
+                    sentInfo.response.split(' ', 1)[0][0],
+                )
+                    ? answers[type]
+                    : {
+                          statusCode: 400,
+                          answer: { message: 'Письмо не было отправлено' },
+                      }
+            })
     }
 }
 

@@ -16,6 +16,8 @@ import { UserBookModule } from './user-book'
 import { GlobalWrapperModules } from './global-wrapper.module'
 import { UserProblemsModule } from './user-problems/user-problems.module'
 import { FilesModule } from './files'
+import { PopularGenresView } from './shared/view-entities/popular-genres.view'
+import { GenreAgeView } from './shared/view-entities'
 
 @Module({
     imports: [
@@ -45,7 +47,11 @@ import { FilesModule } from './files'
                     username: config.get('TYPEORM_USERNAME'),
                     password: config.get('TYPEORM_PASSWORD'),
                     database: config.get<string>('TYPEORM_DATABASE'),
-                    entities: POSTGRES_ENTITIES,
+                    entities: [
+                        ...POSTGRES_ENTITIES,
+                        PopularGenresView,
+                        GenreAgeView,
+                    ],
                     logging: 'all',
                     synchronize: true,
                     logger: 'debug',
@@ -54,7 +60,7 @@ import { FilesModule } from './files'
                     migrationsTableName: 'migration_table',
                     extra: {
                         options:
-                            '-c lock_timeout=300ms -c statement_timeout=200ms',
+                            '-c lock_timeout=1000ms -c statement_timeout=1200ms',
                     },
                 }
             },
