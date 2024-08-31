@@ -16,12 +16,10 @@ export const Beetween = (
             if (!value) return undefined
             value = +value
             if (isNaN(value))
-                throw new BadRequestException('value is not number')
+                throw new BadRequestException(`${metadata.data} is not number`)
             if (value < leftSide || value > rightSide)
                 throw new BadRequestException(
-                    value > rightSide
-                        ? `${value} > ${rightSide}`
-                        : `${value} < ${leftSide}`,
+                    `${leftSide} > ${metadata.data}=${value} || ${metadata.data}=${value} > ${rightSide}`,
                 )
             return value
         }

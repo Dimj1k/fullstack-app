@@ -8,7 +8,7 @@ export const mockBook1 = {
 export const mockBook2 = {
     nameBook: 'mockBook2',
     description: 'mockBook',
-    genre: ['mock'],
+    genre: ['mock book'],
 }
 
 export const bookCreator = {

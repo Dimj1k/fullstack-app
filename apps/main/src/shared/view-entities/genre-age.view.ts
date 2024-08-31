@@ -4,7 +4,7 @@ import { ViewEntity } from 'typeorm'
     name: 'genre_age_view',
     expression: `
     WITH temp_table AS (
-	    SELECT book_id, UNNEST(genre) AS genre, AGE(birthday_date)
+	    SELECT UNNEST(genre) AS genre, AGE(birthday_date)
 	    FROM books
 	    JOIN users_books USING(book_id)
 	    JOIN users ON user_id = users.id

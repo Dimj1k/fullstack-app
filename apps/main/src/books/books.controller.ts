@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Delete,
@@ -7,17 +8,20 @@ import {
     Patch,
     Post,
     Query,
+    Req,
     UploadedFile,
     UseInterceptors,
 } from '@nestjs/common'
 import { CreateBookDto } from './dto'
 import { UpdateBookDto } from './dto'
 import { BooksService } from './books.service'
-import { ApiConsumes, ApiTags } from '@nestjs/swagger'
+import { ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { Beetween, UuidPipe } from '../shared/pipes'
 import { AdminResources } from '../shared/decorators'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { FileToBodyInterceptor } from '../shared/interceptors'
+import { ArrayPipe } from '../shared/pipes/is-array.pipe'
+import { Request } from 'express'
 
 @ApiTags('books')
 @Controller('books')
@@ -32,12 +36,14 @@ export class BooksController {
         return this.booksService.create(createBookDto)
     }
 
+    @ApiQuery({ name: 'genre', required: false })
     @Get('/find-all')
     findAll(
         @Query('skip', Beetween(0)) skip: number,
         @Query('take', Beetween(0, 500)) take: number,
+        @Query('genre', ArrayPipe) genres: string[],
     ) {
-        return this.booksService.findAll(skip, take)
+        return this.booksService.findAll(skip, take, genres)
     }
 
     @Get('/get-one/:nameBook')
@@ -53,6 +59,8 @@ export class BooksController {
         @Param('id', UuidPipe) id: string,
         @Body() updateBookDto: UpdateBookDto,
     ) {
+        if (!Object.keys(updateBookDto).length)
+            throw new BadRequestException('Пустые данные')
         return this.booksService.update(id, updateBookDto)
     }
 

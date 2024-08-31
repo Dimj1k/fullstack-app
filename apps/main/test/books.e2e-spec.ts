@@ -40,13 +40,13 @@ beforeAll(async () => {
         .compile()
     let registrationService = moduleFixture.get<RegistrService>(RegistrService)
     let bookService = moduleFixture.get(BooksService)
-    let [{ email }, , book1] = await Promise.all([
+    let [{ email }, , { bookId }] = await Promise.all([
         registrationService.createUserInSql({ ...bookCreator, password }),
         registrationService.createUserInSql({ ...bookReceiver, password }),
         bookService.create(mockBook1),
         bookService.create(mockBook2),
     ])
-    mockBook1.bookId = book1.bookId
+    mockBook1.bookId = bookId
     let adminService = moduleFixture.get<AdminService>(AdminService)
     await adminService.upgradeToAdmin(email)
     let configService = moduleFixture.get(ConfigService)
@@ -119,18 +119,37 @@ describe('find-all books', () => {
         )
         await request(server).get(`/api/books/find-all${qs}`).expect(400)
     })
+    test('find-all books by genre', async () => {
+        let qs = QueryString.stringify(
+            { genre: ['mock'] },
+            { addQueryPrefix: true },
+        )
+        await request(server)
+            .get(`/api/books/find-all${qs}`)
+            .expect(200)
+            .then((res) => expect(res.body[0].genre).toContain('mock'))
+        qs = QueryString.stringify(
+            { genre: ['$_teeeeeeeeeeeest_$'] },
+            { addQueryPrefix: true },
+        )
+        await request(server)
+            .get(`/api/books/find-all${qs}`)
+            .expect(200)
+            .then((res) => expect(res.body.length).toBe(0))
+    })
 })
 
 describe('update book', () => {
-    test.concurrent(`update ${mockBook1.nameBook} - successful`, async () => {
+    test(`update ${mockBook1.nameBook} - successful`, async () => {
         await request(server)
             .patch(`/api/books/update/${mockBook1.bookId}`)
             .set('authorization', jwtTokens[0])
             .field('genre', ['a', 'd'])
             .attach('image', mockImage)
             .expect(200)
+        mockBook1.genre = ['a', 'd']
     })
-    test.concurrent(`update ${mockBook1.nameBook} - fail`, async () => {
+    test(`update ${mockBook1.nameBook} - fail`, async () => {
         await request(server)
             .patch(`/api/books/update/${mockBook1.bookId}`)
             .set('authorization', jwtTokens[0])

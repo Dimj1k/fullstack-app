@@ -19,7 +19,6 @@ const SRC_PATH = '<rootDir>';
 module.exports = {
     'roots': [
         SRC_PATH,
-        'apps/mailer'
     ],
     "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",

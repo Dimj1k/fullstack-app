@@ -34,11 +34,12 @@ export class BooksService {
         return newBook
     }
 
-    async findAll(skip: number = 0, take: number = 20) {
+    async findAll(skip: number = 0, take: number = 20, genres: string[] = []) {
         return this.bookRepository
             .createQueryBuilder()
             .select(['name_book', 'book_id', 'created_at', 'likes', 'genre'])
             .addSelect("images->'small'", 'image')
+            .where('genre @> :genres::varchar(63)[]', { genres })
             .take(take)
             .skip(skip)
             .execute()

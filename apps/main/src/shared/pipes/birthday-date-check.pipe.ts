@@ -12,8 +12,8 @@ export class BirthdayDateCheck implements PipeTransform {
     transform(user: CreateUserDto, metadata: ArgumentMetadata) {
         if (user.info)
             if (
-                new Date(user.info.birthdayDate).getTime() >
-                new Date().getTime()
+                user.info.birthdayDate &&
+                new Date(user.info.birthdayDate).getTime() > Date.now()
             )
                 throw new HttpException(
                     'bithdayDate > now()',

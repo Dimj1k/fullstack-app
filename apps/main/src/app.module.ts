@@ -8,7 +8,7 @@ import { AdminModule } from './administration'
 import { AuthModule, PUBLIC_KEY } from './auth'
 import { BooksModule, BooksController } from './books'
 import { POSTGRES_ENTITIES } from './shared/entities'
-import { LoggerMiddleware } from './shared/middlewares'
+import { XmlParserMiddleware } from './shared/middlewares'
 import { RegistrModule } from './registration'
 import { POSTGRES_SUBSCRIBERS } from './shared/subscribers'
 import { UserModule } from './user'
@@ -79,6 +79,6 @@ import { GenreAgeView } from './shared/view-entities'
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(LoggerMiddleware).forRoutes(BooksController)
+        consumer.apply(XmlParserMiddleware).forRoutes('*')
     }
 }

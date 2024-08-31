@@ -1,1 +1,1 @@
-export * from './logger.middleware'
+export * from './xml-parser.middleware'
