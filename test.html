@@ -1,0 +1,12 @@
+<script>
+    const headers = [
+        ['Content-Type', 'application/json'],
+    ];
+    fetch('http://localhost:3002/api/users/update', {
+        method: 'PATCH',
+        headers,
+        body: '{"password": "test1", "newPassword": "test"}'
+    }).then((res) => {
+        res.json().then(console.log)
+    })
+</script>

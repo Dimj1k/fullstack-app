@@ -18,6 +18,7 @@ import { FindGenreDto } from './dto/find-genre.dto'
 import { DeleteGenreDto } from './dto/delete-genre.dto'
 import { sleep } from '../../shared/utils'
 import { Cron, CronExpression } from '@nestjs/schedule'
+import { AdminResources } from '../../shared/decorators'
 
 @ApiTags('genres')
 @UseFilters(new OnlyHttpExceptionFilter())
@@ -27,6 +28,7 @@ export class GenreController {
 
     constructor(private readonly genreService: GenreService) {}
 
+    @AdminResources()
     @Post('create')
     async create(@Body() genre: CreateGenreDto) {
         return this.genreService.create(genre)
@@ -42,16 +44,18 @@ export class GenreController {
         else {
             let { count } = this.ips.get(ip)
             this.ips.set(ip, { count: ++count, date: Date.now() })
-            if (count > 30) await sleep(100)
+            if (count > 100) await sleep(100)
         }
         return this.genreService.find(genreName, take)
     }
 
+    @AdminResources()
     @Put('update')
     async update(@Body() { id, newGenreName }: UpdateGenreDto) {
         return this.genreService.update(id, newGenreName)
     }
 
+    @AdminResources()
     @Delete('delete')
     async delete(@Body() { id }: DeleteGenreDto) {
         return this.genreService.delete(id)
@@ -59,8 +63,9 @@ export class GenreController {
 
     @Cron(CronExpression.EVERY_10_SECONDS)
     protected async deleteOldIp() {
+        const now = Date.now()
         for (let [ip, value] of this.ips.entries()) {
-            if (value.date + 9950 > Date.now()) this.ips.delete(ip)
+            if (value.date + 9950 > now) this.ips.delete(ip)
         }
     }
 }

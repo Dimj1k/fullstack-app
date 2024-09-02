@@ -15,6 +15,14 @@ async function bootstrap() {
     app.setGlobalPrefix('api')
     app.disable('x-powered-by')
     app.use(cookieParser())
+    const whiteList = new Set(['null', 'https://www.google.com'])
+    app.enableCors({
+        methods: ['GET', 'POST', 'HEAD'],
+        maxAge: 5,
+        origin: (origin, cb) => {
+            cb(null, whiteList.has(origin) || !origin)
+        },
+    })
     app.useGlobalInterceptors(
         // new XmlBuilderInterceptor(),
         new TimeoutInterceptor(),
