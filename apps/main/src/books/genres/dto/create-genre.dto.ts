@@ -1,11 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsInt, IsString } from 'class-validator'
+import { IsString, MaxLength } from 'class-validator'
 
 export class CreateGenreDto {
-    @IsInt()
-    @ApiProperty()
-    id: number
-
+    @MaxLength(63)
     @IsString()
     @ApiProperty()
     genre: string

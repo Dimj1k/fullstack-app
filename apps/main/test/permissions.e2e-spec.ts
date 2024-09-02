@@ -20,7 +20,6 @@ import {
     permissionBook,
     MockMailer,
 } from './mocks'
-import { sleep } from './utils'
 import { MONGO_ENTITIES, Token } from './mongo-entities'
 import { fakeJwt } from './mocks/fakeJwt.json'
 import { ConfigService } from '@nestjs/config'
@@ -94,6 +93,14 @@ afterAll(async () => {
                     permissionBook.nameBook + 'Admin',
                     permissionBook.nameBook + 'User',
                 ],
+            })
+            .execute(),
+        pg
+            .createQueryBuilder()
+            .delete()
+            .from('genres')
+            .where('genres.genre = any (:genres)', {
+                genres: [permissionBook.genres].flat(),
             })
             .execute(),
         mongo

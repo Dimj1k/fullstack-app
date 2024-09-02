@@ -1,19 +1,14 @@
 import {
+    HttpException,
     Inject,
     Injectable,
-    NotFoundException,
     OnModuleInit,
     UnauthorizedException,
 } from '@nestjs/common'
 import { User } from '../shared/entities/user'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import {
-    Client,
-    ClientGrpc,
-    RpcException,
-    Transport,
-} from '@nestjs/microservices'
+import { ClientGrpc, RpcException } from '@nestjs/microservices'
 import { AuthDto } from './dto'
 import { JwtController, JwtPayload, Tokens } from '../shared/interfaces'
 import { Metadata } from '@grpc/grpc-js'
@@ -73,9 +68,13 @@ export class AuthService implements OnModuleInit {
                 catchError((err) => throwError(() => new RpcException(err))),
             ),
         )
-        let user = await this.userRepository.findOne({
-            where: { id: userId.userId },
-        })
+        let user = await this.userRepository
+            .findOneOrFail({
+                where: { id: userId.userId },
+            })
+            .catch((err) => {
+                throw new HttpException(err, 500)
+            })
         let jwtPayload: JwtPayload = {
             email: user.email,
             roles: user.role,

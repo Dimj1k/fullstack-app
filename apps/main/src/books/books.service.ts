@@ -37,9 +37,9 @@ export class BooksService {
     async findAll(skip: number = 0, take: number = 20, genres: string[] = []) {
         return this.bookRepository
             .createQueryBuilder()
-            .select(['name_book', 'book_id', 'created_at', 'likes', 'genre'])
+            .select(['name_book', 'book_id', 'created_at', 'likes', 'genres'])
             .addSelect("images->'small'", 'image')
-            .where('genre @> :genres::varchar(63)[]', { genres })
+            .where('genres @> :genres::varchar(63)[]', { genres })
             .take(take)
             .skip(skip)
             .execute()
@@ -55,7 +55,7 @@ export class BooksService {
                 'created_at',
                 'description',
                 'likes',
-                'genre',
+                'genres',
             ])
             .where('name_book = :nameBook', { nameBook })
             .getRawOne()

@@ -36,12 +36,12 @@ export class BooksController {
         return this.booksService.create(createBookDto)
     }
 
-    @ApiQuery({ name: 'genre', required: false })
+    @ApiQuery({ name: 'genres', required: false })
     @Get('/find-all')
     findAll(
         @Query('skip', Beetween(0)) skip: number,
         @Query('take', Beetween(0, 500)) take: number,
-        @Query('genre', ArrayPipe) genres: string[],
+        @Query('genres', ArrayPipe) genres: string[],
     ) {
         return this.booksService.findAll(skip, take, genres)
     }

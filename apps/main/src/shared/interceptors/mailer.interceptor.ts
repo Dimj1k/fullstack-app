@@ -6,7 +6,7 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common'
-import { map, Observable } from 'rxjs'
+import { map, Observable, take } from 'rxjs'
 import { Mailer, IMail, ContentMails } from '../../mailer'
 import { Response } from 'express'
 
@@ -16,6 +16,7 @@ export class MailerInterceptor implements NestInterceptor {
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         return next.handle().pipe(
+            take(1),
             map(async ({ content, type, ...header }: Awaited<IMail>) => {
                 let response = context.switchToHttp().getResponse<Response>()
                 await this.mailer

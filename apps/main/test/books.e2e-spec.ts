@@ -121,15 +121,15 @@ describe('find-all books', () => {
     })
     test('find-all books by genre', async () => {
         let qs = QueryString.stringify(
-            { genre: ['mock'] },
+            { genres: ['mock'] },
             { addQueryPrefix: true },
         )
         await request(server)
             .get(`/api/books/find-all${qs}`)
             .expect(200)
-            .then((res) => expect(res.body[0].genre).toContain('mock'))
+            .then((res) => expect(res.body[0].genres).toContain('mock'))
         qs = QueryString.stringify(
-            { genre: ['$_teeeeeeeeeeeest_$'] },
+            { genres: ['$_teeeeeeeeeeeest_$'] },
             { addQueryPrefix: true },
         )
         await request(server)
@@ -144,10 +144,10 @@ describe('update book', () => {
         await request(server)
             .patch(`/api/books/update/${mockBook1.bookId}`)
             .set('authorization', jwtTokens[0])
-            .field('genre', ['a', 'd'])
+            .field('genres', ['a', 'd'])
             .attach('image', mockImage)
             .expect(200)
-        mockBook1.genre = ['a', 'd']
+        mockBook1.genres = ['a', 'd']
     })
     test(`update ${mockBook1.nameBook} - fail`, async () => {
         await request(server)
@@ -155,7 +155,7 @@ describe('update book', () => {
             .set('authorization', jwtTokens[0])
             .send({
                 description: mockBook1.description,
-                genre: mockBook1.genre,
+                genres: mockBook1.genres,
             })
             .expect(400, {
                 message: 'Вы ничего не меняете',
@@ -224,6 +224,14 @@ afterAll(async () => {
             .from('books')
             .where('books.name_book = any (:nameBooks)', {
                 nameBooks: [mockBook1.nameBook, mockBook2.nameBook],
+            })
+            .execute(),
+        pg
+            .createQueryBuilder()
+            .delete()
+            .from('genres')
+            .where('genres.genre = any (:genres)', {
+                genres: [mockBook1.genres, mockBook2.genres].flat(),
             })
             .execute(),
         mongo.getMongoRepository(Token).deleteMany({ userAgent: 'bookTest' }),

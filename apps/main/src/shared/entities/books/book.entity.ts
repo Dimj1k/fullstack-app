@@ -1,4 +1,5 @@
 import {
+    Check,
     Column,
     CreateDateColumn,
     Entity,
@@ -7,6 +8,7 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm'
 import { User } from '../user'
+import { Genre } from '../genres'
 
 @Entity('books')
 export class Book {
@@ -42,7 +44,7 @@ export class Book {
         length: 63,
         array: true,
     })
-    genre: string[]
+    genres: string[]
 
     @ManyToMany(() => User, {
         nullable: true,

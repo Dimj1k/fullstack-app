@@ -1,14 +1,14 @@
 export const mockBook1 = {
     nameBook: 'mockBook1',
     description: 'mockBook',
-    genre: ['mock'],
+    genres: ['mock'],
     bookId: undefined,
 }
 
 export const mockBook2 = {
     nameBook: 'mockBook2',
     description: 'mockBook',
-    genre: ['mock book'],
+    genres: ['mock book'],
 }
 
 export const bookCreator = {

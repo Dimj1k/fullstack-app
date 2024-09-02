@@ -26,15 +26,12 @@ import { ApiParam, ApiTags } from '@nestjs/swagger'
 import { JwtPayload } from '../shared/interfaces'
 import { UserResources } from '../shared/decorators'
 import { Request } from 'express'
-import {
-    RegistrationExceptionFilter,
-    RpcExceptionFilter,
-} from '../shared/filters'
+import { OnlyHttpExceptionFilter, RpcExceptionFilter } from '../shared/filters'
 import { UuidPipe } from '../shared/pipes'
 
 export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 
-@UseFilters(RpcExceptionFilter, RegistrationExceptionFilter)
+@UseFilters(RpcExceptionFilter, OnlyHttpExceptionFilter)
 @ApiTags('users')
 @Controller('users')
 export class UserController {

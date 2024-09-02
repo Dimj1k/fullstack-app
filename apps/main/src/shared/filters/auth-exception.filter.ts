@@ -12,17 +12,11 @@ import { Response } from 'express'
 import { REFRESH_TOKEN, SECURE_COOKIES } from '../constants'
 import { RpcException } from '@nestjs/microservices'
 
-@Catch(
-    UnauthorizedException,
-    RequestTimeoutException,
-    NotFoundException,
-    RpcException,
-)
+@Catch(HttpException, RpcException)
 export class AuthExceptionFilter implements ExceptionFilter {
     catch(exception: HttpException | RpcException, host: ArgumentsHost) {
         let ctx = host.switchToHttp()
         let response = ctx.getResponse<Response>()
-
         if (exception instanceof HttpException) {
             response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
             return response

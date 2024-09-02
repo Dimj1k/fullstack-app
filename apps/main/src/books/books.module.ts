@@ -12,11 +12,12 @@ import { ensureDir } from 'fs-extra'
 import { diskStorage, memoryStorage } from 'multer'
 import { join } from 'path'
 import { format } from 'date-fns'
-import { FilesModule, FilesService } from '../files'
+import { Genre } from '../shared/entities/genres'
+import { GenreController, GenreService } from './genres'
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Book]),
+        TypeOrmModule.forFeature([Book, Genre]),
         MulterModule.register({
             dest: uploadDir,
             fileFilter: (req: Request, file: Express.Multer.File, cb) => {
@@ -42,8 +43,8 @@ import { FilesModule, FilesService } from '../files'
             }),
         }),
     ],
-    controllers: [BooksController],
-    providers: [BooksService, JwtStrategy],
+    controllers: [BooksController, GenreController],
+    providers: [BooksService, GenreService, JwtStrategy],
     exports: [],
 })
 export class BooksModule {}

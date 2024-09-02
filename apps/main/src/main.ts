@@ -5,14 +5,20 @@ import { ValidationPipe } from '@nestjs/common'
 import { AppClusterService } from './cluster.service'
 import * as cookieParser from 'cookie-parser'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import { TimeoutInterceptor } from './shared/interceptors'
+import {
+    TimeoutInterceptor,
+    XmlBuilderInterceptor,
+} from './shared/interceptors'
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule)
     app.setGlobalPrefix('api')
     app.disable('x-powered-by')
     app.use(cookieParser())
-    app.useGlobalInterceptors(new TimeoutInterceptor())
+    app.useGlobalInterceptors(
+        // new XmlBuilderInterceptor(),
+        new TimeoutInterceptor(),
+    )
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
     const config = new DocumentBuilder()
         .addBearerAuth({

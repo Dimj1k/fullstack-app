@@ -3,6 +3,7 @@ import { IsArray, IsOptional, IsString, Length } from 'class-validator'
 import { IsFile } from '../../shared/decorators'
 import { Transform } from 'class-transformer'
 import { BadRequestException } from '@nestjs/common'
+import { Genre } from '../../shared/entities/genres'
 
 export class CreateBookDto {
     @ApiProperty()
@@ -19,14 +20,16 @@ export class CreateBookDto {
     @IsString({ each: true })
     @Transform(({ value }) => {
         try {
-            return typeof value == 'string'
-                ? JSON.parse(value.replaceAll("'", '"'))
-                : value
+            if (typeof value == 'string')
+                return value[0] == '[' && value.at(-1) == ']'
+                    ? JSON.parse(value.replaceAll("'", '"'))
+                    : value.split(',')
+            return value
         } catch {
             return value
         }
     })
-    genre: string[]
+    genres: string[]
 
     @ApiProperty({ type: 'string', format: 'binary', required: false })
     @IsFile({

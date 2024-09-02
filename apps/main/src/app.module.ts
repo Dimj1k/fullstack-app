@@ -18,6 +18,9 @@ import { UserProblemsModule } from './user-problems/user-problems.module'
 import { FilesModule } from './files'
 import { PopularGenresView } from './shared/view-entities/popular-genres.view'
 import { GenreAgeView } from './shared/view-entities'
+import { Genre } from './shared/entities/genres'
+import { Book } from './shared/entities/books'
+import { ormConfig } from './orm-config'
 
 @Module({
     imports: [
@@ -39,31 +42,7 @@ import { GenreAgeView } from './shared/view-entities'
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
-            useFactory: (config: ConfigService) => {
-                return {
-                    type: config.get<'postgres'>('TYPEORM_DRIVER'),
-                    host: config.get('TYPEORM_HOST'),
-                    port: config.get('TYPEORM_PORT'),
-                    username: config.get('TYPEORM_USERNAME'),
-                    password: config.get('TYPEORM_PASSWORD'),
-                    database: config.get<string>('TYPEORM_DATABASE'),
-                    entities: [
-                        ...POSTGRES_ENTITIES,
-                        PopularGenresView,
-                        GenreAgeView,
-                    ],
-                    logging: 'all',
-                    synchronize: true,
-                    logger: 'debug',
-                    subscribers: POSTGRES_SUBSCRIBERS,
-                    autoLoadEntities: true,
-                    migrationsTableName: 'migration_table',
-                    extra: {
-                        options:
-                            '-c lock_timeout=1000ms -c statement_timeout=1200ms',
-                    },
-                }
-            },
+            useFactory: ormConfig,
         }),
         UserModule,
         MailerModule.forRootAsync({

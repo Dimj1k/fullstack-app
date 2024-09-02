@@ -26,13 +26,10 @@ import { UserService } from '../user/user.service'
 import { Request, Response } from 'express'
 import { EmailUrlDto } from './dto/email-url.dto'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
-import {
-    RegistrationExceptionFilter,
-    RpcExceptionFilter,
-} from '../shared/filters'
+import { OnlyHttpExceptionFilter, RpcExceptionFilter } from '../shared/filters'
 import { JwtPayload } from '../shared/interfaces'
 
-@UseFilters(RpcExceptionFilter, RegistrationExceptionFilter)
+@UseFilters(RpcExceptionFilter, OnlyHttpExceptionFilter)
 @ApiTags('user-problems')
 @Controller('user-problems')
 export class UserProblemsController {

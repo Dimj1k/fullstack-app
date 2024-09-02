@@ -1,10 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm'
 
-@Entity('genres', { synchronize: false })
+@Entity('genres')
 export class Genre {
-    @PrimaryGeneratedColumn('increment')
+    @PrimaryGeneratedColumn('rowid')
     id: number
 
+    @Index({ unique: true })
     @Column({ type: 'varchar', length: 63 })
     genre: string
 }

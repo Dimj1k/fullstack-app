@@ -5,7 +5,7 @@ export const password = hashSync('test', 10)
 export const permissionBook = {
     nameBook: 'permBook',
     description: 'book mock',
-    genre: ['mock', 'permission'],
+    genres: ['mock', 'permission'],
 }
 
 export const adminUser = {

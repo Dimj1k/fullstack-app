@@ -17,10 +17,10 @@ import {
 import { UserService } from '../user'
 import { CreateUserDto, RegisterCode } from './dto'
 import { RegistrService } from './registr.service'
-import { RegistrationExceptionFilter } from '../shared/filters'
+import { OnlyHttpExceptionFilter } from '../shared/filters'
 import { RpcExceptionFilter } from '../shared/filters'
 
-@UseFilters(RegistrationExceptionFilter, RpcExceptionFilter)
+@UseFilters(OnlyHttpExceptionFilter, RpcExceptionFilter)
 @ApiTags('registration')
 @Controller('registration')
 export class RegistrController {
