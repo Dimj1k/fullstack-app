@@ -46,6 +46,7 @@ export class GenreController {
             this.ips.set(ip, { count: ++count, date: Date.now() })
             if (count > 100) await sleep(100)
         }
+        console.log(this.ips)
         return this.genreService.find(genreName, take)
     }
 
@@ -64,8 +65,8 @@ export class GenreController {
     @Cron(CronExpression.EVERY_10_SECONDS)
     protected async deleteOldIp() {
         const now = Date.now()
-        for (let [ip, value] of this.ips.entries()) {
-            if (value.date + 9950 > now) this.ips.delete(ip)
+        for (let [ip, value] of this.ips) {
+            if (value.date + 9950 < now) this.ips.delete(ip)
         }
     }
 }

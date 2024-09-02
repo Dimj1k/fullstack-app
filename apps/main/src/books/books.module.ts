@@ -14,6 +14,7 @@ import { join } from 'path'
 import { format } from 'date-fns'
 import { Genre } from '../shared/entities/genres'
 import { GenreController, GenreService } from './genres'
+import { ScheduleModule } from '@nestjs/schedule'
 
 @Module({
     imports: [
@@ -42,6 +43,7 @@ import { GenreController, GenreService } from './genres'
                 },
             }),
         }),
+        ScheduleModule.forRoot(),
     ],
     controllers: [BooksController, GenreController],
     providers: [BooksService, GenreService, JwtStrategy],
