@@ -10,5 +10,6 @@ export class FindGenreDto {
     @Min(0)
     @IsNumber()
     @IsOptional()
+    @ApiProperty({ required: false })
     take?: number
 }

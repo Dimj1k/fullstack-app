@@ -13,7 +13,7 @@ import { CreateGenreDto } from './dto'
 import { UpdateGenreDto } from './dto'
 import { GenreService } from './genre.service'
 import { OnlyHttpExceptionFilter } from '../../shared/filters'
-import { ApiBody, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { FindGenreDto } from './dto/find-genre.dto'
 import { DeleteGenreDto } from './dto/delete-genre.dto'
 import { sleep } from '../../shared/utils'
@@ -34,6 +34,7 @@ export class GenreController {
         return this.genreService.create(genre)
     }
 
+    @ApiQuery({ type: FindGenreDto })
     @Get('find')
     async find(@Query() { genreName, take }: FindGenreDto, @Ip() ip: string) {
         if (!this.ips.has(ip))
@@ -46,7 +47,6 @@ export class GenreController {
             this.ips.set(ip, { count: ++count, date: Date.now() })
             if (count > 100) await sleep(100)
         }
-        console.log(this.ips)
         return this.genreService.find(genreName, take)
     }
 
