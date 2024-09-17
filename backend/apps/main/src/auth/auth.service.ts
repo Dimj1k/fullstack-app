@@ -35,7 +35,7 @@ export class AuthService implements OnModuleInit {
             where: { email },
         })
         if (!user || !(await comparePasswords(password, user.password))) {
-            throw new UnauthorizedException('incorrect login or password')
+            throw new UnauthorizedException('Неверный логин или пароль')
         }
         let metadata = new Metadata()
         metadata.set('client-user-agent', userAgent)

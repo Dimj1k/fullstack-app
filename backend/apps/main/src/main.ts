@@ -15,13 +15,18 @@ async function bootstrap() {
     app.setGlobalPrefix('api')
     app.disable('x-powered-by')
     app.use(cookieParser())
-    const whiteList = new Set(['null', 'https://www.google.com'])
+    const whiteList = new Set([
+        'null',
+        'https://www.google.com',
+        'http://localhost:3000',
+    ])
     app.enableCors({
-        methods: ['GET', 'POST', 'HEAD'],
-        maxAge: 5,
+        methods: '*',
+        // maxAge: 5,
         origin: (origin, cb) => {
             cb(null, whiteList.has(origin) || !origin)
         },
+        credentials: true,
     })
     app.useGlobalInterceptors(
         // new XmlBuilderInterceptor(),

@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Headers,
@@ -37,7 +38,7 @@ export class AuthController {
         @Res() response: Response,
         @Req() request: Request,
     ) {
-        if (refreshToken) return response.json({ message: 'you logged in' })
+        if (refreshToken) throw new BadRequestException('Вы уже вошли')
         let tokens = await this.authService.login(authDto, userAgent)
         // tokens.subscribe((tokens) => {
         //     this.setTokens(tokens, request, response)
