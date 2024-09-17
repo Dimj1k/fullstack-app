@@ -6,11 +6,7 @@ export default function Footer() {
 	return (
 		<footer className={cn(styles.header, stylesFooter.footer)}>
 			<div className={styles.content}>
-				<p>
-					Саратов Дмитрий Александрович
-					<br />
-					Тамбов 2024.
-				</p>
+				<p>2024 г.</p>
 			</div>
 		</footer>
 	)
