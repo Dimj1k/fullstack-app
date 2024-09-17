@@ -18,7 +18,9 @@ export class AuthExceptionFilter implements ExceptionFilter {
         let ctx = host.switchToHttp()
         let response = ctx.getResponse<Response>()
         if (exception instanceof HttpException) {
-            response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
+            let statusCode = exception.getStatus()
+            if (statusCode === HttpStatus.UNAUTHORIZED)
+                response.clearCookie(REFRESH_TOKEN, this.tokenCookieOptions())
             return response
                 .status(exception.getStatus())
                 .json(exception.getResponse())

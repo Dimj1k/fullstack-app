@@ -1,0 +1,6 @@
+.form {
+    display: grid;
+    justify-content: center;
+    gap: 20px 20px;
+    width: calc(var(--max-width) / 2);
+}

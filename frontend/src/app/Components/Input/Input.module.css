@@ -1,0 +1,17 @@
+.input {
+    border: solid 2px black;
+}
+
+:is(.input[type="text"], .input[type="password"], .input[type="email"]) {
+    width: 350px;
+    height: 50px;
+    font-size: larger;
+    background-color: var(--background);
+    color: var(--foreground);
+    text-align: center;
+}
+
+.invalid {
+    outline-color: red;
+    border-color: red;
+}

@@ -1,0 +1,22 @@
+.header {
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-color);
+    height: 50px;
+    width: auto;
+}
+
+.content {
+    gap: 30px;
+    align-items: center;
+    width: var(--max-width);
+}
+
+.content> :last-child {
+    margin-left: auto;
+}
+
+.header,
+.content {
+    display: flex;
+}
