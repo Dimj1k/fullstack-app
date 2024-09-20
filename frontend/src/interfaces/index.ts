@@ -3,6 +3,6 @@ export type TargetType<T extends ISchema<unknown>> = EventTarget &
 	Record<keyof Asserts<T>, {value: string}>
 
 export type RequireKeys<
-	T extends Record<string | number | symbol, T[keyof T]>,
+	T extends Record<string | number | symbol, any>,
 	K extends keyof T,
 > = Required<Pick<T, K>> & Omit<T, K>

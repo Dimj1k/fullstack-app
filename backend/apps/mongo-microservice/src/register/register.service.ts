@@ -34,7 +34,9 @@ export class RegisterService {
         let deletedUser = await this.userRepository.findOneAndDelete(code)
         if (!deletedUser.value || !deletedUser)
             throw new RpcException(
-                new EntityNotFoundError(CacheUser, 'Пользователь не найден'),
+                new BadRequestException(
+                    'Пользователь с таким кодом регистрации не найден',
+                ),
             )
         return deletedUser.value ?? deletedUser
     }
