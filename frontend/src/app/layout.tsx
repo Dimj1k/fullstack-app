@@ -2,7 +2,8 @@ import type {Metadata} from 'next'
 import './globals.css'
 import Header from './Components/Header/Header'
 import Footer from './Components/Footer/Footer'
-import StoreProvider from '@/rtk/provider'
+import StoreProvider from '@/Rtk/provider'
+import AppNotification from './Components/AppNotification/AppNotification'
 
 export const metadata: Metadata = {
 	title: 'Create Next App',
@@ -18,9 +19,12 @@ export default function RootLayout({
 		<html lang="ru">
 			<StoreProvider>
 				<body>
+					<AppNotification />
 					<Header />
 					<main role="main">
-						<div className="content">{children}</div>
+						<div className="content" role="contentinfo">
+							{children}
+						</div>
 					</main>
 					<Footer />
 				</body>

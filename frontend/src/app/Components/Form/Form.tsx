@@ -1,4 +1,3 @@
-'use client'
 import {FormEvent, HTMLProps, PropsWithChildren} from 'react'
 import styles from './Form.module.css'
 
@@ -9,7 +8,11 @@ export default function Forma({
 	...props
 }: PropsWithChildren<FormProps>) {
 	return (
-		<form onSubmit={onSubmit} className={styles.form} style={{gridTemplateAreas}} {...props}>
+		<form
+			onSubmit={onSubmit}
+			className={styles.form}
+			{...props}
+			style={{gridTemplateAreas, ...props['style']}}>
 			{children}
 		</form>
 	)

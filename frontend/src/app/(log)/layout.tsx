@@ -1,4 +1,5 @@
 import type {Metadata} from 'next'
+import styles from './log.module.css'
 
 export const metadata: Metadata = {
 	title: 'Create Next App',
@@ -10,5 +11,5 @@ export default function LogLayout({
 }: Readonly<{
 	children: React.ReactNode
 }>) {
-	return <>{children}</>
+	return <div className={styles.content}>{children}</div>
 }

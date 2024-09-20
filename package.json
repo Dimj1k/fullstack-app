@@ -1,0 +1,14 @@
+{
+    "name": "fullstack-app",
+    "scripts": {
+        "start": "concurrently \"cd backend & npm run start:all\" \"cd frontend & npm run build & cd frontend & npm start\"",
+        "start:dev": "concurrently \"cd backend & npm run start:all:dev\" \"cd frontend & npm run dev\"",
+        "migration:run": "cd backend & npm run migration:run",
+        "migration:down": "cd backend & npm run migration:down",
+        "install": "cd backend & npm i & cd frontend & npm i & npm run migration:run",
+        "uninstall": "npm run migration:down & cd backend & npm uninstall --no-save & cd frontend & npm uninstall --no-save"
+    },
+    "dependencies": {
+        "concurrently": "^9.0.1"
+    }
+}

@@ -1,6 +1,5 @@
-import {Equal, Expect} from '@/interfaces'
-import loginSchema from './login.schema'
 import {Asserts} from 'yup'
+import {loginSchema} from '../Schemas'
 
 export const enum TypeActions {
 	onChangeEmail,
@@ -9,13 +8,13 @@ export const enum TypeActions {
 type State = Partial<Asserts<typeof loginSchema>>
 type Actions = {type: TypeActions; payload: Partial<State>}
 
-export default function LoginReducer(
+export function loginReducer(
 	state: State & {isValid: Record<keyof State, boolean>},
-	action: Actions,
+	{type, payload}: Actions,
 ): State & {isValid: Record<keyof State, boolean>} {
-	switch (action.type) {
+	switch (type) {
 		case TypeActions.onChangeEmail:
-			const {email} = action.payload
+			const {email} = payload
 			return {
 				...state,
 				email,
@@ -25,7 +24,7 @@ export default function LoginReducer(
 				},
 			}
 		case TypeActions.onChangePassword:
-			const {password} = action.payload
+			const {password} = payload
 			return {
 				...state,
 				password,
@@ -35,9 +34,8 @@ export default function LoginReducer(
 				},
 			}
 		default:
-			type maybeNever = typeof action.type
-			/* eslint-disable @typescript-eslint/no-unused-vars */
-			type isNever = Expect<Equal<maybeNever, never>>
-			return state
+			throw Error(
+				'Обнаружен неизвестный тип действия: ' + (type satisfies never) + ' в функции loginReducer',
+			)
 	}
 }

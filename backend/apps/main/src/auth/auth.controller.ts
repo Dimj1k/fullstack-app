@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { AuthDto } from './dto'
-import { Request, Response } from 'express'
+import { CookieOptions, Request, Response } from 'express'
 import { REFRESH_TOKEN, SECURE_COOKIES } from '../shared/constants'
 import { Tokens } from '../shared/interfaces'
 import { GetCookie } from '../shared/decorators'
@@ -55,7 +55,7 @@ export class AuthController {
         @Res() response: Response,
         @Headers('user-agent') userAgent: string,
     ) {
-        if (!refreshToken) throw new UnauthorizedException()
+        if (!refreshToken) throw new UnauthorizedException('refreshToken - нет')
         let tokens = await this.authService.refreshTokens(
             refreshToken,
             userAgent,
@@ -95,6 +95,7 @@ export class AuthController {
         req.headers.authorization = `Bearer ${accessToken}`
         res.json({
             accessToken: `Bearer ${accessToken}`,
+            refreshToken: refreshToken.token,
         })
     }
 

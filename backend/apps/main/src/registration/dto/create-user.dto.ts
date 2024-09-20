@@ -25,7 +25,10 @@ export class UserInfoDto {
 
 export class CreateUserDto {
     @Transform(({ value }: { value: string }) => value.trim().toLowerCase())
-    @IsEmail()
+    @IsEmail(
+        {},
+        { message: 'В поле "Электронная почта" указана не электронная почта' },
+    )
     @ApiProperty()
     email: string
 
@@ -34,7 +37,9 @@ export class CreateUserDto {
     @ApiProperty()
     password: string
 
-    @Match(CreateUserDto, (user) => user.password)
+    @Match(CreateUserDto, (user) => user.password, {
+        message: 'Пароли не совпадают',
+    })
     @Transform(({ value }) => value.trim())
     @IsString()
     @ApiProperty()

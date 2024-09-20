@@ -1,18 +1,26 @@
 import {HTMLProps} from 'react'
 import styles from './Input.module.css'
-import {RequireKeys} from '@/interfaces'
+import {RequireKeys} from '@/Interfaces'
 import cn from 'classnames'
+import React from 'react'
 
-export function Input({gridArea, onChange, ...props}: NoControllingInputProps): JSX.Element
+export function Input({gridArea, onChange, ...props}: NoControllingInputProps): React.JSX.Element
 export function Input({
 	gridArea,
 	onChange,
 	value,
 	valid,
 	...props
-}: ControllingInputProps): JSX.Element
+}: ControllingInputProps): React.JSX.Element
 export function Input({gridArea, ...props}: InputProps) {
-	const prepend = 'placeholder' in props ? <p>{props.placeholder}</p> : <></>
+	const prepend =
+		'prepend' in props ? (
+			<p>{props.prepend}</p>
+		) : 'placeholder' in props ? (
+			<p>{props.placeholder}</p>
+		) : (
+			<></>
+		)
 	if (isControllingInputProps(props)) {
 		const {value, onChange, valid} = props
 		return (
@@ -37,6 +45,7 @@ export function Input({gridArea, ...props}: InputProps) {
 
 type GridArea = {
 	gridArea?: string
+	prepend?: string
 }
 type NoControllingInputProps = Omit<HTMLProps<HTMLInputElement>, 'value'> & GridArea
 type ControllingInputProps = RequireKeys<HTMLProps<HTMLInputElement>, 'onChange' | 'value'> &

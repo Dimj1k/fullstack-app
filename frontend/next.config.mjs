@@ -10,7 +10,10 @@ const nextConfig = {
     },
     'poweredByHeader': false,
     'reactStrictMode': true,
-    'env': {},
+    'env': {
+        API: 'http://localhost:3002/api/',
+        ENV: 'development'
+    },
 };
 
 export default nextConfig;

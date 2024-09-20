@@ -1,0 +1,16 @@
+.code {
+    --width: 50px;
+    --font-size: var(--width);
+    text-align: center;
+    font-size: var(--font-size);
+    width: var(--width);
+    height: var(--width);
+}
+
+.code:focus {}
+
+@media screen and (width < 1080px) {
+    .code {
+        --width: 25px;
+    }
+}

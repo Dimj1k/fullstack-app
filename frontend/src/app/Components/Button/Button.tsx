@@ -1,4 +1,3 @@
-'use client'
 import {HTMLProps, PropsWithChildren} from 'react'
 
 export default function Button({children, gridArea, ...props}: PropsWithChildren<ButtonProps>) {

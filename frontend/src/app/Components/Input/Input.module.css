@@ -1,11 +1,10 @@
 .input {
+    --width: 350px;
+    --font-size: larger;
     border: solid 2px black;
-}
-
-:is(.input[type="text"], .input[type="password"], .input[type="email"]) {
-    width: 350px;
+    width: var(--width);
     height: 50px;
-    font-size: larger;
+    font-size: var(--font-size);
     background-color: var(--background);
     color: var(--foreground);
     text-align: center;
@@ -14,4 +13,11 @@
 .invalid {
     outline-color: red;
     border-color: red;
+}
+
+@media screen and (width < 1080px) {
+    .input {
+        --width: 200px;
+        --font-size: medium;
+    }
 }

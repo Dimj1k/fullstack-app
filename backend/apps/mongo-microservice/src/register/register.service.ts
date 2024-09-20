@@ -16,7 +16,11 @@ export class RegisterService {
     async createInCacheUser(data: CreateUserDto): Promise<{ code: Code }> {
         let userInCreating = await this.findUserByEmail(data.email)
         if (userInCreating)
-            throw new RpcException(new BadRequestException('user creating'))
+            throw new RpcException(
+                new BadRequestException(
+                    'Пользователь с такой электронной почтой уже создаётся',
+                ),
+            )
         let code = this.generateCode()
         let createdUser = this.userRepository.create({
             ...data,
@@ -30,7 +34,7 @@ export class RegisterService {
         let deletedUser = await this.userRepository.findOneAndDelete(code)
         if (!deletedUser.value || !deletedUser)
             throw new RpcException(
-                new EntityNotFoundError(CacheUser, 'user not found'),
+                new EntityNotFoundError(CacheUser, 'Пользователь не найден'),
             )
         return deletedUser.value ?? deletedUser
     }

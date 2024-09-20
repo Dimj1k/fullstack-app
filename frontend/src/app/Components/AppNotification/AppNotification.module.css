@@ -7,6 +7,7 @@
     right: 10px;
     font-size: 20px;
     padding: 10px;
+    box-shadow: 3px 3px #00000088;
 }
 
 .error {
@@ -25,7 +26,7 @@
     background-color: rgb(82, 122, 255);
 }
 
-@media (width < 1080px) {
+@media screen and (width < 1080px) {
     .notification {
         font-size: 10px;
     }

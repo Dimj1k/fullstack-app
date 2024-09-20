@@ -9,18 +9,20 @@ export enum TypesNotification {
 }
 
 export interface NotificationState {
-	messages: string | string[]
+	messages?: string | string[]
 	typeNotification: TypesNotification
 }
 
 export interface NotificationStateWithTime extends NotificationState {
 	showTime: number
+	timeoutHideMs: number
 }
 
 const initialState: NotificationStateWithTime = {
-	messages: '',
+	messages: undefined,
 	typeNotification: TypesNotification.NOTHING,
 	showTime: 0,
+	timeoutHideMs: 3000,
 }
 
 export const notificationSlice = createSlice({
@@ -30,13 +32,19 @@ export const notificationSlice = createSlice({
 	reducers: {
 		show: (state, {payload: {messages, typeNotification}}: PayloadAction<NotificationState>) => {
 			if (typeNotification === TypesNotification.NOTHING) return
-			state.messages = messages
+			state.messages = Array.isArray(messages) ? Array.from(new Set(messages)) : messages
 			state.typeNotification = typeNotification
 			state.showTime = Date.now()
 		},
 		hide: state => {
-			state.messages = ''
+			state.messages = undefined
 			state.typeNotification = TypesNotification.NOTHING
+		},
+		changeTimeOut: (
+			state,
+			{payload: {timeoutHideMs}}: PayloadAction<Pick<NotificationStateWithTime, 'timeoutHideMs'>>,
+		) => {
+			if (state.timeoutHideMs !== timeoutHideMs) state.timeoutHideMs = timeoutHideMs
 		},
 	},
 })

@@ -20,11 +20,17 @@ export class RpcExceptionFilter implements ExceptionFilter {
         const response = ctx.getResponse<Response>()
         const request = ctx.getRequest<Request>()
         let error = exception.getError()
-        let status: HttpStatus =
-            typeof error == 'object'
-                ? (statuses[error['code'] || error['error']['code']] ??
-                  HttpStatus.I_AM_A_TEAPOT)
-                : statuses[error]
-        response.status(status).json(error['error'])
+        if (typeof error == 'object') {
+            let statusCode = statuses[error['code'] ?? HttpStatus.I_AM_A_TEAPOT]
+            return response.status(statusCode).json({
+                statusCode,
+                message: error['details'],
+                error:
+                    statusCode == HttpStatus.BAD_REQUEST
+                        ? 'BAD REQUEST'
+                        : 'SERVICE_UNAVAILABLE',
+            })
+        }
+        return response.status(statuses[error])
     }
 }

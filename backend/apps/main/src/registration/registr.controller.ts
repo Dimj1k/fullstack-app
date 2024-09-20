@@ -38,7 +38,10 @@ export class RegistrController {
         let foundedUser = await this.userService.findUser({
             email: createUserDto.email,
         })
-        if (foundedUser) throw new BadRequestException("user's exists")
+        if (foundedUser)
+            throw new BadRequestException(
+                'Пользователь с данной электронной почтой уже существует',
+            )
         let { code } =
             await this.registrationService.createInCacheUser(createUserDto)
         // registerCode.subscribe((code) => {
@@ -56,7 +59,7 @@ export class RegistrController {
             await this.registrationService.returnByCodeUser(code)
         // confirmedUser.subscribe((res: UserFromMongo) => {
         await this.registrationService.createUserInSql(confirmedUser)
-        return { success: 'Вы успешно зарегистрировались' }
+        return { message: 'Вы успешно зарегистрировались' }
         // })
     }
 }

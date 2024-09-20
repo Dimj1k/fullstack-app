@@ -13,6 +13,7 @@ import {
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule)
     app.setGlobalPrefix('api')
+    // app.enableVersioning()
     app.disable('x-powered-by')
     app.use(cookieParser())
     const whiteList = new Set([
