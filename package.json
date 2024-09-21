@@ -5,8 +5,8 @@
         "start:dev": "concurrently \"cd backend & npm run start:all:dev\" \"cd frontend & npm run dev\"",
         "migration:run": "cd backend & npm run migration:run",
         "migration:down": "cd backend & npm run migration:down",
-        "install": "cd backend & npm i & cd frontend & npm i & npm run migration:run",
-        "uninstall": "npm run migration:down & cd backend & npm uninstall --no-save & cd frontend & npm uninstall --no-save"
+        "install": "cd backend & npm i & cd ../frontend & npm i & cd .. & npm run migration:run",
+        "unbuild": "npm run migration:down && rd /s /q node_modules && del package-lock.json && cd backend && rd /s /q node_modules && del package-lock.json && cd ../frontend && rd /s /q node_modules && del package-lock.json"
     },
     "dependencies": {
         "concurrently": "^9.0.1"
