@@ -10,6 +10,7 @@ export default function Header() {
 			<div className={styles.content}>
 				<Image src={logo} alt="logo" width={50} height={50} />
 				<Link href="/">Главная</Link>
+				<Link href="/profile">Все пользователи</Link>
 				<Link href="/books">Все книги</Link>
 				<Profile />
 			</div>

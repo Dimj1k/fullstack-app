@@ -1,0 +1,45 @@
+.table {
+    display: grid;
+    gap: 1px;
+    text-align: center;
+}
+
+.first-row {
+    background-color: rgb(211, 211, 211);
+    display: grid;
+    grid-template-columns: auto 1px;
+}
+
+.column-separator {
+    justify-self: end;
+    background-color: var(--foreground);
+    height: 25px;
+    min-width: 5px;
+    cursor: ew-resize;
+}
+
+.row-wrapper {
+    display: contents;
+}
+
+.row-wrapper:hover>.cell {
+    background-color: rgb(230, 230, 230);
+    transition: 0.15s background-color;
+}
+
+.draggable.column-separator,
+.draggable.row-wrapper>.cell {
+    background-color: var(--primary-color);
+    transition: none;
+}
+
+.first-row,
+.cell {
+    outline: 1px solid var(--foreground);
+    overflow: hidden;
+    transition: transform 0.15s;
+}
+
+.rows:hover {
+    background-color: rgb(226, 226, 226);
+}

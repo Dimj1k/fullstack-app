@@ -1,0 +1,19 @@
+.pages {
+    display: flex;
+    justify-content: right;
+    gap: 20px;
+}
+
+.div-page {
+    border-radius: 10px;
+    border: 2px solid var(--primary-color);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.select {
+    width: 150px
+}

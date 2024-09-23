@@ -2,6 +2,7 @@ import {Asserts, ISchema} from 'yup'
 export type TargetType<T extends ISchema<unknown>> = EventTarget &
 	Record<keyof Asserts<T>, {value: string}>
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 export type RequireKeys<
 	T extends Record<string | number | symbol, any>,
 	K extends keyof T,

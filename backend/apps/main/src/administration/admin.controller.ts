@@ -1,9 +1,9 @@
 import { Controller, Param, Patch } from '@nestjs/common'
 import { AdminService } from './admin.service'
 import { ApiParam, ApiTags } from '@nestjs/swagger'
-import { AdminResources } from '../shared/decorators'
+import { UserResources } from '../shared/decorators'
 
-@AdminResources()
+@UserResources()
 @ApiTags('admin')
 @Controller('admin')
 export class AdminController {

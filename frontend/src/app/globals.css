@@ -52,6 +52,10 @@ main {
     font-size: var(--default-font-size);
 }
 
+h1 {
+    text-align: center;
+}
+
 @media screen and (width < 1080px) {
      :root {
         --default-font-size: 12pt;

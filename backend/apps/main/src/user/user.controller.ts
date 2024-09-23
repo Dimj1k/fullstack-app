@@ -28,6 +28,7 @@ import { UserResources } from '../shared/decorators'
 import { Request } from 'express'
 import { OnlyHttpExceptionFilter, RpcExceptionFilter } from '../shared/filters'
 import { UuidPipe } from '../shared/pipes'
+import { isEmail } from 'class-validator'
 
 export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 
@@ -37,10 +38,28 @@ export type UserFromMongo = Pick<User, 'email' | 'password' | 'info'>
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
+    @Get('find-all')
+    async findAllUsers(
+        @Query() { skip, take }: { skip: number; take: number },
+    ) {
+        return this.userService.findAllUsers(skip, take)
+    }
+
     @ApiParam({ name: 'id' })
     @Get('find/:id')
     async findUser(@Param('id', UuidPipe) id: UUID) {
+        console.log(id)
         return this.userService.findUser({ id }, { relations: { books: true } })
+    }
+
+    @ApiParam({ name: 'email' })
+    @Get('find-by-email/:email')
+    async findUserByEmail(@Param('email') email: string) {
+        if (!isEmail(email)) throw new NotFoundException('Не email')
+        return this.userService.findUser(
+            { email },
+            { relations: { books: true } },
+        )
     }
 
     @UserResources()

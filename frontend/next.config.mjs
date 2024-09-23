@@ -11,7 +11,7 @@ const nextConfig = {
     'poweredByHeader': false,
     'reactStrictMode': true,
     'env': {
-        API: 'http://localhost:3002/api/',
+        API: 'http://localhost:3002/api',
         ENV: 'development'
     },
 };

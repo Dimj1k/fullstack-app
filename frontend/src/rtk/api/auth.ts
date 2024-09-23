@@ -1,4 +1,4 @@
-import {IAuth, ILogin} from '../interfaces'
+import {IAuth, ILogin, InfoUser} from '../interfaces'
 import {jwtSlice} from '../slices'
 import {notificationSlice, TypesNotification} from '../slices/notification'
 import {showErrorNotification} from '../utils'
@@ -8,8 +8,8 @@ export const authApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		login: builder.mutation<IAuth, ILogin>({
 			query: body => ({url: 'auth/login', body, method: 'POST'}),
-			transformResponse: (res: IAuth) => {
-				return res
+			transformResponse: ({lifeTimeAccessToken, ...res}: IAuth) => {
+				return {...res, lifeTimeAccessToken: lifeTimeAccessToken * 900}
 			},
 			async onQueryStarted(_, {dispatch, queryFulfilled}) {
 				const showNotification = notificationSlice.actions.show
@@ -31,19 +31,17 @@ export const authApi = baseApi.injectEndpoints({
 		}),
 		refreshTokens: builder.mutation<IAuth, void>({
 			query: () => ({url: 'auth/refresh-tokens', method: 'POST'}),
-			transformResponse: (res: IAuth) => {
-				return res
-			},
-			transformErrorResponse: err => {
-				if (err.status === 'FETCH_ERROR') return null
-				return err
+			transformResponse: ({lifeTimeAccessToken, ...res}: IAuth) => {
+				return {...res, lifeTimeAccessToken: lifeTimeAccessToken * 950}
 			},
 			async onQueryStarted(arg, {dispatch, queryFulfilled}) {
 				try {
 					const {data} = await queryFulfilled
 					// localStorage.setItem(JWT_REFRESH_TOKEN, data.refreshToken)
 					dispatch(jwtSlice.actions.addJwt(data))
-				} catch (e) {}
+				} catch (e) {
+					dispatch(jwtSlice.actions.deleteJwt())
+				}
 			},
 			invalidatesTags: ['jwt'],
 		}),
@@ -61,6 +59,10 @@ export const authApi = baseApi.injectEndpoints({
 				}
 			},
 			invalidatesTags: ['jwt'],
+		}),
+		me: builder.query<InfoUser, void>({
+			query: () => ({url: 'users/me'}),
+			providesTags: ['jwt'],
 		}),
 	}),
 	overrideExisting: 'throw',

@@ -1,12 +1,15 @@
 'use client'
 import {RootState, useRegisterationConfirmMutation, useRegisterationMutation} from '@/Rtk'
-import styles from '../log.module.css'
 import RegistrationForm from './RegistrationForm/RegistrationForm'
 import {useEffect, useState} from 'react'
 import Button from '../../Components/Button/Button'
-import CodeForm from './CodeForm/CodeForm'
 import {useRouter} from 'next/navigation'
 import {useSelector} from 'react-redux'
+import dynamic from 'next/dynamic'
+
+const LazyCodeForm = dynamic(() => import('./CodeForm/CodeForm'), {
+	loading: () => <p>Загрузка...</p>,
+})
 
 export default function Home() {
 	const [
@@ -19,12 +22,12 @@ export default function Home() {
 	const [toCode, switchToCode] = useState(false)
 	const router = useRouter()
 	useEffect(() => {
-		if (accessToken) router.push('/profile')
-		if (isSuccessCode) router.push('/auth')
+		if (accessToken) router.replace('/')
+		if (isSuccessCode) router.replace('/auth')
 	}, [isSuccessCode, accessToken, router])
 	return (
 		<>
-			<h1 className={styles.h1}>Регистрация профиля</h1>
+			<h1>Регистрация профиля</h1>
 			{(!toCode && !isSuccessRegisteration && (
 				<RegistrationForm
 					sendRegisteration={sendRegisteration}
@@ -32,7 +35,7 @@ export default function Home() {
 				/>
 			)) ||
 				((toCode || isSuccessRegisteration) && (
-					<CodeForm isLoading={isLoadingCode} sendCode={sendCode} />
+					<LazyCodeForm isLoading={isLoadingCode} sendCode={sendCode} />
 				))}
 			{!isSuccessRegisteration && (
 				<Button onClick={() => switchToCode(state => !state)}>

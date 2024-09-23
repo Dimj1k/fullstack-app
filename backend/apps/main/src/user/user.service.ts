@@ -92,6 +92,10 @@ export class UserService {
         return this.userRepository.findOne({ where, ...options })
     }
 
+    async findAllUsers(skip: number = 0, take: number = 20) {
+        return this.userRepository.find({ skip, take })
+    }
+
     async deleteById(id: UUID) {
         return this.userRepository.delete({ id })
     }

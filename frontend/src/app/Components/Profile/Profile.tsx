@@ -5,20 +5,20 @@ import {RootState, useRefreshTokensMutation} from '@/Rtk'
 import {useEffect} from 'react'
 
 export default function Profile() {
-	const accessToken = useSelector((state: RootState) => state.jwt.accessToken)
-	const [refreshTokens, {isUninitialized, isLoading}] = useRefreshTokensMutation({
-		fixedCacheKey: 'refresh',
-	})
+	const {accessToken, lifeTimeAccessToken, userId} = useSelector((state: RootState) => state.jwt)
+	const [refreshTokens, {isUninitialized, isLoading, isSuccess}] = useRefreshTokensMutation()
 	useEffect(() => {
-		if (!accessToken) {
-			refreshTokens()
+		const timeoutId = setTimeout(() => refreshTokens(), lifeTimeAccessToken)
+		return () => {
+			clearTimeout(timeoutId)
 		}
-	}, [])
-	if (isUninitialized || isLoading) return <p>Загрузка...</p>
+	}, [accessToken, refreshTokens])
+	if (isLoading) return <p>Загрузка</p>
 	return (
 		<>
-			{accessToken && <Link href="/profile">Ваш профиль</Link>}
-			{!accessToken && (
+			{!isUninitialized && isSuccess && accessToken ? (
+				<Link href={`/profile/${userId}`}>Ваш профиль</Link>
+			) : (
 				<Link href="/auth" additionalhrefs={['/registeration']}>
 					Войти/Зарегистрироваться
 				</Link>

@@ -39,23 +39,26 @@ export class AuthService implements OnModuleInit {
         }
         let metadata = new Metadata()
         metadata.set('client-user-agent', userAgent)
-        return await lastValueFrom(
-            this.jwtService
-                .createTokens(
-                    {
-                        email: user.email,
-                        userId: user.id,
-                        roles: user.role,
-                    },
-                    metadata,
-                )
-                .pipe(
-                    take(1),
-                    catchError((err) =>
-                        throwError(() => new RpcException(err)),
+        return [
+            await lastValueFrom(
+                this.jwtService
+                    .createTokens(
+                        {
+                            email: user.email,
+                            userId: user.id,
+                            roles: user.role,
+                        },
+                        metadata,
+                    )
+                    .pipe(
+                        take(1),
+                        catchError((err) =>
+                            throwError(() => new RpcException(err)),
+                        ),
                     ),
-                ),
-        )
+            ),
+            user.id,
+        ] as const
     }
 
     async refreshTokens(
@@ -82,16 +85,22 @@ export class AuthService implements OnModuleInit {
         }
         let metadata = new Metadata()
         metadata.set('client-user-agent', userAgent)
-        return lastValueFrom(
-            this.jwtService
-                .refreshTokens({ token: refreshToken, ...jwtPayload }, metadata)
-                .pipe(
-                    take(1),
-                    catchError((err) =>
-                        throwError(() => new RpcException(err)),
+        return [
+            await lastValueFrom(
+                this.jwtService
+                    .refreshTokens(
+                        { token: refreshToken, ...jwtPayload },
+                        metadata,
+                    )
+                    .pipe(
+                        take(1),
+                        catchError((err) =>
+                            throwError(() => new RpcException(err)),
+                        ),
                     ),
-                ),
-        )
+            ),
+            user.id,
+        ] as const
     }
 
     async deleteTokens(refreshToken: Tokens['refreshToken']['token']) {

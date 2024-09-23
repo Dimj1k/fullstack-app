@@ -47,8 +47,6 @@ export default function CodeForm({
 					key={`code-${idx}`}
 					className={styles.code}
 					{...props}
-					role="cell"
-					aria-colindex={idx + 1}
 					disabled={isLoading}
 					ref={element => {
 						inputsRefArray.current[idx] = element
@@ -122,11 +120,7 @@ export default function CodeForm({
 	return (
 		<>
 			<h1>Введите полученный шестизначный код регистрации</h1>
-			<Forma
-				gridTemplateAreas={`"a b c d e f""g g g g g g"`}
-				aria-colcount={inputsCode.length}
-				role="grid"
-				onSubmit={onSubmit}>
+			<Forma gridTemplateAreas={`"a b c d e f""g g g g g g"`} onSubmit={onSubmit}>
 				{inputsCode.map((v, idx) => (
 					<Fragment key={`code-${idx}`}>{v}</Fragment>
 				))}

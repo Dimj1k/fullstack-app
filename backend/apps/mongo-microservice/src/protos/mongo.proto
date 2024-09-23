@@ -50,7 +50,7 @@ message UserId {
 
 message Tokens {
     string accessToken = 1;
-    RefreshToken refreshToken = 2; 
+    RefreshToken refreshToken = 2;
 }
 
 message Message {

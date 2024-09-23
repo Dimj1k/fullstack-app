@@ -21,6 +21,7 @@ import { GetCookie } from '../shared/decorators'
 import { ApiTags } from '@nestjs/swagger'
 import { AuthExceptionFilter } from '../shared/filters'
 import { RpcExceptionFilter } from '../shared/filters'
+import { UUID } from 'node:crypto'
 
 @UseFilters(AuthExceptionFilter)
 @ApiTags('auth')
@@ -39,11 +40,11 @@ export class AuthController {
         @Req() request: Request,
     ) {
         if (refreshToken) throw new BadRequestException('Вы уже вошли')
-        let tokens = await this.authService.login(authDto, userAgent)
+        let [tokens, userId] = await this.authService.login(authDto, userAgent)
         // tokens.subscribe((tokens) => {
         //     this.setTokens(tokens, request, response)
         // })
-        this.setTokens(tokens, request, response)
+        this.setTokens(tokens, userId, request, response)
     }
 
     @HttpCode(HttpStatus.OK)
@@ -56,12 +57,12 @@ export class AuthController {
         @Headers('user-agent') userAgent: string,
     ) {
         if (!refreshToken) throw new UnauthorizedException('refreshToken - нет')
-        let tokens = await this.authService.refreshTokens(
+        let [tokens, userId] = await this.authService.refreshTokens(
             refreshToken,
             userAgent,
         )
         // tokens.subscribe((tokens) => this.setTokens(tokens, request, response))
-        this.setTokens(tokens, request, response)
+        this.setTokens(tokens, userId, request, response)
     }
 
     @HttpCode(HttpStatus.OK)
@@ -84,6 +85,7 @@ export class AuthController {
 
     private setTokens(
         { accessToken, refreshToken }: Tokens,
+        userId: UUID,
         req: Request,
         res: Response,
     ) {
@@ -96,6 +98,8 @@ export class AuthController {
         res.json({
             accessToken: `Bearer ${accessToken}`,
             refreshToken: refreshToken.token,
+            lifeTimeAccessToken: 3600,
+            userId,
         })
     }
 
