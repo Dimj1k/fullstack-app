@@ -1,7 +1,6 @@
 import {Metadata} from 'next'
 import Table from '@/app/Components/Table/Table'
 import Link from '../Components/Link/Link'
-import {cookies} from 'next/headers'
 import {getCookiesOnTable} from '../Components/Table/actions'
 import {redirect} from 'next/navigation'
 import {paramsToUrl} from '../../Utils/url-search-params'

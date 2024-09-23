@@ -4,7 +4,6 @@ import styles from './Table.module.css'
 import {Column, Data, isHTMLDivElement, UserPosition} from './Interfaces'
 import cn from 'classnames'
 import {FirstRow, SelectPage} from './Components'
-import {useSearchParams} from 'next/navigation'
 
 type MoveRow = {
 	startY: number
@@ -17,11 +16,13 @@ export default function Table<T extends Data>({
 	columns: keys,
 	title,
 	optionsTable,
+	datalength,
 }: {
 	data: T[]
 	columns: Column<T>[]
 	title: string
 	optionsTable?: string[]
+	datalength?: number
 }) {
 	const gridTemplateColumnsState = useState<string[]>(
 		!optionsTable ? new Array(keys.length).fill('1fr') : optionsTable,
@@ -29,10 +30,9 @@ export default function Table<T extends Data>({
 	const [startDragRow, setStartDragRow] = useState<(MoveRow | undefined)[]>(
 		new Array(data.length).fill(undefined),
 	)
-	const searchParams = useSearchParams()
 	const maxSiblings = useMemo<number[]>(() => ({...new Array(data.length).fill(0)}), [data.length])
 	const [orderData, setOrderData] = useState<T[]>(data)
-	useEffect(() => setOrderData(data), [searchParams])
+	useEffect(() => setOrderData(data), [data])
 	if (!data) return <></>
 	const onDragStartRow = (event: UserPosition, idRow: number) => {
 		if (!('clientHeight' in event.target)) return
@@ -227,7 +227,7 @@ export default function Table<T extends Data>({
 					</div>
 				))}
 			</div>
-			<SelectPage datalength={4} />
+			<SelectPage datalength={datalength ?? 4} />
 		</>
 	)
 }

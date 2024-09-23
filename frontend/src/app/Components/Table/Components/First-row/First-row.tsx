@@ -26,7 +26,7 @@ export function FirstRow<T extends Data>({
 			const width = arrayFirstRowRef.current[0]?.clientWidth
 			setGridTemplateColumns(new Array(keys.length).fill(width ? `${width}px` : '1fr'))
 		}
-	}, [])
+	}, [keys.length])
 	const onDragSeparatorStart = (event: UserPosition, separatorId: number) => {
 		startXSeparators[separatorId] =
 			event.clientX - (arrayFirstRowRef.current[separatorId]?.clientWidth ?? 0)
