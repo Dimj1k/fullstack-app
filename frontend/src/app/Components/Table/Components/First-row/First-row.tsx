@@ -6,11 +6,11 @@ import {useChangesWindowSize} from '@/Hooks'
 import cn from 'classnames'
 
 export function FirstRow<T extends Data>({
-	keys,
+	columns: keys,
 	title,
 	gridTemplateColumnsState: [gridTemplateColumns, setGridTemplateColumns],
 }: {
-	keys: Column<T>[]
+	columns: Column<T>[]
 	title: string
 	gridTemplateColumnsState: [string[], Dispatch<SetStateAction<string[]>>]
 }) {

@@ -8,15 +8,19 @@ export default function Profile() {
 	const {accessToken, lifeTimeAccessToken, userId} = useSelector((state: RootState) => state.jwt)
 	const [refreshTokens, {isUninitialized, isLoading, isSuccess}] = useRefreshTokensMutation()
 	useEffect(() => {
-		const timeoutId = setTimeout(() => refreshTokens(), lifeTimeAccessToken)
-		return () => {
-			clearTimeout(timeoutId)
+		if (!lifeTimeAccessToken) {
+			const timeoutId = setTimeout(() => refreshTokens(), lifeTimeAccessToken)
+			return () => {
+				clearTimeout(timeoutId)
+			}
+		} else {
+			refreshTokens()
 		}
 	}, [accessToken, refreshTokens])
 	if (isLoading) return <p>Загрузка</p>
 	return (
 		<>
-			{!isUninitialized && isSuccess && accessToken ? (
+			{(!isUninitialized && isSuccess) || accessToken ? (
 				<Link href={`/profile/${userId}`}>Ваш профиль</Link>
 			) : (
 				<Link href="/auth" additionalhrefs={['/registeration']}>

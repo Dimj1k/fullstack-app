@@ -11,20 +11,20 @@ const LazyCodeForm = dynamic(() => import('./CodeForm/CodeForm'), {
 	loading: () => <p>Загрузка...</p>,
 })
 
-export default function Home() {
+export default function PageRegisteration() {
 	const [
 		sendRegisteration,
 		{isSuccess: isSuccessRegisteration, isLoading: isLoadingRegisteration},
 	] = useRegisterationMutation()
-	const accessToken = useSelector((state: RootState) => state.jwt.accessToken)
+	const userId = useSelector((state: RootState) => state.jwt.userId)
 	const [sendCode, {isSuccess: isSuccessCode, isLoading: isLoadingCode}] =
 		useRegisterationConfirmMutation()
 	const [toCode, switchToCode] = useState(false)
 	const router = useRouter()
 	useEffect(() => {
-		if (accessToken) router.replace('/')
+		if (userId) router.replace('/')
 		if (isSuccessCode) router.replace('/auth')
-	}, [isSuccessCode, accessToken, router])
+	}, [isSuccessCode, userId, router])
 	return (
 		<>
 			<h1>Регистрация профиля</h1>

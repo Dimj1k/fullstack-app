@@ -10,15 +10,16 @@ export function SelectPage({datalength}: {datalength: number}) {
 	const router = useRouter()
 	const [take, setTake] = useState(Number(searchParams.get('take')) ?? 5)
 	const pages = new Array(Math.ceil(datalength / take)).fill(<></>)
+	const currentPage = searchParams.get('page')
 	return (
 		<Suspense fallback={<p>Загрузка...</p>}>
 			<div className={styles.pages}>
 				{pages.map((v, page) => (
 					<Link
-						replace={true}
+						replace
 						key={page}
 						href={`${pathname}${paramsToUrl({page: page + 1, take})}`}
-						here={searchParams.get('page') === `${page + 1}`}
+						here={currentPage === `${page + 1}`}
 						prefetch={false}>
 						<div className={styles['div-page']}>{page + 1}</div>
 					</Link>

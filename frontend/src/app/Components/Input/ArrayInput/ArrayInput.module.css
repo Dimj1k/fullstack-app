@@ -1,0 +1,23 @@
+.button {
+    user-select: none;
+    background-color: buttonface;
+    text-align: center;
+    border-radius: 2px;
+    color: buttontext;
+    border: 1px outset buttonborder;
+    border-image: initial;
+}
+
+.button:hover {
+    background-color: #ccc;
+}
+
+.button:active {
+    background-color: var(--background);
+}
+
+.inputs-div {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}

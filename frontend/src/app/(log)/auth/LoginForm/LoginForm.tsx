@@ -16,17 +16,23 @@ export default function Form() {
 	const showNotification = useNotification()
 	const [sendLogin, {isLoading}] = useLoginMutation()
 	const router = useRouter()
-	const accessToken = useSelector((state: RootState) => state.jwt.accessToken)
+	const userId = useSelector((state: RootState) => state.jwt.userId)
 	useEffect(() => {
-		if (accessToken) router.replace('/profile')
-	}, [accessToken, router])
+		if (userId) router.replace(`/profile/${userId}`)
+	}, [userId, router])
 	const login = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		const {email, password} = event.target as TargetType<typeof loginSchema>
 		const form = {email: email.value, password: password.value}
 		loginSchema
 			.validate(form, {abortEarly: false})
-			.then(v => sendLogin(v).then(res => (!res.error ? router.replace('/profile') : null)))
+			.then(v =>
+				sendLogin(v).then(res => {
+					if (!res.error) {
+						router.replace('/profile/' + res.data.userId)
+					}
+				}),
+			)
 			.catch((err: ValidationError) =>
 				showNotification({
 					typeNotification: TypesNotification.WARNING,

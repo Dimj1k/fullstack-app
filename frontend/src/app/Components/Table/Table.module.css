@@ -15,7 +15,7 @@
     background-color: var(--foreground);
     height: 25px;
     min-width: 5px;
-    cursor: ew-resize;
+    cursor: col-resize;
 }
 
 .row-wrapper {
@@ -30,14 +30,16 @@
 .draggable.column-separator,
 .draggable.row-wrapper>.cell {
     background-color: var(--primary-color);
-    transition: none;
+}
+
+.drag {
+    cursor: row-resize;
 }
 
 .first-row,
 .cell {
     outline: 1px solid var(--foreground);
     overflow: hidden;
-    transition: transform 0.15s;
 }
 
 .rows:hover {

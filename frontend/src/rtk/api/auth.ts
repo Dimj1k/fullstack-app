@@ -8,14 +8,13 @@ export const authApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		login: builder.mutation<IAuth, ILogin>({
 			query: body => ({url: 'auth/login', body, method: 'POST'}),
-			transformResponse: ({lifeTimeAccessToken, ...res}: IAuth) => {
-				return {...res, lifeTimeAccessToken: lifeTimeAccessToken * 900}
+			transformResponse: ({lifeTimeAccessToken, refreshToken, ...res}: IAuth) => {
+				return {...res, refreshToken, lifeTimeAccessToken: lifeTimeAccessToken * 900}
 			},
 			async onQueryStarted(_, {dispatch, queryFulfilled}) {
 				const showNotification = notificationSlice.actions.show
 				try {
 					const {data} = await queryFulfilled
-					// localStorage.setItem(JWT_REFRESH_TOKEN, data.refreshToken)
 					dispatch(jwtSlice.actions.addJwt(data))
 					dispatch(
 						showNotification({
@@ -31,13 +30,12 @@ export const authApi = baseApi.injectEndpoints({
 		}),
 		refreshTokens: builder.mutation<IAuth, void>({
 			query: () => ({url: 'auth/refresh-tokens', method: 'POST'}),
-			transformResponse: ({lifeTimeAccessToken, ...res}: IAuth) => {
-				return {...res, lifeTimeAccessToken: lifeTimeAccessToken * 950}
+			transformResponse: ({lifeTimeAccessToken, refreshToken, ...res}: IAuth) => {
+				return {...res, refreshToken, lifeTimeAccessToken: lifeTimeAccessToken * 950}
 			},
 			async onQueryStarted(arg, {dispatch, queryFulfilled}) {
 				try {
 					const {data} = await queryFulfilled
-					// localStorage.setItem(JWT_REFRESH_TOKEN, data.refreshToken)
 					dispatch(jwtSlice.actions.addJwt(data))
 				} catch (e) {
 					dispatch(jwtSlice.actions.deleteJwt())
@@ -63,9 +61,10 @@ export const authApi = baseApi.injectEndpoints({
 		me: builder.query<InfoUser, void>({
 			query: () => ({url: 'users/me'}),
 			providesTags: ['jwt'],
+			keepUnusedDataFor: 300,
 		}),
 	}),
 	overrideExisting: 'throw',
 })
 
-export const {useLoginMutation, useRefreshTokensMutation, useLogoutMutation} = authApi
+export const {useLoginMutation, useRefreshTokensMutation, useLogoutMutation, useMeQuery} = authApi

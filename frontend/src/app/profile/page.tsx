@@ -3,13 +3,8 @@ import Table from '@/app/Components/Table/Table'
 import Link from '../Components/Link/Link'
 import {getCookiesOnTable} from '../Components/Table/actions'
 import {redirect} from 'next/navigation'
-import {paramsToUrl} from '../../Utils/url-search-params'
-
-type User = {
-	id: React.JSX.Element
-	email: string
-	role: ['ADMIN', 'USER']
-}
+import {paramsToUrl} from '@/Utils/url-search-params'
+import {getAllUsers, User} from '@/Api'
 
 const RoleToRu: Record<User['role'][number], string> = {
 	ADMIN: 'Администратор',
@@ -27,14 +22,7 @@ export default async function Page({
 	searchParams: {page: string; take: string}
 }) {
 	if (!take && !page) redirect(`/profile${paramsToUrl({page: 1, take: 5})}`)
-	const res = await fetch(
-		`${process.env.API}/users/find-all${paramsToUrl({take, skip: `${(+page - 1) * +take}`})}`,
-		{
-			next: {revalidate: 5},
-		},
-	)
-	if (!res.ok) throw Error()
-	const data = ((await res.json()) as User[]).map((v, idx) => ({
+	const data = (await getAllUsers(take, page)).map((v, idx) => ({
 		id: (
 			<Link prefetch={false} href={`/profile/${v.id}`}>
 				{idx + 1}

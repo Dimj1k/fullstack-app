@@ -1,6 +1,6 @@
 import type {UUID} from 'crypto'
 
-const enum UserRoles {
+export const enum UserRoles {
 	USER = 'USER',
 	ADMIN = 'ADMIN',
 }

@@ -48,8 +48,10 @@ export class UserController {
     @ApiParam({ name: 'id' })
     @Get('find/:id')
     async findUser(@Param('id', UuidPipe) id: UUID) {
-        console.log(id)
-        return this.userService.findUser({ id }, { relations: { books: true } })
+        return this.userService.findUser(
+            { id },
+            { relations: { books: true, info: true } },
+        )
     }
 
     @ApiParam({ name: 'email' })

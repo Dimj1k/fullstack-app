@@ -1,0 +1,6 @@
+.splitter {
+    border-left: 2px solid var(--primary-color);
+    align-self: stretch;
+    margin-left: 0.5%;
+    margin-right: 0.5%;
+}

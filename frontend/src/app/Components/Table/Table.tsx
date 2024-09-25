@@ -31,8 +31,8 @@ export default function Table<T extends Data>({
 		new Array(data.length).fill(undefined),
 	)
 	const maxSiblings = useMemo<number[]>(() => ({...new Array(data.length).fill(0)}), [data.length])
-	const [orderData, setOrderData] = useState<T[]>(data)
-	useEffect(() => setOrderData(data), [data])
+	const [refreshedData, setRefreshedData] = useState<T[]>(data)
+	useEffect(() => setRefreshedData(data), [data])
 	if (!data) return <></>
 	const onDragStartRow = (event: UserPosition, idRow: number) => {
 		if (!('clientHeight' in event.target)) return
@@ -67,7 +67,10 @@ export default function Table<T extends Data>({
 					}
 					if (sibling) {
 						sibling.childNodes.forEach(node => {
-							if (isHTMLDivElement(node)) node.style.transform = `translate(0, ${-rowHeight}px)`
+							if (isHTMLDivElement(node)) {
+								node.style.transition = '0.15s transform'
+								node.style.transform = `translate(0, ${-rowHeight}px)`
+							}
 						})
 					}
 				} else {
@@ -97,7 +100,10 @@ export default function Table<T extends Data>({
 					}
 					if (sibling) {
 						sibling.childNodes.forEach(node => {
-							if (isHTMLDivElement(node)) node.style.transform = `translate(0, ${rowHeight}px)`
+							if (isHTMLDivElement(node)) {
+								node.style.transition = '0.15s transform'
+								node.style.transform = `translate(0, ${rowHeight}px)`
+							}
 						})
 					}
 				} else {
@@ -154,7 +160,10 @@ export default function Table<T extends Data>({
 				sibling = sibling?.nextElementSibling
 				if (sibling) {
 					sibling.childNodes.forEach(node => {
-						if (isHTMLDivElement(node)) node.style.transform = ''
+						if (isHTMLDivElement(node)) {
+							node.style.transition = ''
+							node.style.transform = ''
+						}
 					})
 				}
 			}
@@ -163,27 +172,30 @@ export default function Table<T extends Data>({
 				sibling = sibling?.previousElementSibling
 				if (sibling) {
 					sibling.childNodes.forEach(node => {
-						if (isHTMLDivElement(node)) node.style.transform = ''
+						if (isHTMLDivElement(node)) {
+							node.style.transition = ''
+							node.style.transform = ''
+						}
 					})
 				}
 			}
 		}
 		let affectedData: T[]
 		if (dragged > 0) {
-			affectedData = orderData.slice(idRow, dragged + idRow + 1)
-			affectedData = orderData.slice(0, idRow).concat(
+			affectedData = refreshedData.slice(idRow, dragged + idRow + 1)
+			affectedData = refreshedData.slice(0, idRow).concat(
 				affectedData
 					.splice(1)
 					.concat(affectedData)
-					.concat(orderData.slice(dragged + idRow + 1)),
+					.concat(refreshedData.slice(dragged + idRow + 1)),
 			)
 		} else {
-			affectedData = orderData.slice(dragged + idRow, idRow + 1)
-			affectedData = orderData.slice(0, dragged + idRow).concat(
+			affectedData = refreshedData.slice(dragged + idRow, idRow + 1)
+			affectedData = refreshedData.slice(0, dragged + idRow).concat(
 				affectedData
 					.splice(-1)
 					.concat(affectedData)
-					.concat(orderData.slice(idRow + 1)),
+					.concat(refreshedData.slice(idRow + 1)),
 			)
 		}
 		startDragRow[idRow] = undefined
@@ -191,7 +203,7 @@ export default function Table<T extends Data>({
 		parentElement?.childNodes.forEach(node => {
 			if (isHTMLDivElement(node)) node.style.transform = ''
 		})
-		setOrderData([...affectedData])
+		setRefreshedData([...affectedData])
 		setStartDragRow([...startDragRow])
 	}
 	return (
@@ -200,13 +212,17 @@ export default function Table<T extends Data>({
 			<div
 				className={styles.table}
 				style={{gridTemplateColumns: `30px ${gridTemplateColumnsState[0].join(' ')}`}}>
-				<FirstRow title={title} keys={keys} gridTemplateColumnsState={gridTemplateColumnsState} />
-				{orderData.map((v, idx) => (
+				<FirstRow
+					title={title}
+					columns={keys}
+					gridTemplateColumnsState={gridTemplateColumnsState}
+				/>
+				{refreshedData.map((v, idx) => (
 					<div
 						key={v.rowId}
 						className={cn(styles['row-wrapper'], {[styles.draggable]: startDragRow[idx]})}>
 						<div
-							className={cn(styles.cell)}
+							className={cn(styles.cell, styles.drag)}
 							onDragStart={event => onDragStartRow(event, idx)}
 							onDrag={event => onDragRow(event, idx)}
 							onDragEnd={event => onDragEndRow(event, idx)}

@@ -1,0 +1,12 @@
+.textarea {
+    resize: vertical;
+    --width: 350px;
+    width: var(--width);
+}
+
+@media screen and (width < 1080px) {
+    .textarea {
+        --width: 200px;
+        --font-size: medium;
+    }
+}

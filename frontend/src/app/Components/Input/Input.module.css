@@ -1,7 +1,7 @@
 .input {
     --width: 350px;
     --font-size: larger;
-    border: solid 2px black;
+    border: solid 2px var(--foreground);
     width: var(--width);
     height: 50px;
     font-size: var(--font-size);
