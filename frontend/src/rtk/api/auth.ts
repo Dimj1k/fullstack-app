@@ -1,7 +1,7 @@
 import {IAuth, ILogin, InfoUser} from '../interfaces'
 import {jwtSlice} from '../slices'
 import {notificationSlice, TypesNotification} from '../slices/notification'
-import {showErrorNotification} from '../utils'
+import {RootState} from '../store'
 import {baseApi} from './base'
 
 export const authApi = baseApi.injectEndpoints({
@@ -22,9 +22,7 @@ export const authApi = baseApi.injectEndpoints({
 							typeNotification: TypesNotification.SUCCESS,
 						}),
 					)
-				} catch (e) {
-					showErrorNotification(e, dispatch)
-				}
+				} catch {}
 			},
 			invalidatesTags: ['jwt'],
 		}),
@@ -37,9 +35,7 @@ export const authApi = baseApi.injectEndpoints({
 				try {
 					const {data} = await queryFulfilled
 					dispatch(jwtSlice.actions.addJwt(data))
-				} catch (e) {
-					dispatch(jwtSlice.actions.deleteJwt())
-				}
+				} catch {}
 			},
 			invalidatesTags: ['jwt'],
 		}),
@@ -52,16 +48,18 @@ export const authApi = baseApi.injectEndpoints({
 				try {
 					await queryFulfilled
 					dispatch(jwtSlice.actions.deleteJwt())
-				} catch (e) {
-					showErrorNotification(e, dispatch)
-				}
+				} catch {}
 			},
 			invalidatesTags: ['jwt'],
 		}),
-		me: builder.query<InfoUser, void>({
-			query: () => ({url: 'users/me'}),
+		me: builder.query<InfoUser, string | undefined>({
+			query: accessToken => ({url: 'users/me'}),
 			providesTags: ['jwt'],
 			keepUnusedDataFor: 300,
+			onQueryStarted(arg, api) {
+				const {accessToken} = (api.getState() as RootState).jwt
+				if (!accessToken) throw Error()
+			},
 		}),
 	}),
 	overrideExisting: 'throw',

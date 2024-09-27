@@ -1,14 +1,13 @@
-import {FormEvent, HTMLProps, PropsWithChildren} from 'react'
+import {FormEvent, ForwardedRef, forwardRef, HTMLProps, PropsWithChildren} from 'react'
 import styles from './Form.module.css'
 
-export default function Forma({
-	onSubmit,
-	children,
-	gridTemplateAreas,
-	...props
-}: PropsWithChildren<FormProps>) {
+export default forwardRef(function Forma(
+	{onSubmit, children, gridTemplateAreas, ...props}: PropsWithChildren<FormProps>,
+	ref: ForwardedRef<HTMLFormElement>,
+) {
 	return (
 		<form
+			ref={ref}
 			onSubmit={onSubmit}
 			className={styles.form}
 			{...props}
@@ -16,7 +15,7 @@ export default function Forma({
 			{children}
 		</form>
 	)
-}
+})
 
 interface FormProps extends HTMLProps<HTMLFormElement> {
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void

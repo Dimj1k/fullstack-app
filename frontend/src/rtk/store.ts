@@ -3,6 +3,7 @@ import {configureStore} from '@reduxjs/toolkit'
 import {jwtSlice} from './slices'
 import {notificationSlice} from './slices/notification'
 import {baseApi} from './api'
+import {queryErrorMiddleware} from './middlewares'
 
 export const store = configureStore({
 	reducer: {
@@ -11,7 +12,7 @@ export const store = configureStore({
 		[notificationSlice.reducerPath]: notificationSlice.reducer,
 	},
 	devTools: true,
-	middleware: gDM => gDM().concat(baseApi.middleware),
+	middleware: gDM => gDM().concat(baseApi.middleware, queryErrorMiddleware),
 })
 
 export type RootState = ReturnType<typeof store.getState>

@@ -7,3 +7,5 @@ export type RequireKeys<
 	T extends Record<string | number | symbol, any>,
 	K extends keyof T,
 > = Required<Pick<T, K>> & Omit<T, K>
+
+export type PickType<T, K extends keyof T> = Pick<T, K>[K]

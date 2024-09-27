@@ -10,6 +10,8 @@ export interface PropsProfile {
 	booksUsers: React.JSX.Element
 }
 
+export const dynamicParams = false
+
 export async function generateStaticParams() {
 	const users = await getAllUsers()
 	return users.map(({id: userId}) => ({

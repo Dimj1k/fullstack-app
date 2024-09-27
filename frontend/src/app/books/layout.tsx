@@ -6,13 +6,6 @@ export const metadata: Metadata = {
 	description: 'Все книги',
 }
 
-export default async function ProfileLayout({
-	children,
-}: PropsWithChildren<{modal: React.ReactNode}>) {
-	return (
-		<div>
-			{children}
-			<div id="create-new-book-modal" />
-		</div>
-	)
+export default async function ProfileLayout({children}: PropsWithChildren) {
+	return <div>{children}</div>
 }

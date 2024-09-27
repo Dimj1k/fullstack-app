@@ -1,0 +1,20 @@
+.list {
+    display: grid;
+    overflow-y: scroll;
+    overflow-anchor: none;
+}
+
+.column {
+    position: sticky;
+    top: 0;
+    background-color: var(--background);
+    border-left: 1px outset var(--foreground);
+}
+
+.row {
+    height: auto;
+    border-bottom: 1px outset var(--foreground);
+    border-left: 1px outset var(--foreground);
+    display: flex;
+    align-items: center;
+}

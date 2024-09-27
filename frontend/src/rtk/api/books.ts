@@ -1,5 +1,6 @@
+import {PickType} from '@/Interfaces'
+import {Book, BookWithDescription, ParamsFindBooks} from '../interfaces'
 import {notificationSlice, TypesNotification} from '../slices'
-import {showErrorNotification} from '../utils'
 import {baseApi} from './base'
 
 export const booksApi = baseApi.enhanceEndpoints({addTagTypes: ['books']}).injectEndpoints({
@@ -15,20 +16,29 @@ export const booksApi = baseApi.enhanceEndpoints({addTagTypes: ['books']}).injec
 			async onQueryStarted(_, {dispatch, queryFulfilled}) {
 				const showNotification = notificationSlice.actions.show
 				try {
-					const {data} = await queryFulfilled
+					await queryFulfilled
 					dispatch(
 						showNotification({
 							messages: 'Вы добавили новую книгу',
 							typeNotification: TypesNotification.SUCCESS,
 						}),
 					)
-				} catch (e) {
-					showErrorNotification(e, dispatch)
-				}
+				} catch {}
+			},
+		}),
+		findBooks: builder.query<Book[], ParamsFindBooks>({
+			query: params => ({url: 'books/find-all', params}),
+			providesTags: ['books'],
+			keepUnusedDataFor: 5,
+		}),
+		findBook: builder.query<BookWithDescription, PickType<Book, 'name_book'>>({
+			query: name_book => ({url: `books/get-one/${name_book}`}),
+			providesTags(result) {
+				return [{type: 'books', id: result?.book_id}]
 			},
 		}),
 	}),
 	overrideExisting: 'throw',
 })
 
-export const {useCreateBookMutation} = booksApi
+export const {useCreateBookMutation, useFindBooksQuery} = booksApi

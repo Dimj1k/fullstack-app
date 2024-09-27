@@ -1,6 +1,5 @@
 import {ICode, IMessage, IRegisteration} from '../interfaces'
 import {notificationSlice, TypesNotification} from '../slices'
-import {showErrorNotification} from '../utils'
 import {baseApi} from './base'
 
 export const registerationApi = baseApi.injectEndpoints({
@@ -16,9 +15,7 @@ export const registerationApi = baseApi.injectEndpoints({
 					dispatch(
 						showNotification({typeNotification: TypesNotification.SUCCESS, messages: message}),
 					)
-				} catch (e) {
-					showErrorNotification(e, dispatch)
-				}
+				} catch {}
 			},
 		}),
 		registerationConfirm: builder.mutation<IMessage, ICode>({
@@ -34,9 +31,7 @@ export const registerationApi = baseApi.injectEndpoints({
 							messages: message,
 						}),
 					)
-				} catch (e) {
-					showErrorNotification(e, dispatch)
-				}
+				} catch {}
 			},
 		}),
 	}),

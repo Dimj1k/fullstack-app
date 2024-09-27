@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {HTMLProps, useState} from 'react'
 import {Input} from '../Input'
 import styles from './ArrayInput.module.css'
 
@@ -6,11 +6,12 @@ export function ArrayInput({
 	maxLength,
 	add,
 	name,
+	...props
 }: {
 	maxLength?: number
 	add: string
 	name: string
-}) {
+} & HTMLProps<HTMLInputElement>) {
 	maxLength ??= 10
 	const [numInputs, setNumInputs] = useState(1)
 	const [resValue, setResValue] = useState<Record<number, string>>({})
@@ -31,13 +32,12 @@ export function ArrayInput({
 
 	return (
 		<div>
-			<input type="hidden" value={Object.values(resValue)} name={name} />
+			<input type="hidden" value={Object.values(resValue)} name={name} {...props} />
 			<p>{add}ы</p>
 			<div className={styles['inputs-div']}>
 				{Array.from({length: numInputs < maxLength ? numInputs : maxLength}, (_, id) => (
 					<Input
-						key={id}
-						name={`${name}-${id}`}
+						key={`${name}-${id}`}
 						onChange={event => {
 							setResValue({
 								...resValue,

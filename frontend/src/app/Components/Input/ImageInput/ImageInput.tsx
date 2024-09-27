@@ -1,5 +1,6 @@
 import {FormEvent, HTMLProps, useRef, useState} from 'react'
 import styles from './ImageInput.module.css'
+import stylesButton from '../ArrayInput/ArrayInput.module.css'
 import Image from 'next/image'
 import {RequireKeys} from '@/Interfaces'
 
@@ -16,7 +17,7 @@ export function ImageInput(props: RequireKeys<HTMLProps<HTMLInputElement>, 'name
 		<div className={styles['image-div']}>
 			<label
 				htmlFor="image-uploads"
-				className={styles.button}
+				className={stylesButton.button}
 				tabIndex={0}
 				onKeyDown={event => {
 					if (event.key == ' ' || event.key == 'Enter') {
@@ -58,9 +59,11 @@ export function ImageInput(props: RequireKeys<HTMLProps<HTMLInputElement>, 'name
 function returnFileSize(fileSize: number) {
 	if (fileSize < 1 << 10) {
 		return fileSize + 'Б'
-	} else if (fileSize > 1 << 10 && fileSize < 1 << 20) {
+	}
+	if (fileSize > 1 << 10 && fileSize < 1 << 20) {
 		return (fileSize / (1 << 10)).toFixed(1) + 'КБ'
-	} else if (fileSize > 10 << 10) {
+	}
+	if (fileSize > 1 << 20) {
 		return (fileSize / (1 << 20)).toFixed(1) + 'МБ'
 	}
 }
@@ -68,5 +71,5 @@ function returnFileSize(fileSize: number) {
 function returnFileName(fileName: string) {
 	const {length} = fileName
 	if (length - 3 < 10) return fileName
-	return fileName.slice(0, 5) + '...' + fileName.slice(-3)
+	return fileName.slice(0, 4) + '...' + fileName.slice(-3)
 }

@@ -13,7 +13,7 @@ export interface FullUser extends User {
 		birthdayDate: null | Date
 		gender: Gender
 	}
-	books: Record<string, string>
+	books: Record<string, string>[]
 }
 
 export async function getAllUsers(take?: string, page?: string): Promise<User[]> {

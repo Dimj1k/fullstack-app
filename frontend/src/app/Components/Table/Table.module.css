@@ -30,6 +30,7 @@
 .draggable.column-separator,
 .draggable.row-wrapper>.cell {
     background-color: var(--primary-color);
+    z-index: 1;
 }
 
 .drag {

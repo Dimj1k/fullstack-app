@@ -2,7 +2,7 @@ import {Metadata} from 'next'
 import Table from '@/app/Components/Table/Table'
 import Link from '../Components/Link/Link'
 import {getCookiesOnTable} from '../Components/Table/actions'
-import {redirect} from 'next/navigation'
+import {permanentRedirect} from 'next/navigation'
 import {paramsToUrl} from '@/Utils/url-search-params'
 import {getAllUsers, User} from '@/Api'
 
@@ -21,7 +21,7 @@ export default async function Page({
 }: {
 	searchParams: {page: string; take: string}
 }) {
-	if (!take && !page) redirect(`/profile${paramsToUrl({page: 1, take: 5})}`)
+	if (!take && !page) permanentRedirect(`/profile${paramsToUrl({page: 1, take: 5})}`)
 	const data = (await getAllUsers(take, page)).map((v, idx) => ({
 		id: (
 			<Link prefetch={false} href={`/profile/${v.id}`}>

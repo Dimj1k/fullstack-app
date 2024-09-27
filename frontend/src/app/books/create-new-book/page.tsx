@@ -1,6 +1,6 @@
 'use client'
 
-import {FormEvent} from 'react'
+import {FormEvent, useMemo, useRef} from 'react'
 import Forma from '../../Components/Form/Form'
 import {Input} from '../../Components/Input/Input'
 import Button from '../../Components/Button/Button'
@@ -10,9 +10,16 @@ import {ValidationError} from 'yup'
 import {TypesNotification, useCreateBookMutation} from '@/Rtk'
 import {ArrayInput, ImageInput, TextAreaInput} from '../../Components/Input'
 
+const keys = [1, -1]
+
 export default function CreateNewBook() {
-	const [sendNewBook, {}] = useCreateBookMutation()
+	const [sendNewBook, {isSuccess, isError, requestId}] = useCreateBookMutation()
 	const showNotification = useNotification()
+	const formRef = useRef<HTMLFormElement>(null)
+
+	if (isSuccess) {
+		formRef.current?.reset()
+	}
 
 	const onSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
@@ -29,7 +36,7 @@ export default function CreateNewBook() {
 	return (
 		<div>
 			<h1>Размещение новой книги</h1>
-			<Forma onSubmit={onSubmit} gridTemplateAreas={`"a""b""c"`}>
+			<Forma onSubmit={onSubmit} ref={formRef} gridTemplateAreas={`"a""b""c"`}>
 				<Input name="nameBook" type="text" placeholder="Название книги" />
 				<TextAreaInput
 					name="description"
@@ -37,8 +44,8 @@ export default function CreateNewBook() {
 					placeholder="Описание книги"
 					spellCheck="true"
 				/>
-				<ArrayInput add="Жанр" maxLength={6} name="genres" />
-				<ImageInput name="image" />
+				<ArrayInput add="Жанр" maxLength={6} key={isSuccess ? ++keys[0] : keys[0]} name="genres" />
+				<ImageInput name="image" key={isSuccess ? --keys[1] : keys[1]} />
 				<Button>Разместить новую книгу</Button>
 			</Forma>
 		</div>
