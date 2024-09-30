@@ -1,6 +1,6 @@
 'use client'
 
-import {FormEvent, useMemo, useRef} from 'react'
+import {FormEvent, useRef} from 'react'
 import Forma from '../../Components/Form/Form'
 import {Input} from '../../Components/Input/Input'
 import Button from '../../Components/Button/Button'
@@ -13,7 +13,7 @@ import {ArrayInput, ImageInput, TextAreaInput} from '../../Components/Input'
 const keys = [1, -1]
 
 export default function CreateNewBook() {
-	const [sendNewBook, {isSuccess, isError, requestId}] = useCreateBookMutation()
+	const [sendNewBook, {isSuccess}] = useCreateBookMutation()
 	const showNotification = useNotification()
 	const formRef = useRef<HTMLFormElement>(null)
 

@@ -22,9 +22,7 @@ export default function RootLayout({
 					<AppNotification />
 					<Header />
 					<main role="main">
-						<div className="content" role="contentinfo">
-							{children}
-						</div>
+						<div className="content">{children}</div>
 					</main>
 					<Footer />
 				</body>

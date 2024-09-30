@@ -3,7 +3,7 @@ import {baseQueryWithMutex} from './base-query'
 
 export const baseApi = createApi({
 	baseQuery: baseQueryWithMutex,
-	tagTypes: ['jwt'],
+	tagTypes: ['jwt', 'books'],
 	refetchOnReconnect: false,
 	reducerPath: 'backendApi',
 	endpoints: () => ({}),

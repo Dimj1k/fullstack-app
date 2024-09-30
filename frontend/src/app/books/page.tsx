@@ -9,7 +9,7 @@ import {useSelector} from 'react-redux'
 
 export default function BooksPage() {
 	const accessToken = useSelector((state: RootState) => state.jwt.accessToken)
-	const {data: dataMe, isError: isErrorMe} = useMeQuery(accessToken)
+	const {data: dataMe, isError: isErrorMe} = useMeQuery(accessToken ? '' : undefined)
 	const [onItem, setOnItem] = useState<undefined | number>(0)
 	const [take] = useState(5)
 	const {data: dataBooks, isError: isErrorBooks} = useFindBooksQuery({

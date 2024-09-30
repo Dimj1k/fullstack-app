@@ -32,15 +32,12 @@ export const baseQueryWithMutex: BaseQueryFn<
 	unknown,
 	FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-	if (api.endpoint === 'refreshTokens') {
-		await mutex.waitForUnlock()
-		const release = await mutex.acquire()
-		try {
-			const result = await baseQuery(args, api, extraOptions)
-			return result
-		} finally {
-			release()
-		}
+	await mutex.waitForUnlock()
+	const release = await mutex.acquire()
+	try {
+		const result = await baseQuery(args, api, extraOptions)
+		return result
+	} finally {
+		release()
 	}
-	return baseQuery(args, api, extraOptions)
 }

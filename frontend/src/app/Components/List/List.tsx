@@ -28,6 +28,7 @@ export function List<T extends Data>({
 	}, [startIndex])
 	return (
 		<div
+			data-testid="List"
 			onScroll={event => {
 				const target = event.target as EventTarget & HTMLDivElement
 				setScrollTop(target.scrollTop)
@@ -56,7 +57,7 @@ export function List<T extends Data>({
 					const value = row[key]
 					return (
 						<div key={`${row.rowId}-${key as string}`} className={styles.row}>
-							{Array.isArray(value) ? value.join(',') : value}
+							{value}
 						</div>
 					)
 				}),

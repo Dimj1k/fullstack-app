@@ -31,11 +31,13 @@ export const authApi = baseApi.injectEndpoints({
 			transformResponse: ({lifeTimeAccessToken, refreshToken, ...res}: IAuth) => {
 				return {...res, refreshToken, lifeTimeAccessToken: lifeTimeAccessToken * 950}
 			},
-			async onQueryStarted(arg, {dispatch, queryFulfilled}) {
+			async onQueryStarted(arg, {dispatch, getState, queryFulfilled}) {
 				try {
 					const {data} = await queryFulfilled
 					dispatch(jwtSlice.actions.addJwt(data))
-				} catch {}
+				} catch {
+					dispatch(jwtSlice.actions.deleteJwt())
+				}
 			},
 			invalidatesTags: ['jwt'],
 		}),
@@ -52,14 +54,10 @@ export const authApi = baseApi.injectEndpoints({
 			},
 			invalidatesTags: ['jwt'],
 		}),
-		me: builder.query<InfoUser, string | undefined>({
-			query: accessToken => ({url: 'users/me'}),
+		me: builder.query<InfoUser, string | void>({
+			query: () => ({url: 'users/me'}),
 			providesTags: ['jwt'],
 			keepUnusedDataFor: 300,
-			onQueryStarted(arg, api) {
-				const {accessToken} = (api.getState() as RootState).jwt
-				if (!accessToken) throw Error()
-			},
 		}),
 	}),
 	overrideExisting: 'throw',

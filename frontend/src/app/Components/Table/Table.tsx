@@ -1,5 +1,5 @@
 'use client'
-import {useEffect, useMemo, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import styles from './Table.module.css'
 import {Column, Data, isHTMLDivElement, UserPosition} from './Interfaces'
 import cn from 'classnames'
@@ -30,19 +30,24 @@ export default function Table<T extends Data>({
 	const [startDragRow, setStartDragRow] = useState<(MoveRow | undefined)[]>(
 		new Array(data.length).fill(undefined),
 	)
-	const maxSiblings = useMemo<number[]>(() => ({...new Array(data.length).fill(0)}), [data.length])
+	const {current: maxSiblings} = useRef<number[]>({...new Array(data.length).fill(0)})
 	const [refreshedData, setRefreshedData] = useState<T[]>(data)
 	useEffect(() => setRefreshedData(data), [data])
 	if (!data) return <></>
 	const onDragStartRow = (event: UserPosition, idRow: number) => {
 		if (!('clientHeight' in event.target)) return
 		const {clientHeight} = event.target
-		startDragRow[idRow] = {
-			startY: event.clientY,
-			boundaryDown: (data.length - idRow - 1) * clientHeight + 10,
-			boundaryUp: -idRow * clientHeight - 10,
-		}
-		setStartDragRow([...startDragRow])
+		setStartDragRow(
+			startDragRow.map((v, idx) =>
+				idx === idRow
+					? {
+							startY: event.clientY,
+							boundaryDown: (data.length - idRow - 1) * clientHeight + 10,
+							boundaryUp: -idRow * clientHeight - 10,
+						}
+					: v,
+			),
+		)
 	}
 	const onDragRow = (event: UserPosition, idRow: number) => {
 		if (!startDragRow[idRow] || !('clientHeight' in event.target)) return
@@ -146,12 +151,11 @@ export default function Table<T extends Data>({
 		const {parentElement} = event.target
 		const dragged = maxSiblings[idRow]
 		if (!dragged) {
-			startDragRow[idRow] = undefined
 			maxSiblings[idRow] = 0
 			parentElement?.childNodes.forEach(node => {
 				if (isHTMLDivElement(node)) node.style.transform = ''
 			})
-			setStartDragRow([...startDragRow])
+			setStartDragRow(startDragRow.map((v, idx) => (idx === idRow ? undefined : v)))
 			return
 		}
 		let sibling: Element | HTMLElement | null | undefined = parentElement
@@ -198,13 +202,12 @@ export default function Table<T extends Data>({
 					.concat(refreshedData.slice(idRow + 1)),
 			)
 		}
-		startDragRow[idRow] = undefined
 		maxSiblings[idRow] = 0
 		parentElement?.childNodes.forEach(node => {
 			if (isHTMLDivElement(node)) node.style.transform = ''
 		})
-		setRefreshedData([...affectedData])
-		setStartDragRow([...startDragRow])
+		setRefreshedData(affectedData)
+		setStartDragRow(startDragRow.map((v, idx) => (idx === idRow ? undefined : v)))
 	}
 	return (
 		<>

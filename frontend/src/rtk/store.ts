@@ -11,7 +11,7 @@ export const store = configureStore({
 		[jwtSlice.reducerPath]: jwtSlice.reducer,
 		[notificationSlice.reducerPath]: notificationSlice.reducer,
 	},
-	devTools: true,
+	devTools: process.env.NODE_ENV === 'development',
 	middleware: gDM => gDM().concat(baseApi.middleware, queryErrorMiddleware),
 })
 

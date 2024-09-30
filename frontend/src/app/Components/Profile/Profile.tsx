@@ -8,13 +8,13 @@ export default function Profile() {
 	const {accessToken, lifeTimeAccessToken, userId} = useSelector((state: RootState) => state.jwt)
 	const [refreshTokens, {isUninitialized, isLoading, isSuccess}] = useRefreshTokensMutation()
 	useEffect(() => {
-		if (!lifeTimeAccessToken) {
+		if (lifeTimeAccessToken) {
 			const timeoutId = setTimeout(() => refreshTokens(), lifeTimeAccessToken)
 			return () => {
 				clearTimeout(timeoutId)
 			}
 		} else {
-			refreshTokens()
+			if (userId) refreshTokens()
 		}
 	}, [accessToken, refreshTokens])
 	if (isLoading) return <p>Загрузка</p>

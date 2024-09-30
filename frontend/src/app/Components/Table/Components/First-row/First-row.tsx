@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useEffect, useMemo, useRef} from 'react'
+import {Dispatch, SetStateAction, useEffect, useRef} from 'react'
 import {setCookieOnTable} from '../../actions'
 import {Column, Data, UserPosition} from '../../Interfaces'
 import styles from '../../Table.module.css'
@@ -15,11 +15,8 @@ export function FirstRow<T extends Data>({
 	gridTemplateColumnsState: [string[], Dispatch<SetStateAction<string[]>>]
 }) {
 	const setCookieOnThisTable = setCookieOnTable.bind(null, title)
-	const arrayFirstRowRef = useRef<(HTMLDivElement | null)[]>([])
-	const startXSeparators = useMemo<(number | undefined)[]>(
-		() => new Array(keys.length),
-		[keys.length],
-	)
+	const arrayFirstRowRef = useRef<(HTMLDivElement | null)[]>(new Array(keys.length))
+	const {current: startXSeparators} = useRef<(number | undefined)[]>(new Array(keys.length))
 	const {windowWidth} = useChangesWindowSize()
 	useEffect(() => {
 		if (gridTemplateColumns.every(v => v == '1fr')) {
@@ -49,7 +46,7 @@ export function FirstRow<T extends Data>({
 					key={key as string}
 					className={styles['first-row']}
 					ref={ref => {
-						arrayFirstRowRef.current.push(ref)
+						arrayFirstRowRef.current[id] = ref
 					}}>
 					{displayName}
 					<div

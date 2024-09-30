@@ -12,7 +12,6 @@ const nextConfig = {
     'reactStrictMode': true,
     'env': {
         API: 'http://localhost:3002/api',
-        ENV: 'development'
     },
 };
 

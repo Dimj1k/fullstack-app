@@ -17,6 +17,7 @@ export function ImageInput(props: RequireKeys<HTMLProps<HTMLInputElement>, 'name
 		<div className={styles['image-div']}>
 			<label
 				htmlFor="image-uploads"
+				role="button"
 				className={stylesButton.button}
 				tabIndex={0}
 				onKeyDown={event => {
@@ -49,6 +50,7 @@ export function ImageInput(props: RequireKeys<HTMLProps<HTMLInputElement>, 'name
 						alt="Ваше изображение обложки"
 						width={64}
 						height={64}
+						priority={true}
 					/>
 				</div>
 			)}
