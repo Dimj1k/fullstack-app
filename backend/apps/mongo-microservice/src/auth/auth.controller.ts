@@ -123,7 +123,8 @@ export class AuthController {
 
     private async getPairTokens(jwtPayload: JwtPayload) {
         let accessToken = (await this.jwtService.signAsync({
-            ...jwtPayload,
+            ...(({ userId, ...jwtPayload }) => jwtPayload)(jwtPayload),
+            sub: jwtPayload.userId,
         })) as JwtToken
         let refreshToken = {
             token: randomUUID(),

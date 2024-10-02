@@ -4,7 +4,7 @@ import Link from '../Components/Link/Link'
 import {getCookiesOnTable} from '../Components/Table/actions'
 import {permanentRedirect} from 'next/navigation'
 import {paramsToUrl} from '@/Utils/url-search-params'
-import {getAllUsers, User} from '@/Api'
+import {getAllUsers, User} from '@/backendApi'
 
 const RoleToRu: Record<User['role'][number], string> = {
 	ADMIN: 'Администратор',
@@ -29,7 +29,7 @@ export default async function Page({
 			</Link>
 		),
 		email: v.email,
-		role: v.role.map(v => RoleToRu[v]),
+		role: v.role.map(v => RoleToRu[v]).join(', '),
 		rowId: idx,
 	}))
 	const title = 'Пользователи'

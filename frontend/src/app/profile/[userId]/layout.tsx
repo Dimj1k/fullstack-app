@@ -1,6 +1,6 @@
 import {Metadata} from 'next'
 import {notFound} from 'next/navigation'
-import {getAllUsers, getUserById} from '@/Api'
+import {getAllUsers, getUserById} from '@/backendApi'
 import styles from './profile.module.css'
 import {Splitter} from '../../Components/Splitter/Splitter'
 

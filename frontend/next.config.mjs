@@ -12,6 +12,7 @@ const nextConfig = {
     'reactStrictMode': true,
     'env': {
         API: 'http://localhost:3002/api',
+        CENTRIFUGE: 'ws://localhost:8000/connection/websocket'
     },
 };
 

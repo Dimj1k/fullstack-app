@@ -45,7 +45,7 @@ export default function CodeForm({
 		<>
 			<h1>Введите полученный шестизначный код регистрации</h1>
 			<Forma gridTemplateAreas={`"a b c d e f""g g g g g g"`} onSubmit={onSubmit} ref={ref}>
-				<CodeInput length={length} submit={onSubmit} isLoading={isLoading} />
+				<CodeInput length={length} submit={onSubmit} isLoading={isLoading} {...props} />
 				<Button gridArea="g" role="row" disabled={isLoading}>
 					Отправить код регистрации
 				</Button>

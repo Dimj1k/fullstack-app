@@ -7,10 +7,11 @@ import {
 	useState,
 	KeyboardEvent,
 	ClipboardEvent,
+	memo,
 } from 'react'
 import styles from './CodeInput.module.css'
 
-export function CodeInput({
+export const CodeInput = memo(function CodeInput({
 	length,
 	isLoading,
 	submit,
@@ -106,4 +107,4 @@ export function CodeInput({
 			))}
 		</>
 	)
-}
+})

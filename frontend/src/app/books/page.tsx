@@ -1,21 +1,23 @@
 'use client'
-import {RootState, useFindBooksQuery, useMeQuery, UserRoles} from '@/Rtk'
+import {useAppSelector, useFindBooksQuery, useLazyMeQuery, UserRoles} from '@/Rtk'
 import Link from '../Components/Link/Link'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {List} from '../Components/List/List'
 import Image from 'next/image'
 import logo from '../Components/Header/header.logo.png'
-import {useSelector} from 'react-redux'
 
 export default function BooksPage() {
-	const accessToken = useSelector((state: RootState) => state.jwt.accessToken)
-	const {data: dataMe, isError: isErrorMe} = useMeQuery(accessToken ? '' : undefined)
+	const accessToken = useAppSelector(state => state.jwt.accessToken)
+	const [me, {data: dataMe, isError: isErrorMe}] = useLazyMeQuery()
 	const [onItem, setOnItem] = useState<undefined | number>(0)
 	const [take] = useState(5)
 	const {data: dataBooks, isError: isErrorBooks} = useFindBooksQuery({
 		skip: onItem,
 		take,
 	})
+	useEffect(() => {
+		if (accessToken) me()
+	}, [accessToken])
 	return (
 		<>
 			{(dataBooks && (

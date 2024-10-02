@@ -36,7 +36,7 @@ export const booksApi = baseApi.injectEndpoints({
 						]
 					: [{type: 'books', id: 'NEW_BOOK'}],
 			keepUnusedDataFor: 60,
-			transformResponse(baseQueryReturnValue: Book<'arr'>[], meta, arg) {
+			transformResponse(baseQueryReturnValue: Book<'arr'>[]) {
 				return baseQueryReturnValue.map(({genres, ...book}) => ({
 					...book,
 					genres: genres.join(','),

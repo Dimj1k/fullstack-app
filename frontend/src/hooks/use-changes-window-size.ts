@@ -1,7 +1,7 @@
 import {useSyncExternalStore} from 'react'
 
 function onWindowSizeChange(cb: () => void) {
-	window.addEventListener('resize', cb)
+	window.addEventListener('resize', cb, {passive: true})
 
 	return () => window.removeEventListener('resize', cb)
 }

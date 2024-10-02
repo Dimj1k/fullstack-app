@@ -1,7 +1,6 @@
 import {IAuth, ILogin, InfoUser} from '../interfaces'
 import {jwtSlice} from '../slices'
 import {notificationSlice, TypesNotification} from '../slices/notification'
-import {RootState} from '../store'
 import {baseApi} from './base'
 
 export const authApi = baseApi.injectEndpoints({
@@ -31,7 +30,7 @@ export const authApi = baseApi.injectEndpoints({
 			transformResponse: ({lifeTimeAccessToken, refreshToken, ...res}: IAuth) => {
 				return {...res, refreshToken, lifeTimeAccessToken: lifeTimeAccessToken * 950}
 			},
-			async onQueryStarted(arg, {dispatch, getState, queryFulfilled}) {
+			async onQueryStarted(arg, {dispatch, queryFulfilled}) {
 				try {
 					const {data} = await queryFulfilled
 					dispatch(jwtSlice.actions.addJwt(data))
@@ -54,7 +53,7 @@ export const authApi = baseApi.injectEndpoints({
 			},
 			invalidatesTags: ['jwt'],
 		}),
-		me: builder.query<InfoUser, string | void>({
+		me: builder.query<InfoUser, void>({
 			query: () => ({url: 'users/me'}),
 			providesTags: ['jwt'],
 			keepUnusedDataFor: 300,
@@ -63,4 +62,5 @@ export const authApi = baseApi.injectEndpoints({
 	overrideExisting: 'throw',
 })
 
-export const {useLoginMutation, useRefreshTokensMutation, useLogoutMutation, useMeQuery} = authApi
+export const {useLoginMutation, useRefreshTokensMutation, useLogoutMutation, useLazyMeQuery} =
+	authApi

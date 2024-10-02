@@ -1,10 +1,9 @@
 'use client'
-import {RootState, useRegisterationConfirmMutation, useRegisterationMutation} from '@/Rtk'
+import {useAppSelector, useRegisterationConfirmMutation, useRegisterationMutation} from '@/Rtk'
 import RegistrationForm from './RegistrationForm/RegistrationForm'
 import {useEffect, useState} from 'react'
 import Button from '../../Components/Button/Button'
 import {useRouter} from 'next/navigation'
-import {useSelector} from 'react-redux'
 import dynamic from 'next/dynamic'
 
 const LazyCodeForm = dynamic(() => import('./CodeForm/CodeForm'), {
@@ -16,7 +15,7 @@ export default function PageRegisteration() {
 		sendRegisteration,
 		{isSuccess: isSuccessRegisteration, isLoading: isLoadingRegisteration},
 	] = useRegisterationMutation()
-	const userId = useSelector((state: RootState) => state.jwt.userId)
+	const userId = useAppSelector(state => state.jwt.userId)
 	const [sendCode, {isSuccess: isSuccessCode, isLoading: isLoadingCode}] =
 		useRegisterationConfirmMutation()
 	const [toCode, switchToCode] = useState(false)

@@ -1,5 +1,5 @@
 'use client'
-import {RootState, TypesNotification, useLoginMutation} from '@/Rtk'
+import {TypesNotification, useAppSelector, useLoginMutation} from '@/Rtk'
 import {FormEvent, useEffect} from 'react'
 import type {ValidationError} from 'yup'
 import {TargetType} from '@/Interfaces'
@@ -8,7 +8,6 @@ import Button from '@/app/Components/Button/Button'
 import {useNotification} from '@/Hooks'
 import Link from '@/app/Components/Link/Link'
 import {useRouter} from 'next/navigation'
-import {useSelector} from 'react-redux'
 import EmailAndPasswordInputs from '../../Сomponents/EmailAndPasswordInputs'
 import {loginSchema} from '../../Schemas'
 
@@ -16,7 +15,7 @@ export default function Form() {
 	const showNotification = useNotification()
 	const [sendLogin, {isLoading}] = useLoginMutation()
 	const router = useRouter()
-	const userId = useSelector((state: RootState) => state.jwt.userId)
+	const userId = useAppSelector(state => state.jwt.userId)
 	useEffect(() => {
 		if (userId) router.replace(`/profile/${userId}`)
 	}, [userId, router])

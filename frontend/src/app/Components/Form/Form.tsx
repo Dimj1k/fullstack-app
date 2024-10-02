@@ -1,15 +1,16 @@
 import {FormEvent, ForwardedRef, forwardRef, HTMLProps, PropsWithChildren} from 'react'
 import styles from './Form.module.css'
+import cn from 'classnames'
 
 export default forwardRef(function Forma(
-	{onSubmit, children, gridTemplateAreas, ...props}: PropsWithChildren<FormProps>,
+	{onSubmit, children, gridTemplateAreas, className, ...props}: PropsWithChildren<FormProps>,
 	ref: ForwardedRef<HTMLFormElement>,
 ) {
 	return (
 		<form
 			ref={ref}
 			onSubmit={onSubmit}
-			className={styles.form}
+			className={cn(styles.form, className)}
 			{...props}
 			style={{gridTemplateAreas, ...props['style']}}>
 			{children}
