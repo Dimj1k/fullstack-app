@@ -3,5 +3,5 @@ import {addChannel} from './function'
 
 export async function POST(request: NextRequest) {
 	const users = (await request.json()) as string[]
-	return await addChannel(...users)
+	return addChannel(...users)
 }

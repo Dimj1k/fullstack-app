@@ -10,7 +10,10 @@
 /frontend/build
 
 # centrifugo
-/centrifugo
+/centrifugo/centrifugo.exe
+/centrifugo/CHANGELOG.md
+/centrifugo/LICENSE
+/centrifugo/README.md
 
 # Logs
 logs

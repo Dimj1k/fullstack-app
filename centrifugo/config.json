@@ -1,0 +1,19 @@
+{
+    "token_rsa_public_key": "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAh9Em6Hyf1vYFA8NOgCOi\nbV38w8WjVNP1ztjzL1vNJnbQD3eC1Oc/3pZb1fl9d6YDYwoO6/d0r3L4DiVaYuNW\nroshnZbSUWYfSPtv+p3IglBTx0qvPxaYnlRHOcaZ392mgzUiz9tnv4plh7LxbWQt\n2l1StOnMAqmgssKEvIS91XY5p0zh7ZuwsxmF2QoAe8stsDWDxhGsr7wsvW3Z8n9R\nVoU+eUjNOKYGz1Z9QonSPfeXF61H8e9lrZ54XrGyQ6irYBDi4ogEXTLLPkXdBZMA\ncGRiC/ky2Yl4+Dzp4dBasKYNpBJ22ybo6sPG/I35GhB6LdMDQGVKYVM1tZBimIw8\naKv6YfHJN560Roih/nB8f1rduSBDdymP/H6oq99tgBs8wOviAm7v/skvynIoXeL0\nprzJALmg41HpUWyJ+LYQDzCWJlBhYE4TtYHrCC17Bw9KhsCbCy1G1XoBNtCP37Y5\nSZYn3OR/sGsntuYxcdCBRGO5lHcrjQwVFw8msZlCwfhEnZn/0UcpC/79sRzFwKMN\nqlc3cCAQ5bV0RYKRv6f7QiadzFmNkAxAQ2QCKU/3pM6oovQaY1O3hEoIA43Z5KYN\nxMdLISazHeT+KvIf7jjR7ftU3P4C2ZykFiSG/YkIAoo6bO//MNP+AtIsEUz0LyVn\nRFsGdClxA6vd1YLxBvK16t0CAwEAAQ==\n-----END PUBLIC KEY-----",
+    "admin_password": "admin",
+    "admin_secret": "admin",
+    "api_key": "32a41e48-ec4b-4604-8022-bb234d96b1c4",
+    "admin": true,
+    "history_size": 100,
+    "history_ttl": "3600s",
+    "allowed_origins": ["http://localhost:3000"],
+    "allow_subscribe_for_client": true,
+    "namespaces": [{
+        "name": "personal",
+        "history_size": 100,
+        "history_ttl": "3600s",
+        "allow_subscribe_for_client": true,
+        "allow_publish_for_subscriber": true,
+        "allow_publish_for_client": true
+    }]
+}
