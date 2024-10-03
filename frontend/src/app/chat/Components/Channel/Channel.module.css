@@ -12,13 +12,36 @@
     justify-content: center;
 }
 
-.content {
+.window {
     height: 80%;
     width: 400px;
-    overflow-y: auto;
     background-color: var(--background);
     display: flex;
+    gap: 10px;
     flex-direction: column
+}
+
+.close {
+    align-self: flex-end;
+    cursor: pointer;
+    height: 20pt;
+    width: 20pt;
+    font-size: 20pt;
+    text-align: center;
+    border-radius: 2px;
+}
+
+.close:hover {
+    background-color: beige;
+}
+
+.close::before {
+    content: 'X';
+}
+
+.content {
+    height: 90%;
+    overflow-y: auto;
 }
 
 .msg {
@@ -26,15 +49,20 @@
     margin: 5px;
     border-radius: 2px;
     background-color: beige;
+    text-wrap: wrap;
+}
+
+.publisher {
+    font-size: 10px;
 }
 
 .u-msg {
     background-color: var(--primary-color);
+    text-align: end;
 }
 
 .input {
-    margin-top: auto;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 @media (prefers-color-scheme: dark) {

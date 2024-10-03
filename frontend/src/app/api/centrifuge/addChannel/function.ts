@@ -1,4 +1,3 @@
-import 'server-only'
 import {nanoid} from '@reduxjs/toolkit'
 import {Mutex} from 'async-mutex'
 import {writeFile} from 'fs/promises'
@@ -18,12 +17,10 @@ export const addChannel = async (...userIds: string[]) => {
 			if (!userIdChannels) {
 				allChannels[userId] = [newChannel]
 			} else {
-				if (!userIdChannels.includes(newChannel)) {
-					userIdChannels.push(newChannel)
-				}
+				userIdChannels.push(newChannel)
 			}
 		}
-		await writeFile(channelsJson, JSON.stringify(allChannels))
+		await writeFile(channelsJson, JSON.stringify(allChannels), 'utf-8')
 		return NextResponse.json({newChannel}, {status: 201})
 	} catch (error) {
 		return NextResponse.json(error, {status: 500})

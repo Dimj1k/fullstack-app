@@ -62,3 +62,10 @@ h1 {
         --max-width: 780px;
     }
 }
+
+@media screen and (width < 780px) {
+     :root {
+        --default-font-size: 6pt;
+        --max-width: auto;
+    }
+}

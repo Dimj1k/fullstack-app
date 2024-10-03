@@ -1,4 +1,3 @@
-import 'server-only'
 import {readFile} from 'fs/promises'
 import {channelsJson, isExists} from '../../utils'
 import {NextResponse} from 'next/server'

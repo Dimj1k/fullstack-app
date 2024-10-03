@@ -1,4 +1,4 @@
-import {FormEvent, HTMLProps, useRef, useState} from 'react'
+import {FormEvent, HTMLProps, memo, useRef, useState} from 'react'
 import styles from './ImageInput.module.css'
 import stylesButton from '../ArrayInput/ArrayInput.module.css'
 import Image from 'next/image'

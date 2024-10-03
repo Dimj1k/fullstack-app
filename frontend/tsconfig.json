@@ -16,6 +16,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "strictPropertyInitialization": false,
+    "forceConsistentCasingInFileNames": false,
     "jsx": "preserve",
     "incremental": true,
     "plugins": [

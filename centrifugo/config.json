@@ -14,6 +14,7 @@
         "history_ttl": "3600s",
         "allow_subscribe_for_client": true,
         "allow_publish_for_subscriber": true,
-        "allow_publish_for_client": true
+        "allow_publish_for_client": true,
+        "allow_history_for_subscriber": true
     }]
 }

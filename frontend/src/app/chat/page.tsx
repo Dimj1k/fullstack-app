@@ -18,16 +18,14 @@ export default function Chat() {
 			getMyChannels(userId)
 		}
 	}, [userId])
-	const onSubmit = useCallback(
-		(event: FormEvent<HTMLFormElement>) => {
-			event.preventDefault()
-			const {
-				toUserId: {value},
-			} = event.target as EventTarget & {toUserId: {value: string}}
-			if (value) addNewChannel([userId, value])
-		},
-		[userId, addNewChannel],
-	)
+	const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault()
+		const {
+			toUserId: {value},
+		} = event.target as EventTarget & {toUserId: {value: string}}
+		if (value) addNewChannel([userId, value])
+	}
+
 	return (
 		<CentrifugeContext.Provider value={{centrifuge, userId}}>
 			<AddChannel onSubmit={onSubmit} nameInput="toUserId" />

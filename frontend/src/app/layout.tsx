@@ -1,4 +1,4 @@
-import type {Metadata} from 'next'
+import type {Metadata, Viewport} from 'next'
 import './globals.css'
 import Header from './Components/Header/Header'
 import Footer from './Components/Footer/Footer'

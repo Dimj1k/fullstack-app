@@ -1,4 +1,5 @@
 import type {Metadata} from 'next'
+import {Fragment} from 'react'
 
 export const metadata: Metadata = {
 	title: 'Сообщения',
@@ -10,5 +11,5 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode
 }>) {
-	return <>{children}</>
+	return <Fragment>{children}</Fragment>
 }
