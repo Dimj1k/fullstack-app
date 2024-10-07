@@ -1,11 +1,9 @@
-'use client'
-import {useDispatch} from 'react-redux'
-import {StoreDispatch, notificationSlice} from '@/Rtk'
+import {notificationSlice, useAppDispatch} from '@/Rtk'
 import {useEffect} from 'react'
 import {bindActionCreators} from '@reduxjs/toolkit'
 
 export function useNotification(timeoutHideMs: number = 3000) {
-	const storeDispatch = useDispatch<StoreDispatch>()
+	const storeDispatch = useAppDispatch()
 	const dispatch = bindActionCreators(notificationSlice.actions, storeDispatch)
 	useEffect(() => {
 		dispatch.changeTimeOut({timeoutHideMs})

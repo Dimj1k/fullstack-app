@@ -4,8 +4,9 @@ import {isErrorFromApi} from '../interfaces'
 
 export const queryErrorMiddleware: Middleware = (api: MiddlewareAPI) => next => action => {
 	if (isRejectedWithValue(action) && !action.meta.aborted) {
-		if (isErrorFromApi(action.payload)) {
-			const message = action.payload.data.message
+		const err = action.payload
+		if (isErrorFromApi(err)) {
+			const {message} = err.data
 			if (message) {
 				api.dispatch(
 					notificationSlice.actions.show({

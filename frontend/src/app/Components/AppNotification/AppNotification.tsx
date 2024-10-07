@@ -1,16 +1,15 @@
 'use client'
 import {useRef, useEffect, Fragment, useLayoutEffect} from 'react'
-import {notificationSlice, StoreDispatch, TypesNotification, useAppSelector} from '@/Rtk'
+import {notificationSlice, TypesNotification, useAppDispatch, useAppSelector} from '@/Rtk'
 import cn from 'classnames'
 import styles from './AppNotification.module.css'
-import {useDispatch} from 'react-redux'
 
-export default function AppNotification() {
+export function AppNotification() {
 	const {messages, typeNotification, showTime, timeoutHideMs} = useAppSelector(
 		state => state.notification,
 	)
 	const ref = useRef<HTMLDivElement>(null)
-	const storeDispatch = useDispatch<StoreDispatch>()
+	const storeDispatch = useAppDispatch()
 	useLayoutEffect(() => {
 		if (typeNotification === TypesNotification.NOTHING) return
 		const div = ref.current

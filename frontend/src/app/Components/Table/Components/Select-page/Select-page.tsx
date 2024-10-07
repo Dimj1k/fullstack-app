@@ -1,15 +1,15 @@
-import {Suspense, useState} from 'react'
+import {memo, Suspense, useState} from 'react'
 import styles from './Select-page.module.css'
 import {usePathname, useRouter, useSearchParams} from 'next/navigation'
 import Link from '../../../Link/Link'
 import {paramsToUrl} from '@/Utils/url-search-params'
 
-export function SelectPage({datalength}: {datalength: number}) {
+export const SelectPage = memo(function SelectPage({datalength}: {datalength: number}) {
 	const pathname = usePathname()
 	const searchParams = useSearchParams()
 	const router = useRouter()
 	const [take, setTake] = useState(Number(searchParams.get('take')) ?? 5)
-	const pages = new Array(Math.ceil(datalength / take)).fill(<></>)
+	const pages = new Array(Math.ceil(datalength / take)).fill(null)
 	const currentPage = searchParams.get('page')
 	return (
 		<Suspense fallback={<p>Загрузка...</p>}>
@@ -45,4 +45,4 @@ export function SelectPage({datalength}: {datalength: number}) {
 			</div>
 		</Suspense>
 	)
-}
+})

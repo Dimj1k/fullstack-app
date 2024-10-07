@@ -25,7 +25,7 @@ export function List<T extends Data>({
 		if (!isNaN(startIndex) && startIndex >= 0) {
 			setOnItem(startIndex * take)
 		}
-	}, [startIndex])
+	}, [startIndex, setOnItem, take])
 	return (
 		<div
 			data-testid="List"

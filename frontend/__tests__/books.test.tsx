@@ -3,7 +3,7 @@ import BooksPage from '@/app/books/page'
 import StoreProvider from '../src/Rtk/provider'
 import {mockServer, searchParams} from './mocks/api.mock'
 import {mockBooks} from './mocks/data/books.mock'
-import {baseApi, store} from '../src/Rtk'
+import {authApi, baseApi, store} from '../src/Rtk'
 
 const getTakeAndSkip = () => {
 	return new Promise<{take: string; skip: string}>(resolve => {
@@ -25,6 +25,7 @@ const server = mockServer()
 
 let booksPage: RenderResult
 beforeEach(() => {
+	store.dispatch(authApi.endpoints.me.initiate())
 	booksPage = render(
 		<StoreProvider>
 			<BooksPage />

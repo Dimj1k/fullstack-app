@@ -34,6 +34,7 @@ export default function EmailAndPasswordInputs({
 						value={email as string}
 						onChange={event => validator(event, TypeActions.onChangeEmail)}
 						valid={isValid.email ? 1 : 0}
+						autoComplete="on"
 						{...props}
 					/>
 				)}
@@ -57,6 +58,7 @@ export default function EmailAndPasswordInputs({
 				{withoutEmail || (
 					<Input
 						name="email"
+						autoComplete="on"
 						placeholder="Электронная почта"
 						type="text"
 						gridArea={gridArea?.forEmail}

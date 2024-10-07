@@ -1,30 +1,15 @@
 import {nanoid} from '@reduxjs/toolkit'
-import {Mutex} from 'async-mutex'
-import {writeFile} from 'fs/promises'
-import {channelsJson} from '../../utils'
-import {getAllChannels} from '../getChannelsByUserId'
 import {NextResponse} from 'next/server'
+import {Channels, connectToMongo} from '@/mongo'
 
-const mutex = new Mutex()
-export const addChannel = async (...userIds: string[]) => {
-	await mutex.waitForUnlock()
-	const release = await mutex.acquire()
+export const addChannel = async (...members: string[]) => {
+	const channelName = nanoid()
 	try {
-		const newChannel = nanoid()
-		const allChannels = await getAllChannels()
-		for (const userId of userIds) {
-			const userIdChannels = allChannels[userId]
-			if (!userIdChannels) {
-				allChannels[userId] = [newChannel]
-			} else {
-				userIdChannels.push(newChannel)
-			}
-		}
-		await writeFile(channelsJson, JSON.stringify(allChannels), 'utf-8')
-		return NextResponse.json({newChannel}, {status: 201})
+		await connectToMongo()
+		const newChannel = new Channels({channelName, members})
+		await newChannel.save()
+		return NextResponse.json({channelName}, {status: 201})
 	} catch (error) {
 		return NextResponse.json(error, {status: 500})
-	} finally {
-		release()
 	}
 }

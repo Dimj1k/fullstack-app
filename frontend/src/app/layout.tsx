@@ -1,9 +1,9 @@
-import type {Metadata, Viewport} from 'next'
+import type {Metadata} from 'next'
 import './globals.css'
 import Header from './Components/Header/Header'
 import Footer from './Components/Footer/Footer'
 import StoreProvider from '@/Rtk/provider'
-import AppNotification from './Components/AppNotification/AppNotification'
+import {AppNotification} from './Components/AppNotification'
 
 export const metadata: Metadata = {
 	title: 'Create Next App',

@@ -1,7 +1,7 @@
 import {FormEvent, HTMLProps} from 'react'
 import Form from '@/app/Components/Form/Form'
-import {Input} from '../../../Components/Input'
-import Button from '../../../Components/Button/Button'
+import {Input} from '@/app/Components/Input'
+import Button from '@/app/Components/Button/Button'
 
 export const AddChannel: React.FC<
 	HTMLProps<HTMLFormElement> & {

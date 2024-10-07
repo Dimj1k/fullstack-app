@@ -1,4 +1,4 @@
-import {NextRequest, NextResponse} from 'next/server'
+import {type NextRequest, NextResponse} from 'next/server'
 import {getChannelsByUserId} from './function'
 import {searchParams} from '../../utils'
 

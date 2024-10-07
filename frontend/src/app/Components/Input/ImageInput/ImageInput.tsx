@@ -4,7 +4,9 @@ import stylesButton from '../ArrayInput/ArrayInput.module.css'
 import Image from 'next/image'
 import {RequireKeys} from '@/Interfaces'
 
-export function ImageInput(props: RequireKeys<HTMLProps<HTMLInputElement>, 'name'>) {
+export const ImageInput = memo(function ImageInput(
+	props: RequireKeys<HTMLProps<HTMLInputElement>, 'name'>,
+) {
 	const [image, setImage] = useState<File | null>(null)
 	const ref = useRef<HTMLInputElement | null>(null)
 
@@ -56,7 +58,7 @@ export function ImageInput(props: RequireKeys<HTMLProps<HTMLInputElement>, 'name
 			)}
 		</div>
 	)
-}
+})
 
 function returnFileSize(fileSize: number) {
 	if (fileSize < 1 << 10) {

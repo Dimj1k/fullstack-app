@@ -27,6 +27,7 @@ export function Input({gridArea, ...props}: InputProps) {
 			<div style={{gridArea}}>
 				{prepend}
 				<input
+					autoComplete="off"
 					className={cn(styles.input, {[styles.invalid]: !valid})}
 					{...props}
 					onChange={onChange}
@@ -38,7 +39,7 @@ export function Input({gridArea, ...props}: InputProps) {
 	return (
 		<div style={{gridArea}}>
 			{prepend}
-			<input className={styles.input} {...props} />
+			<input className={styles.input} autoComplete="off" {...props} />
 		</div>
 	)
 }

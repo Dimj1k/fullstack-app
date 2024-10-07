@@ -12,7 +12,8 @@ const nextConfig = {
     'reactStrictMode': true,
     'env': {
         API: 'http://localhost:3002/api',
-        CENTRIFUGE: 'ws://localhost:8000/connection/websocket'
+        CENTRIFUGE: 'ws://localhost:8000/connection/websocket',
+        MONGO_DB: "mongodb://localhost:27017"
     },
 };
 

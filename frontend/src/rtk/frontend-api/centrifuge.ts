@@ -14,7 +14,7 @@ export const centrifugeApi = frontendBaseApi.injectEndpoints({
 		}),
 		addChannel: builder.mutation<{newChannel: string}, string[]>({
 			query: body => ({url: 'centrifuge/addChannel', body, method: 'POST'}),
-			invalidatesTags: ['channels'],
+			invalidatesTags: (_, error) => (error ? [] : ['channels']),
 		}),
 	}),
 })

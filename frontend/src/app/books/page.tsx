@@ -16,8 +16,10 @@ export default function BooksPage() {
 		take,
 	})
 	useEffect(() => {
-		if (accessToken) me()
-	}, [accessToken])
+		if (accessToken) {
+			me()
+		}
+	}, [accessToken, me])
 	return (
 		<>
 			{(dataBooks && (

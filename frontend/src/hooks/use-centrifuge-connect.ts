@@ -26,16 +26,16 @@ export const useCentrifugeConnect = (replaceRouter = '/') => {
 		[userId, refreshToken],
 	)
 	useEffect(() => {
-		if (!centrifuge) {
-			router.replace(replaceRouter)
-		} else {
+		if (centrifuge) {
 			centrifuge.connect()
+		} else {
+			router.replace(replaceRouter)
 		}
 		return () => {
 			if (centrifuge) {
 				centrifuge.disconnect()
 			}
 		}
-	}, [centrifuge])
+	}, [centrifuge, router, replaceRouter])
 	return centrifuge
 }

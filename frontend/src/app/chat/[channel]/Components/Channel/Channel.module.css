@@ -1,0 +1,26 @@
+.content {
+    height: 90%;
+    overflow-y: auto;
+}
+
+.msg {
+    font-size: 16pt;
+    margin: 5px;
+    border-radius: 2px;
+    background-color: beige;
+    word-wrap: break-word;
+    text-wrap: wrap;
+}
+
+.publisher {
+    font-size: 10px;
+}
+
+.u-msg {
+    background-color: var(--primary-color);
+    text-align: end;
+}
+
+.input {
+    margin-bottom: 5px;
+}

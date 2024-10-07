@@ -12,7 +12,7 @@ export const booksApi = baseApi.injectEndpoints({
 				// headers: {'Content-Type': 'multipart/form-data'},
 				method: 'POST',
 			}),
-			invalidatesTags: [{type: 'books', id: 'NEW_BOOK'}],
+			invalidatesTags: ['books'],
 			async onQueryStarted(_, {dispatch, queryFulfilled}) {
 				const showNotification = notificationSlice.actions.show
 				try {
@@ -28,13 +28,7 @@ export const booksApi = baseApi.injectEndpoints({
 		}),
 		findBooks: builder.query<Book[], ParamsFindBooks>({
 			query: params => ({url: 'books/find-all', params}),
-			providesTags: result =>
-				result
-					? [
-							...result.map(book => ({type: 'books' as const, id: book.book_id})),
-							{type: 'books', id: 'NEW_BOOK'},
-						]
-					: [{type: 'books', id: 'NEW_BOOK'}],
+			providesTags: ['books'],
 			keepUnusedDataFor: 60,
 			transformResponse(baseQueryReturnValue: Book<'arr'>[]) {
 				return baseQueryReturnValue.map(({genres, ...book}) => ({

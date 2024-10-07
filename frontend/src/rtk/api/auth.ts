@@ -1,4 +1,4 @@
-import {IAuth, ILogin, InfoUser} from '../interfaces'
+import {IAuth, ILogin, InfoUser, isErrorFromApi} from '../interfaces'
 import {jwtSlice} from '../slices'
 import {notificationSlice, TypesNotification} from '../slices/notification'
 import {baseApi} from './base'
@@ -23,7 +23,7 @@ export const authApi = baseApi.injectEndpoints({
 					)
 				} catch {}
 			},
-			invalidatesTags: ['jwt'],
+			invalidatesTags: (_, err) => (err ? [] : ['jwt']),
 		}),
 		refreshTokens: builder.mutation<IAuth, void>({
 			query: () => ({url: 'auth/refresh-tokens', method: 'POST'}),
@@ -34,11 +34,17 @@ export const authApi = baseApi.injectEndpoints({
 				try {
 					const {data} = await queryFulfilled
 					dispatch(jwtSlice.actions.addJwt(data))
-				} catch {
-					dispatch(jwtSlice.actions.deleteJwt())
+				} catch (err) {
+					if (isErrorFromApi(err)) {
+						if (err.status === 401) {
+							dispatch(jwtSlice.actions.deleteJwt())
+						}
+					} else if (err && typeof err == 'object' && 'error' in err && isErrorFromApi(err.error)) {
+						dispatch(jwtSlice.actions.deleteJwt())
+					}
 				}
 			},
-			invalidatesTags: ['jwt'],
+			invalidatesTags: (_, err) => (err ? [] : ['jwt']),
 		}),
 		logout: builder.mutation<void, void>({
 			query: () => ({url: 'auth/logout', method: 'POST'}),
@@ -51,7 +57,7 @@ export const authApi = baseApi.injectEndpoints({
 					dispatch(jwtSlice.actions.deleteJwt())
 				} catch {}
 			},
-			invalidatesTags: ['jwt'],
+			invalidatesTags: (_, err) => (err ? [] : ['jwt']),
 		}),
 		me: builder.query<InfoUser, void>({
 			query: () => ({url: 'users/me'}),
