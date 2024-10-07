@@ -19,7 +19,6 @@ describe('Ввод кода в CodeInput', () => {
 		const validCode = '123421'
 		expect(inputs.length).toBe(6)
 		let onInput = 0
-		inputs[onInput].focus()
 		for (const char of validCode) {
 			await userEvent.type(inputs[onInput], char)
 			if (onInput < inputs.length - 1) {
@@ -58,9 +57,6 @@ describe('Ввод кода в CodeInput', () => {
 })
 
 describe('Вставка кода в CodeInput', () => {
-	beforeEach(async () => {
-		inputs[0].focus()
-	})
 	test('Вставка кода 6 цифр', async () => {
 		const clipboardData = '669821'
 		await userEvent.paste(clipboardData)
@@ -143,7 +139,6 @@ describe('Перемещение по CodeInput', () => {
 		})
 	})
 	test('Клавиши передвижения', async () => {
-		inputs[0].focus()
 		await userEvent.keyboard('{ArrowRight}')
 		expect(inputs[1].tabIndex).toBe(0)
 		expect(inputs[0].tabIndex).toBe(-1)

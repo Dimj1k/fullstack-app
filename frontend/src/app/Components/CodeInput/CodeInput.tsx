@@ -21,18 +21,15 @@ export function CodeInput({
 } & HTMLProps<HTMLInputElement>) {
 	const maxIdx = length - 1
 	const [inputsCode, setInputsCode] = useState<number[]>(new Array(length).fill(-1))
-	const onInput = inputsCode.findIndex(v => v == 0)
+	const idx = inputsCode.findIndex(v => v == 0)
+	const onInput = idx == -1 ? 0 : idx
 	const [codeValues, setCodeValues] = useState<Record<number, string>>({
 		...new Array(length).fill(''),
 	})
 	const inputsRefArray = useRef<(HTMLInputElement | null)[]>(new Array(length))
 	useEffect(() => {
-		if (onInput != -1) {
-			inputsRefArray.current[onInput]?.focus()
-			inputsRefArray.current[onInput]?.select()
-		} else {
-			inputsRefArray.current[0]?.focus()
-		}
+		inputsRefArray.current[onInput]?.focus()
+		inputsRefArray.current[onInput]?.select()
 	}, [isLoading, codeValues, onInput])
 
 	const constructInputs = (currentInput: number) => {
