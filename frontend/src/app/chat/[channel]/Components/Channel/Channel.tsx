@@ -25,7 +25,7 @@ export const Channel: React.FC<{channel: string}> = ({channel}) => {
 			centrifuge.newSubscription(`personal:${channel}`)
 		sub.subscribe()
 		setSub(sub)
-		sub.history({limit: 100}).then(({publications}) => {
+		sub.history({limit: -1}).then(({publications}) => {
 			if (historyUpdate) {
 				flushSync(() => setMessages(messages => [...messages, ...publications]))
 				content.scrollTo(0, content.scrollHeight)
@@ -52,13 +52,13 @@ export const Channel: React.FC<{channel: string}> = ({channel}) => {
 		}
 	}, [messages])
 
-	const closeChannel = useCallback(() => {
+	const closeChannel = () => {
 		if (!sub) return
 		router.back()
 		setMessages([])
 		sub.removeAllListeners('publication')
 		sub.unsubscribe()
-	}, [sub, router, setMessages])
+	}
 
 	const sendMessage = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()

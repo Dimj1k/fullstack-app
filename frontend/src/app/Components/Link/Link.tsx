@@ -16,17 +16,9 @@ export default function Link({
 	LinkProps & {style?: CSSProperties; additionalhrefs?: Url[]; here?: boolean}
 >) {
 	const pathName = usePathname()
-	const router = useRouter()
-	const onKeyDown = (e: KeyboardEvent<HTMLAnchorElement>) => {
-		if (e.key == ' ' || e.key == 'Enter') {
-			e.preventDefault()
-			router.push(href as string)
-		}
-	}
 	return (
 		<_Link
 			href={href}
-			onKeyDown={onKeyDown}
 			className={cn(styles.link, {
 				[styles.here]: href == pathName || additionalhrefs?.some(v => v == pathName) || here,
 			})}

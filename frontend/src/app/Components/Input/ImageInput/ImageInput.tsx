@@ -1,4 +1,4 @@
-import {FormEvent, HTMLProps, memo, useRef, useState} from 'react'
+import {FormEvent, HTMLProps, memo, useId, useRef, useState} from 'react'
 import styles from './ImageInput.module.css'
 import stylesButton from '../ArrayInput/ArrayInput.module.css'
 import Image from 'next/image'
@@ -9,6 +9,7 @@ export const ImageInput = memo(function ImageInput(
 ) {
 	const [image, setImage] = useState<File | null>(null)
 	const ref = useRef<HTMLInputElement | null>(null)
+	const imageId = useId()
 
 	const onChange = (event: FormEvent<HTMLInputElement>) => {
 		const image = (event.target as EventTarget & HTMLInputElement).files?.[0]
@@ -18,7 +19,7 @@ export const ImageInput = memo(function ImageInput(
 	return (
 		<div className={styles['image-div']}>
 			<label
-				htmlFor="image-uploads"
+				htmlFor={imageId}
 				role="button"
 				className={stylesButton.button}
 				tabIndex={0}
@@ -35,7 +36,7 @@ export const ImageInput = memo(function ImageInput(
 				ref={ref}
 				onChange={onChange}
 				accept="image/png, image/jpeg, image/gif, image/webp"
-				id="image-uploads"
+				id={imageId}
 				className={styles['image-uploads']}
 				{...props}
 			/>

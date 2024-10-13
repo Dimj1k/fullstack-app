@@ -1,4 +1,4 @@
-import {HTMLProps} from 'react'
+import {HTMLProps, useId} from 'react'
 import styles from './Input.module.css'
 import {RequireKeys} from '@/Interfaces'
 import cn from 'classnames'
@@ -13,11 +13,16 @@ export function Input({
 	...props
 }: ControllingInputProps): React.JSX.Element
 export function Input({gridArea, ...props}: InputProps) {
+	const inputId = useId()
 	const prepend =
 		'prepend' in props ? (
-			<p>{props.prepend}</p>
+			<label htmlFor={inputId}>
+				<p>{props.prepend}</p>
+			</label>
 		) : 'placeholder' in props ? (
-			<p>{props.placeholder}</p>
+			<label htmlFor={inputId}>
+				<p>{props.placeholder}</p>
+			</label>
 		) : (
 			<></>
 		)
@@ -30,6 +35,7 @@ export function Input({gridArea, ...props}: InputProps) {
 					autoComplete="off"
 					className={cn(styles.input, {[styles.invalid]: !valid})}
 					{...props}
+					id={inputId}
 					onChange={onChange}
 					value={value}
 				/>
@@ -39,7 +45,7 @@ export function Input({gridArea, ...props}: InputProps) {
 	return (
 		<div style={{gridArea}}>
 			{prepend}
-			<input className={styles.input} autoComplete="off" {...props} />
+			<input className={styles.input} autoComplete="off" id={inputId} {...props} />
 		</div>
 	)
 }

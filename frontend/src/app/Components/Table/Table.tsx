@@ -232,9 +232,8 @@ export default function Table<T extends Data>({
 							onTouchStart={event => onDragStartRow(event.touches[0], idx)}
 							onTouchMove={event => onDragRow(event.touches[0], idx)}
 							onTouchEnd={event => onDragEndRow(event.changedTouches[0], idx)}
-							draggable>
-							::
-						</div>
+							draggable
+						/>
 						{keys.map(({key}) => {
 							const value = v[key]
 							return (

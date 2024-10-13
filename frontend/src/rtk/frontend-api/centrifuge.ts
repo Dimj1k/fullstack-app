@@ -4,7 +4,14 @@ export const centrifugeApi = frontendBaseApi.injectEndpoints({
 	overrideExisting: 'throw',
 	endpoints: builder => ({
 		getMyChannels: builder.query<{channel: string}[], string>({
-			query: userId => ({url: 'centrifuge/getChannelsByUserId', params: {userId}}),
+			query: userId => ({
+				url: 'centrifuge/getChannelsByUserId',
+				params: {userId},
+				timeout: 2000,
+				responseHandler: response => {
+					return response.json()
+				},
+			}),
 			providesTags: ['channels'],
 			transformResponse: (res: string[]) => {
 				return res.map(channel => ({

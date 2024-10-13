@@ -37,7 +37,7 @@ export default function ChatLayout({
 			<div className={styles.channels}>
 				{isSuccess &&
 					data.map(({channel}) => (
-						<Link key={channel} href={`chat/${channel}`} scroll={false}>
+						<Link key={channel} href={`chat/${channel}`} scroll={false} prefetch={false}>
 							Канал {channel}
 						</Link>
 					))}

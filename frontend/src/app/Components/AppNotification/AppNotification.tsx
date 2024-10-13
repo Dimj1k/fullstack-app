@@ -61,7 +61,7 @@ export function AppNotification() {
 	return (
 		<div
 			className={cn(styles.notification, styles[typeNotification.toLowerCase()])}
-			role="notification"
+			role="status"
 			ref={ref}>
 			{message}
 		</div>

@@ -37,6 +37,10 @@
     cursor: row-resize;
 }
 
+.drag::after {
+    content: '::'
+}
+
 .first-row,
 .cell {
     outline: 1px solid var(--foreground);
